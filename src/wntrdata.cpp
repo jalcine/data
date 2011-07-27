@@ -1,0 +1,48 @@
+/**
+ * @author Jacky Alcine <jacky.alcine@thesii.org>
+ * @legalese
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ * @endlegalese
+ */
+
+#include <boost/python.hpp>
+#include "config.hpp"
+#include "wntrdata.hpp"
+
+using namespace boost::python;
+
+namespace Wintermute {
+    namespace Data {
+        void Configuration::Initialize( void ) {
+            Wintermute::Data::Ontology::Configuration::Initialize();
+            Wintermute::Data::Linguistics::Configuration::Initialize(Configuration::getDirectory() + string("/linguistics"));
+        }
+
+        void Configuration::Deinitialize( void ) {
+            Wintermute::Data::Ontology::Configuration::Deinitialize();
+            Wintermute::Data::Linguistics::Configuration::Deinitialize();
+        }
+
+        BOOST_PYTHON_MODULE(wntrdata){
+            class_<Configuration>("Configuration",no_init)
+                    .def("Initialize",Configuration::Initialize)
+                    .def("Deinitialize",Configuration::Deinitialize);
+
+            //class_<SaveModel>("SaveModel",no_init).def("save",SaveModel::save);
+            //class_<LoadModel>("LoadModel",no_init).def("load",LoadModel::load);
+        }
+    }
+}

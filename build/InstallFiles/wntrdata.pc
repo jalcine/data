@@ -1,0 +1,14 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: Wintermute Database (library)
+Description: Library and development files for Wintermute's database.
+Version: 0.0.1
+URL: https://www.launchpad.net/wintermute
+Requires: 
+Conflicts: wntrdata > 0.0.1
+Libs: -L${libdir} -lwntrdata
+Libs.private: -lm
+Cflags: -I${includedir}/wntr/data
