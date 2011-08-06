@@ -1,0 +1,35 @@
+<!--
+	core.xml - Wintermute's core ontology.
+	
+	<description>
+	This ontology is a meta-ontology; meaning that it only holds links to 
+	other ontologies. This allow modularity of Wintermute and gives it the
+	ability to enable and disable knowledge at whim.
+	</description>
+-->
+<!DOCTYPE rdf:RDF [
+   <!ENTITY owl "http://www.w3.org/2002/07/owl#">
+   <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#">
+   <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#">
+]>
+
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:snap="http://www.ifomis.org/bfo/1.0/snap#"
+    xmlns:span="http://www.ifomis.org/bfo/1.0/span#"
+    xmlns="http://micra.com/COSMO/COSMO.owl#"
+    xml:base="http://micra.com/COSMO/COSMO.owl">
+	
+	<owl:Ontology rdf="core.xml">
+		<rdfs:comment>
+			This ontology is a meta-ontology; meaning that it only holds links to 
+			other ontologies. This allow modularity of Wintermute and gives it the
+			ability to enable and disable knowledge at whim.
+		</rdfs:comment>
+
+	</owl:Ontology>
+</rdf:RDF>
