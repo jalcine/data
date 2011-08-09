@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+
+ -->
+<RuleSet locale="en">
+  <Rule type="Ae"> <!-- personal pronouns -->
+    <Bind with="C,D" subtype="n" format="only" />
+    <Bind with="B,E" subtype="p" format="only" />
+    <Bind with="none" subtype="o" format="only" />
+  </Rule>
+  
+  <Rule type="Ad" primary="B"> <!-- demonstrative pronouns -->
+    <Bind with="B,D,E" format="only" />
+  </Rule>
+  
+  <Rule type="B" primary="B"> <!-- proper nouns -->
+    <Bind with="B,D,E" format="only" />
+  </Rule>
+
+  <Rule type="C" primary="B">
+    <Bind with="A,B,C,D,E,F" format="only" />
+  </Rule>
+</RuleSet>
