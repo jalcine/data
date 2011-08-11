@@ -1,0 +1,474 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!--
+    XML storage of Wintermute's linguistical database.
+
+    @author Jacky Alcine <jacky.alcine@thesii.org>
+    @date 31 March 2011 15:06:28 UTC-4
+-->
+<Collection>
+    <!-- START PRONOUNS -->
+
+    <!-- start English personal pronouns -->
+    <Lexicon symbol="I">
+        <Link ontoid="0" flags="Aen1" />
+    </Lexicon>
+    <Lexicon symbol="we">
+        <Link ontoid="0" flags="Aen1*" />
+    </Lexicon>
+    <Lexicon symbol="me">
+        <Link ontoid="0" flags="Aeo1" />
+    </Lexicon>
+    <Lexicon symbol="us">
+        <Link ontoid="0" flags="Aeo1*" />
+    </Lexicon>
+    <Lexicon symbol="our">
+        <Link ontoid="0" flags="Aep1*" />
+    </Lexicon>
+    <Lexicon symbol="you">
+        <Link ontoid="0" flags="Aen2" />
+        <Link ontoid="0" flags="Aen2*" />
+        <Link ontoid="0" flags="Aeo2" />
+        <Link ontoid="0" flags="Aeo2*" />
+    </Lexicon>
+    <Lexicon symbol="your">
+        <Link ontoid="0" flags="Aep2" />
+        <Link ontoid="0" flags="Aep2*" />
+    </Lexicon>
+    <Lexicon symbol="he">
+        <Link ontoid="0" flags="Aen3@" />
+    </Lexicon>
+    <Lexicon symbol="his">
+        <Link ontoid="0" flags="Aep3@" />
+    </Lexicon>
+    <Lexicon symbol="she">
+        <Link ontoid="0" flags="Aen3#" />
+    </Lexicon>
+    <Lexicon symbol="her">
+        <Link ontoid="0" flags="Aep3#" />
+        <Link ontoid="0" flags="Aeo3#" />
+    </Lexicon>
+    <Lexicon symbol="it">
+        <Link ontoid="0" flags="Aen3!" />
+        <Link ontoid="0" flags="Aeo3!" />
+    </Lexicon>
+    <Lexicon symbol="its">
+        <Link ontoid="0" flags="Aep3!" />
+    </Lexicon>
+    <Lexicon symbol="they">
+        <Link ontoid="0" flags="Aen3@*" />
+        <Link ontoid="0" flags="Aen3#*" />
+        <Link ontoid="0" flags="Aen3!*" />
+    </Lexicon>
+    <Lexicon symbol="their">
+        <Link ontoid="0" flags="Aep3@*" />
+        <Link ontoid="0" flags="Aep3#*" />
+        <Link ontoid="0" flags="Aep3!*" />
+    </Lexicon>
+    <Lexicon symbol="them">
+        <Link ontoid="0" flags="Aeo3@*" />
+        <Link ontoid="0" flags="Aeo3#*" />
+        <Link ontoid="0" flags="Aeo3!*" />
+    </Lexicon>
+    <!-- end English personal pronouns -->
+
+	<!-- start English demonstrative pronouns -->
+	<Lexicon symbol="this">
+		<Link ontoid="0" flags="Ads" />
+	</Lexicon>
+	<Lexicon symbol="that">
+		<Link ontoid="0" flags="Ado" />
+	</Lexicon>
+	<Lexicon symbol="these">
+		<Link ontoid="0" flags="Ads*" />
+	</Lexicon>
+	<Lexicon symbol="those">
+		<Link ontoid="0" flags="Ado*" />
+	</Lexicon>
+	<Lexicon symbol="there">
+		<Link ontoid="0" flags="Adk+" />
+	</Lexicon>
+	<Lexicon symbol="here">
+		<Link ontoid="0" flags="Adk-" />
+	</Lexicon>
+	<Lexicon symbol="yesterday">
+		<Link ontoid="0" flags="Adt-" />
+	</Lexicon>
+	<Lexicon symbol="today">
+		<Link ontoid="0" flag="Adt|" />
+	</Lexicon>
+	<Lexicon symbol="tomorrow">
+		<Link ontoid="0" flags="Adt+" />
+	</Lexicon>
+	<!-- end English demonstrative pronouns -->
+
+	<!-- start English relative pronouns -->
+	<Lexicon symbol="what"></Lexicon>
+	<Lexicon symbol="who"></Lexicon>
+	<Lexicon symbol="which"></Lexicon>
+	<Lexicon symbol="whom"></Lexicon>
+	<Lexicon symbol="whose"></Lexicon>
+	<Lexicon symbol="that"></Lexicon>
+	<!-- end English relative pronouns -->
+
+	<!-- start English indefinite pronouns -->
+	<Lexicon symbol="all"></Lexicon>
+	<Lexicon symbol="another"></Lexicon>
+	<Lexicon symbol="any"></Lexicon>
+	<Lexicon symbol="anybody"></Lexicon>
+	<Lexicon symbol="anyone"></Lexicon>
+	<Lexicon symbol="anything"></Lexicon>
+	<Lexicon symbol="both"></Lexicon>
+	<Lexicon symbol="each"></Lexicon>
+	<Lexicon symbol="either"></Lexicon>
+	<Lexicon symbol="everybody"></Lexicon>
+	<Lexicon symbol="everyone"></Lexicon>
+	<Lexicon symbol="everything"></Lexicon>
+	<Lexicon symbol="few"></Lexicon>
+	<Lexicon symbol="many"></Lexicon>
+	<Lexicon symbol="most"></Lexicon>
+	<Lexicon symbol="much"></Lexicon>
+	<Lexicon symbol="neither"></Lexicon>
+	<Lexicon symbol="nobody"></Lexicon>
+	<Lexicon symbol="none"></Lexicon>
+	<Lexicon symbol="nothing"></Lexicon>
+	<Lexicon symbol="one"></Lexicon>
+	<Lexicon symbol="other"></Lexicon>
+	<Lexicon symbol="several"></Lexicon>
+	<Lexicon symbol="some"></Lexicon>
+	<Lexicon symbol="some"></Lexicon>
+	<Lexicon symbol="somebody"></Lexicon>
+	<Lexicon symbol="someone"></Lexicon>
+	<Lexicon symbol="something"></Lexicon>
+	<Lexicon symbol="such"></Lexicon>
+	<!-- end English indefinite pronouns -->
+	<!-- END PRONOUNS -->
+
+	<Lexicon symbol="aboard">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="about">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="above">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="according">
+		<Link ontoid="0" flags="Fm+" />
+	</Lexicon>
+	<Lexicon symbol="across">
+		<Link ontoid="0" flags="F+" />
+	</Lexicon>
+	<Lexicon symbol="after">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="against">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="along">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="alongside">
+		<Link ontoid="0" flags="F+" />
+	</Lexicon>
+	<Lexicon symbol="along">
+		<Link ontoid="0" flags="Fm+" />
+	</Lexicon>
+	<Lexicon symbol="amid">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="apart">
+		<Link ontoid="0" flags="Fm+" />
+	</Lexicon>
+	<Lexicon symbol="around">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="aside">
+		<Link ontoid="0" flags="Fm+" />
+	</Lexicon>
+	<Lexicon symbol="at">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="away">
+		<Link ontoid="0" flags="Fm+" />
+	</Lexicon>
+	<Lexicon symbol="because">
+		<Link ontoid="0" flags="Fm+" />
+	</Lexicon>
+	<Lexicon symbol="before">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="behind">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="below">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="beneath">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="beside">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="besides">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="between">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="beyond">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="by">
+		<Link ontoid="0" flags="F+" />
+	</Lexicon>
+	<Lexicon symbol="means">
+		<Link ontoid="0" flags="Fm+-" />
+	</Lexicon>
+	<!-- must remember 'by' and 'by means of'; should 'by THE means of' be included? -->
+	<Lexicon symbol="despite">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="down">
+		<Link ontoid="0" flags="F+" />
+	</Lexicon>
+	<Lexicon symbol="from">
+		<Link ontoid="0" flags="F+" />
+	</Lexicon>
+	<Lexicon symbol="during">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="except">
+		<Link ontoid="0" flags="F+" />
+	</Lexicon>
+	<Lexicon symbol="for">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="under">
+		<Link ontoid="0" flags="F+" />
+	</Lexicon>
+	<Lexicon symbol="in">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="addition">
+		<Link ontoid="0" flags="Fm+-" />
+	</Lexicon>
+	<Lexicon symbol="back">
+		<Link ontoid="0" flags="F+-" />
+	</Lexicon>
+	<Lexicon symbol="behalf">
+		<Link ontoid="0" flags="Fm+-" />
+	</Lexicon>
+	<Lexicon symbol="account">
+		<Link ontoid="0" flags="Fm+-" />
+	</Lexicon>
+	<Lexicon symbol="front">
+		<Link ontoid="0" flags="Fm+-" />
+	</Lexicon>
+	<Lexicon symbol="place">
+		<Link ontoid="0" flags="Fm+-" />
+	</Lexicon>
+	<Lexicon symbol="regard">
+		<Link ontoid="0" flags="Fm+-" />
+	</Lexicon>
+	<Lexicon symbol="inside">
+		<Link ontoid="0" flags="F+" />
+	</Lexicon>
+	<Lexicon symbol="of">
+		<Link ontoid="0" flags="F+" />
+	</Lexicon>
+	<Lexicon symbol="into">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="like">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="near">
+		<Link ontoid="0" flags="F+" />
+	</Lexicon>
+	<Lexicon symbol="off">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="on">
+		<Link ontoid="0" flags="F+" />
+	</Lexicon>
+	<Lexicon symbol="onto">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="top">
+		<Link ontoid="0" flags="Fm+-" />
+	</Lexicon>
+	<Lexicon symbol="opposite">
+		<Link ontoid="0" flags="F+" />
+	</Lexicon>
+	<Lexicon symbol="out">
+		<Link ontoid="0" flags="F+" />
+	</Lexicon>
+	<Lexicon symbol="outside">
+		<Link ontoid="0" flags="F+" />
+	</Lexicon>
+	<Lexicon symbol="over">
+		<Link ontoid="0" flags="F+" />
+	</Lexicon>
+	<Lexicon symbol="past">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="prior">
+		<Link ontoid="0" flags="Fm-" />
+	</Lexicon>
+	<Lexicon symbol="round">
+		<Link ontoid="0" flags="F-" />
+	</Lexicon>
+	<Lexicon symbol="save">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="since">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="subsequent">
+		<Link ontoid="0" flags="Fm-" />
+	</Lexicon>
+	<Lexicon symbol="together">
+		<Link ontoid="0" flags="Fm-" />
+	</Lexicon>
+	<Lexicon symbol="through">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="throughout">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="till">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="to">
+		<Link ontoid="0" flags="F+-" />
+	</Lexicon>
+	<Lexicon symbol="toward">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="under">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="underneath">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="until">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="unto">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="up">
+		<Link ontoid="0" flags="F+" />
+	</Lexicon>
+	<Lexicon symbol="upon">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="with">
+		<Link ontoid="0" flags="F+" />
+	</Lexicon>
+	<Lexicon symbol="within">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+	<Lexicon symbol="without">
+		<Link ontoid="0" flags="F" />
+	</Lexicon>
+
+	<Lexicon symbol="a">
+		<Link ontoid="0" flags="Ax" />
+	</Lexicon>
+	<Lexicon symbol="the">
+		<Link ontoid="0" flags="Ax" />
+	</Lexicon>
+
+	<!-- START VERBS -->
+	<Lexicon symbol="be">
+		<Link ontoid="1" flags="Ci" />
+	</Lexicon>
+	<Lexicon symbol="being">
+		<Link ontoid="1" flags="Cg"  />
+		<Link ontoid="1" flags="Cpr" />
+	</Lexicon>
+	<Lexicon symbol="been">
+		<Link ontoid="1" flags="Cpa" />
+	</Lexicon>
+	<Lexicon symbol="is">
+		<Link ontoid="1" flags="Cr3~" />
+	</Lexicon>
+	<Lexicon symbol="am">
+		<Link ontoid="1" flags="Cr1~" />
+	</Lexicon>
+	<Lexicon symbol="are">
+		<Link ontoid="1" flags="Cr1*" />
+		<Link ontoid="1" flags="Cr2~" />
+		<Link ontoid="1" flags="Cr2*" />
+		<Link ontoid="1" flags="Cr3*" />
+	</Lexicon>
+	<Lexicon symbol="were">
+		<Link ontoid="1" flags="Ca1*" />
+		<Link ontoid="1" flags="Ca2~" />
+		<Link ontoid="1" flags="Ca2*" />
+		<Link ontoid="1" flags="Ca3*" />
+	</Lexicon>
+	<Lexicon symbol="was">
+		<Link ontoid="1" flags="Ca1" />
+	</Lexicon>
+
+	<Lexicon symbol="go">
+		<Link ontoid="2" flags="Ci" />
+	</Lexicon>
+	<Lexicon symbol="goes">
+		<Link ontoid="2" flags="Cr3" />
+	</Lexicon>
+	<Lexicon symbol="going">
+		<Link ontoid="2" flags="Cg"  />
+		<Link ontoid="2" flags="Cpr" />
+	</Lexicon>
+	<Lexicon symbol="gone">
+	<Link ontoid="2" flags="Cpa" />
+	</Lexicon>
+	<Lexicon symbol="went">
+	<Link ontoid="2" flags="Ca" />
+	</Lexicon>
+
+	<Lexicon symbol="do">
+		<Link ontoid="3" flags="Ci" />
+	</Lexicon>
+	<Lexicon symbol="did">
+		<Link ontoid="3" flags="Cpa" />
+	</Lexicon>
+	<Lexicon symbol="done"></Lexicon>
+	<Lexicon symbol="does"></Lexicon>
+	<Lexicon symbol="doing"></Lexicon>
+
+	<Lexicon symbol="have"></Lexicon>
+	<Lexicon symbol="having"></Lexicon>
+	<Lexicon symbol="has"></Lexicon>
+	<Lexicon symbol="had"></Lexicon>
+	<!-- END VERBS -->
+
+	<!-- TENSE SENSTIVE WORDS -->
+	<Lexicon symbol="will"></Lexicon>
+	<Lexicon symbol="can"></Lexicon>
+	<Lexicon symbol="may"></Lexicon>
+	<Lexicon symbol="shall"></Lexicon>
+	<Lexicon symbol="would"></Lexicon>
+	<Lexicon symbol="should"></Lexicon>
+	<Lexicon symbol="could"></Lexicon>
+	<Lexicon symbol="might"></Lexicon>
+	<Lexicon symbol="must"></Lexicon>
+
+
+	<!-- END TENSE SENSTIVE WORDS -->
+
+	<!-- START NOUNS -->
+	<Lexicon symbol="wintermute">
+		<Link ontoid="10" flags="Bp" />
+	</Lexicon>
+	<Lexicon symbol="jacky">
+		<Link ontoid="11" flags="Bp" />
+	</Lexicon>
+	<Lexicon symbol="alcine">
+		<Link ontoid="11" flags="Bp" />
+	</Lexicon>
+	<!-- END NOUNS -->
+</Collection>
