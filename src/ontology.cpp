@@ -42,32 +42,18 @@ namespace Wintermute {
             ConceptList* Concept::allConcepts = new ConceptList;
             InstanceList* Instance::allInstances = new InstanceList;
 
-            /* begin class Configuration */
             void Configuration::Initialize(){
-                cout << "(data) [Ontology::Configuration] Loaded." << endl;
+                //cout << "(data) [Ontology::Configuration] Loaded." << endl;
             }
 
             void Configuration::Deinitialize(){
-                cout << "(data) [Ontology::Configuration] Unloaded." << endl;
+                //cout << "(data) [Ontology::Configuration] Unloaded." << endl;
             }
-
-            /* end class Configuration */
-
-            /* begin class Store */
 
             Store::Store() : _uuid(""), _model(NULL) {}
 
-            /// @todo Load every single Statement as a Concept in the background.
-            /*
-              Approach!
-              ---------------
-              Make a Soprano::Model and load all of the statements from the parser into the model.
-              Iteratively query for each statement and pull out the extras (use those to form a link and its respective concepts).
-
-              Tada?
-            */
             Store::Store( const string& storeUUID ) : _uuid(storeUUID), _model(NULL){
-                cout << "(data) [Store] (UUID: '" << storeUUID << "') Initializing.. " << endl;
+                //cout << "(data) [Store] (UUID: '" << storeUUID << "') Initializing.. " << endl;
                 Model *theModel = createModel();
                 const QString theUrl((string(Data::Configuration::getDirectory() + string("/") +  string(WNTRDATA_ONTO_DIR) + string("/") + storeUUID + string(".owl"))).c_str());
                 const QUrl ontologyUrl(theUrl);
@@ -77,28 +63,28 @@ namespace Wintermute {
                 cout << "(data) [Store] (UUID: '" << storeUUID << "') Loading from '" << ontologyUrl.toString ().toStdString () << "'.." << endl;
                 QList<Statement> statementList = itr.allStatements ();
 
-                {
-                    progress_display theStatus(statementList.count (),cout," "," "," ");
-                    progress_timer theTimer;
+                /*{
+                    //progress_display theStatus(statementList.count (),cout," "," "," ");
+                    //progress_timer theTimer;
 
                     Q_FOREACH(Statement s, statementList){
                         if (theModel->addStatement (s) != Error::ErrorNone){
                             cout << "(data) [Store] (UUID: '" << storeUUID << "') Parse error: "
                                  << theModel->lastError ().message ().toStdString () << endl;
                         }
-                        ++theStatus;
+                        //++theStatus;
                     }
 
-                    cout << "(data) [Store] (UUID: '" << storeUUID << "') Parsing elapsed in ";
-                }
+                    //cout << "(data) [Store] (UUID: '" << storeUUID << "') Parsing elapsed in ";
+                }*/
 
                 cout << "(data) [Store] (UUID: '" << storeUUID << "') " << statementList.count() << " concepts recognized. " << endl;
             }
 
-            void Store::saveInstance( const Instance& theInstance, const bool& canOverwrite ) {}
-            void Store::saveConcept( const Concept& theConcept, const bool& canOverwrite ) {}
-            void Store::saveLink ( const Link& theLink, const bool& canOverwrite ) {}
-            //void Store::save();
+            void Store::saveInstance( const Instance& theInstance, const bool& canOverwrite ) { }
+            void Store::saveConcept( const Concept& theConcept, const bool& canOverwrite ) { }
+            void Store::saveLink ( const Link& theLink, const bool& canOverwrite ) { }
+            //void Store::save() { }
 
             Store* Store::obtain( const string& storeUUID ) {
                 Store *theStore = NULL;
@@ -116,10 +102,6 @@ namespace Wintermute {
             Instance* Store::obtainInstance( const string& storeUUID, const string& instanceUUID ) { return NULL; }
 
             Store::~Store() {}
-
-            /* end class Store */
-
-            /* begin class Concept */
 
             Concept::Concept() {}
 
@@ -169,8 +151,6 @@ namespace Wintermute {
 					return result->second;
 			}
 
-			/* end class Concept */
-			/* begin class Link */
 
             Link::Link() : _relation(NULL),
                 _parent(NULL),
@@ -228,8 +208,6 @@ namespace Wintermute {
 					return allLinks->find(linkUUID)->second;
 			}
 
-			/* end class Link */
-			/* begin class Instance */
 
 			Instance::Instance() : Concept() {}
 

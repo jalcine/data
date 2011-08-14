@@ -49,15 +49,15 @@ namespace Wintermute {
 
 		   void Configuration::Initialize(const string storageDir, const string locale)
 		   {
-			cout << "(data) [Ling:Config] Initializing data.." << endl;
+			//cout << "(data) [Ling:Config] Initializing data.." << endl;
 			Configuration::setDirectory(storageDir);
 			Configuration::setLocale(locale);
 
-			cout << "(data) [Ling:Config] Setting up linguistics data sources... " << endl;
+			//cout << "(data) [Ling:Config] Setting up linguistics data sources... " << endl;
 			Storage::addDataSource(LocalStorage::create,LocalStorage::exists);
 			Storage::addDataSource(XMLStorage::create,XMLStorage::exists);
 
-			cout << "(data) [Ling:Config] Parsing sources.. " << endl;
+			//cout << "(data) [Ling:Config] Parsing sources.. " << endl;
 			LocalStorage::spawn();
 			XMLStorage::spawn();
 		   }

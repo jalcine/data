@@ -7,29 +7,57 @@
 
  -->
 <RuleSet locale="en">
-    <Rule type="Ad" primary="B">
-        <Bind with="B,D,E" />
+    <Rule type="Ad">
+        <Bind with="B" />
+        <Bind with="D,E,F" skipWord="no" />
     </Rule>
 
     <Rule type="Aen">
-        <Bind with="C,D" />
+        <Bind with="C" />
+        <Bind with="D" skipWord="no" />
     </Rule>
 
     <Rule type="Aep">
-        <Bind with="B,E" />
+        <Bind with="B" />
+        <Bind with="E" skipWord="no" />
     </Rule>
 
     <Rule type="Ax">
-        <Bind with="B,Ap" />
+        <Bind with="D,E,F" skipWord="no" hideOther="yes" hideFilter="B,D,E,F," />
+        <Bind width="B" />
     </Rule>
 
     <Rule type="B">
-        <Bind with="B,D,E" />
-        <Bind with="C" postAction="reverse" />
+        <Bind with="D,E,F" skipWord="no" />
+        <Bind with="B,C" postAction="reverse" />
     </Rule>
 
-    <Rule type="C" primary="B">
-        <Bind with="A,B,C,D,E,F" />
+    <Rule type="Bz">
+        <Bind with="Bz" hide="yes" />
+        <Bind with="D,E,F" skipWord="no" />
+        <Bind with="Ad" skipWord="no" />
     </Rule>
+
+    <Rule type="C">
+        <Bind with="A,B,C,F" hideOther="no" />
+        <Bind with="D,E,F" skipWord="no"/>
+    </Rule>
+
+    <Rule type="D">
+        <Bind with="B,C,D,E,F" skipWord="no" postAction="otherType" hide="yes" />
+    </Rule>
+
+    <Rule type="E">
+        <Bind with="B,C,D,E,F" skipWord="no" postAction="otherType" hide="yes" />
+    </Rule>
+
+    <Rule type="Fm">
+        <Bind with="F+" skipWord="no" hide="yes" />
+    </Rule>
+
+    <Rule type="F">
+        <Bind with="A,C,D" skipWord="no" hide="yes" />
+    </Rule>
+
     <Added />
 </RuleSet>

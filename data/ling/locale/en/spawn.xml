@@ -460,6 +460,15 @@
 
 	<!-- END TENSE SENSTIVE WORDS -->
 
+	<!-- START ADJECTIVES -->
+	<Lexicon symbol="best">
+		<Link ontoid="3" flags="E" />
+	</Lexicon>
+	<Lexicon symbol="worst">
+		<Link ontoid="3" flags="E" />
+	</Lexicon>
+	<!-- END ADJECTIVES -->
+
 	<!-- START NOUNS -->
 	<Lexicon symbol="wintermute">
 		<Link ontoid="10" flags="Bp" />

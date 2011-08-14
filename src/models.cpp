@@ -233,10 +233,11 @@ namespace Wintermute {
                         } else ++ l_cntSkip;
                     }
 
-                    cout << endl << "(data) [XMLStorage] Generated " << ( l_nodLst.size () - l_cntSkip ) << " lexicons, skipped " << l_cntSkip << ", parsed " << l_nodLst.length () << "." << endl;
+                    if (l_nodLst.size () - l_cntSkip != 0)
+                        cout << endl << "(data) [XMLStorage] Generated " << ( l_nodLst.size () - l_cntSkip ) << " lexicons, skipped " << l_cntSkip << ", parsed " << l_nodLst.length () << "." << endl;
                 }
 
-                cout << "(data) [XMLStorage] Rendered '" << l_pthDoc << "'." << endl;
+                //cout << "(data) [XMLStorage] Rendered '" << l_pthDoc << "'." << endl;
             }
 
             void XMLStorage::addDocument(const string& p_url){
