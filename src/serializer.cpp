@@ -23,8 +23,8 @@
 
 namespace Wintermute
 {
-    namespace Data
-    {
-
-    } // namespaces
+     namespace Data
+     {
+	  
+     } // namespaces
 }

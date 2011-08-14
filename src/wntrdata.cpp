@@ -25,24 +25,24 @@
 using namespace boost::python;
 
 namespace Wintermute {
-    namespace Data {
-        void Configuration::Initialize( void ) {
-            Wintermute::Data::Ontology::Configuration::Initialize();
-            Wintermute::Data::Linguistics::Configuration::Initialize(Configuration::getDirectory() + string("/linguistics"));
-        }
-
-        void Configuration::Deinitialize( void ) {
-            Wintermute::Data::Ontology::Configuration::Deinitialize();
-            Wintermute::Data::Linguistics::Configuration::Deinitialize();
-        }
-
-        BOOST_PYTHON_MODULE(wntrdata){
-            class_<Configuration>("Configuration",no_init)
-                    .def("Initialize",Configuration::Initialize)
-                    .def("Deinitialize",Configuration::Deinitialize);
-
-            //class_<SaveModel>("SaveModel",no_init).def("save",SaveModel::save);
-            //class_<LoadModel>("LoadModel",no_init).def("load",LoadModel::load);
-        }
-    }
+     namespace Data {
+	  void Configuration::Initialize( void ) {
+	       Wintermute::Data::Ontology::Configuration::Initialize();
+	       Wintermute::Data::Linguistics::Configuration::Initialize(Configuration::getDirectory() + string("/") + string(WNTRDATA_LING_DIR));
+	  }
+	  
+	  void Configuration::Deinitialize( void ) {
+	       Wintermute::Data::Ontology::Configuration::Deinitialize();
+	       Wintermute::Data::Linguistics::Configuration::Deinitialize();
+	  }
+	  
+	  BOOST_PYTHON_MODULE(wntrdata){
+	       class_<Configuration>("Configuration",no_init)
+	       .def("Initialize",Configuration::Initialize)
+	       .def("Deinitialize",Configuration::Deinitialize);
+	       
+	       //class_<SaveModel>("SaveModel",no_init).def("save",SaveModel::save);
+	       //class_<LoadModel>("LoadModel",no_init).def("load",LoadModel::load);
+	  }
+     }
 }

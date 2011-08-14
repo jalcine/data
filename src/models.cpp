@@ -79,7 +79,7 @@ namespace Wintermute {
             const bool LocalStorage::exists (const Lexidata& p_lxin){
                 const string l_pth(LocalStorage::formPath(p_lxin));
                 QFile* l_lex = new QFile(l_pth.c_str ());
-                //cout << "(database) [LocalStorage] Lexicon: (" << l_lex->size () << ") " << l_pth << endl;
+                //cout << "(data) [LocalStorage] Lexicon: (" << l_lex->size () << ") " << l_pth << endl;
                 return l_lex->exists ();
             }
 
@@ -104,7 +104,7 @@ namespace Wintermute {
                 const char* thePath = this->url().c_str();
                 QFile* theFile = new QFile(thePath);
                 if (theFile->open (QIODevice::WriteOnly | QIODevice::Truncate)){
-                    cout << "(database) [LocalSaveModel] Saving '" <<  m_lxdata.id() << "' ..." << endl;
+                    cout << "(data) [LocalSaveModel] Saving '" <<  m_lxdata.id() << "' ..." << endl;
                     ostringstream outLexidata;
                     outLexidata << m_lxdata.symbol() << endl;
 
@@ -117,7 +117,7 @@ namespace Wintermute {
                     theFile->write(data);
                     theFile->close ();
                 } else {
-                    cout << "(database) [LocalSaveModel] Failed to save '" << m_lxdata.id() << "'! Error: " << theFile->errorString ().toStdString () << endl;
+                    cout << "(data) [LocalSaveModel] Failed to save '" << m_lxdata.id() << "'! Error: " << theFile->errorString ().toStdString () << endl;
                 }
             }
 
@@ -147,54 +147,59 @@ namespace Wintermute {
                 QFile* l_qhndl = new QFile(l_pth);
 
                 if (l_qhndl->open (QIODevice::ReadOnly)){
-                    //cout << "(database) [LocalLoadModel] Loading from '" << this->Model::_lxdata.id() << "' (" << theFile->size ()<< " bytes)..." << endl;
-                    ifstream l_inLexidata(l_pth);
-                    string l_sym, l_flg, l_ont;
+                    //cout << "(data) [LocalLoadModel] Loading from '" << this->Model::_lxdata.id() << "' (" << theFile->size ()<< " bytes)..." << endl;
+                    QTextStream l_inLexData(l_qhndl->readAll ());
+                    QString l_sym, l_flg, l_ont;
                     Leximap l_map;
 
-                    l_inLexidata >> l_sym;
+                    l_inLexData >> l_sym;
 
-                    while (!l_inLexidata.eof ()) {
-                        l_inLexidata >> l_ont >> l_flg;
-                        //cout << "(database) [LocalLoadModel] Flagset: " << ontoid << " " << flag << endl;
-                        l_map.insert (Leximap::value_type(l_ont, l_flg));
+                    while (!l_inLexData.atEnd ()) {
+                        l_inLexData >> l_ont >> l_flg;
+                        if (l_ont.isEmpty () || l_flg.isEmpty ())
+                            continue;
+                        //cout << "(data) [LocalLoadModel] Flagset: " << qPrintable(l_ont) << " " << qPrintable(l_flg) << endl;
+                        l_map.insert (Leximap::value_type(l_ont.toStdString (), l_flg.toStdString ()));
                     }
 
                     if (l_map.size () == 0){
-                        //cout << "(database) [LocalLoadModel] WARNING: No flags loaded into the system." << endl << "(" <<  theFile->size () << "): file:///" << thePath << endl;
+                        //cout << "(data) [LocalLoadModel] WARNING: No flags loaded into the system." << endl << "(" <<  l_qhndl->size () << "): file:///" << l_pth << endl;
                     }
                     else {
-                        //cout << "(database) [LocalLoadModel] " << mapping.size () << " flags loaded for "<< _lxdata.getID() << " ( "<< symbol << " )." << endl;
-                        this->Model::m_lxdata = Lexidata(m_lxdata.id(),m_lxdata.locale(), l_sym, l_map);
+                        //cout << "(data) [LocalLoadModel] " << mapping.size () << " flags loaded for "<< _lxdata.getID() << " ( "<< symbol << " )." << endl;
+                        this->Model::m_lxdata = Lexidata(m_lxdata.id(),m_lxdata.locale(), qPrintable(l_sym), l_map);
                     }
 
                     l_qhndl->close ();
                 } else {
-                    //cout << "(database) [LocalLoadModel] Failed to load '" << this->LoadModel::_lxdata.id() << "'." << endl;
+                    //cout << "(data) [LocalLoadModel] Failed to load '" << this->LoadModel::_lxdata.id() << "'." << endl;
                 }
             }
 
+            /// @todo Finish definition of XMLStorage.
             Storage* XMLStorage::create(const Lexidata& p_lxinfo){
+                //return new XMLStorage(p_lxinfo);
                 return NULL;
             }
 
+            /// @todo Use iteration to determine if this sect of data was already formed.
             const bool XMLStorage::exists (const Lexidata& p_lxinfo){
                 return false;
             }
 
-            /// @bug Some of the information stored here gets passed along as malformed information. I'll place a bug report when possible.
+            /// @bug Some of the information stored here gets passed along as malformed information.
             void XMLStorage::spawn (){
                 const string l_pthDoc = Configuration::directory () + string("/locale/") + Configuration::locale() + string("/") + string("spawn.xml");
                 QFile* l_qhndl = new QFile(QString(l_pthDoc.c_str()));
                 QDomDocument l_domDoc;
 
                 if (!l_qhndl->open (QIODevice::ReadOnly | QIODevice::Text)){
-                    cout << "(database) [XMLStorage] Failed to open '" << l_pthDoc << "';" << l_qhndl->errorString ().toStdString () << endl;
+                    cout << "(data) [XMLStorage] Failed to open '" << l_pthDoc << "';" << l_qhndl->errorString ().toStdString () << endl;
                     return;
                 }
 
                 if (!l_domDoc.setContent(l_qhndl)){
-                    cout << "(database) [XMLStorage] Failed to parse '" << l_pthDoc << "';" << l_qhndl->errorString ().toStdString () << endl;
+                    cout << "(data) [XMLStorage] Failed to parse '" << l_pthDoc << "';" << l_qhndl->errorString ().toStdString () << endl;
                     return;
                 }
 
@@ -218,20 +223,20 @@ namespace Wintermute {
                                     const string l_ont = l_lnkEle.attribute ("ontoid").toStdString ();
                                     const string l_flg = l_lnkEle.attribute ("flags").toStdString ();
                                     l_theMap.insert (Leximap::value_type(l_ont,l_flg));
-                                    //cout << "(database) [XMLStorage] Parsed flagset #" << theMap.size ()<< ": " << ontoid << " " << flags << endl;
+                                    //cout << "(data) [XMLStorage] Parsed flagset #" << theMap.size ()<< ": " << ontoid << " " << flags << endl;
                                 }
 
                                 Lexidata theLex( md5(l_sym) , Configuration::locale() , l_sym , l_theMap);
-                                //cout << "(database) [XMLStorage] Size: " << theMap.size ()  << ":" << links.length () << endl;
+                                //cout << "(data) [XMLStorage] Size: " << theMap.size ()  << ":" << links.length () << endl;
                                 LocalStorage::serializeToDisk (theLex);
                             } else ++l_cntSkip;
                         } else ++ l_cntSkip;
                     }
 
-                    cout << endl << "(database) [XMLStorage] Generated " << ( l_nodLst.size () - l_cntSkip ) << " lexicons, skipped " << l_cntSkip << ", parsed " << l_nodLst.length () << "." << endl;
+                    cout << endl << "(data) [XMLStorage] Generated " << ( l_nodLst.size () - l_cntSkip ) << " lexicons, skipped " << l_cntSkip << ", parsed " << l_nodLst.length () << "." << endl;
                 }
 
-                cout << "(database) [XMLStorage] Rendered '" << l_pthDoc << "'." << endl;
+                cout << "(data) [XMLStorage] Rendered '" << l_pthDoc << "'." << endl;
             }
 
             void XMLStorage::addDocument(const string& p_url){

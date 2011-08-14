@@ -4,26 +4,32 @@
   Rule definition of standard English grammar for Wintermute.
   This document represents the means of converting linguistics into
   ontological information in the English language. God be with us.
-  
+
  -->
 <RuleSet locale="en">
-  <Rule type="Ae"> <!-- personal pronouns -->
-    <Bind with="C,D" subtype="n" format="only" />
-    <Bind with="B,E" subtype="p" format="only" />
-    <Bind with="none" subtype="o" format="only" />
-  </Rule>
-  
-  <Rule type="Ad" primary="B"> <!-- demonstrative pronouns -->
-    <Bind with="B,D,E" format="only" />
-  </Rule>
-  
-  <Rule type="B" primary="B"> <!-- proper nouns -->
-    <Bind with="B,D,E" format="only" />
-  </Rule>
+    <Rule type="Ad" primary="B">
+        <Bind with="B,D,E" />
+    </Rule>
 
-  <Rule type="C" primary="B">
-    <Bind with="A,B,C,D,E,F" format="only" />
-  </Rule>
+    <Rule type="Aen">
+        <Bind with="C,D" />
+    </Rule>
 
-  <Added />
+    <Rule type="Aep">
+        <Bind with="B,E" />
+    </Rule>
+
+    <Rule type="Ax">
+        <Bind with="B,Ap" />
+    </Rule>
+
+    <Rule type="B">
+        <Bind with="B,D,E" />
+        <Bind with="C" postAction="reverse" />
+    </Rule>
+
+    <Rule type="C" primary="B">
+        <Bind with="A,B,C,D,E,F" />
+    </Rule>
+    <Added />
 </RuleSet>

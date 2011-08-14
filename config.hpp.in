@@ -7,7 +7,10 @@
 
 #cmakedefine DEBUG
 
-#define __WDATA_DATA_DIR__ "@WNTRDATA_DATA_DIR@"
+#define WNTRDATA_DATA_DIR "@WNTRDATA_DATA_DIR@"
+#define WNTRDATA_LING_DIR "@WNTRDATA_LING_DIR@"
+#define WNTRDATA_ONTO_DIR "@WNTRDATA_ONTO_DIR@"
+
 #include <string>
 
 using namespace std;
@@ -16,13 +19,27 @@ using std::string;
 
 namespace Wintermute {
     namespace Data {
+        /**
+         * @brief
+         * @class Configuration config.hpp "config.hpp"
+         */
         class Configuration {
         public:
-            static  const string getDirectory(){
-                return __WDATA_DATA_DIR__;
-            }
-
+            /**
+             * @brief
+             * @fn getDirectory
+             * @return const string
+             */
+            static const string getDirectory(){ return WNTRDATA_DATA_DIR;}
+            /**
+             * @brief
+             * @fn Initialize
+             */
             static void Initialize();
+            /**
+             * @brief
+             * @fn Deinitialize
+             */
             static void Deinitialize();
         };
     }

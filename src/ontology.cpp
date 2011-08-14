@@ -44,11 +44,11 @@ namespace Wintermute {
 
             /* begin class Configuration */
             void Configuration::Initialize(){
-                cout << "(database) [Ontology::Configuration] Loaded." << endl;
+                cout << "(data) [Ontology::Configuration] Loaded." << endl;
             }
 
             void Configuration::Deinitialize(){
-                cout << "(database) [Ontology::Configuration] Unloaded." << endl;
+                cout << "(data) [Ontology::Configuration] Unloaded." << endl;
             }
 
             /* end class Configuration */
@@ -67,15 +67,14 @@ namespace Wintermute {
               Tada?
             */
             Store::Store( const string& storeUUID ) : _uuid(storeUUID), _model(NULL){
-                cout << "(database) [Store] (UUID: '" << storeUUID << "') Initializing.. " << endl;
+                cout << "(data) [Store] (UUID: '" << storeUUID << "') Initializing.. " << endl;
                 Model *theModel = createModel();
-                const QString theUrl((string(Data::Configuration::getDirectory() + string("/ontology/") + storeUUID + string(".owl"))).c_str());
+                const QString theUrl((string(Data::Configuration::getDirectory() + string("/") +  string(WNTRDATA_ONTO_DIR) + string("/") + storeUUID + string(".owl"))).c_str());
                 const QUrl ontologyUrl(theUrl);
-                cout <<theUrl.toStdString ()<< endl;
 
                 const Soprano::Parser* parser = Soprano::PluginManager::instance()->discoverParserForSerialization( Soprano::SerializationRdfXml );
                 StatementIterator itr = parser->parseFile (theUrl, ontologyUrl, Soprano::SerializationRdfXml);
-                cout << "(database) [Store] (UUID: '" << storeUUID << "') Loading from '" << ontologyUrl.toString ().toStdString () << "'.." << endl;
+                cout << "(data) [Store] (UUID: '" << storeUUID << "') Loading from '" << ontologyUrl.toString ().toStdString () << "'.." << endl;
                 QList<Statement> statementList = itr.allStatements ();
 
                 {
@@ -84,16 +83,16 @@ namespace Wintermute {
 
                     Q_FOREACH(Statement s, statementList){
                         if (theModel->addStatement (s) != Error::ErrorNone){
-                            cout << "(database) [Store] (UUID: '" << storeUUID << "') Parse error: "
+                            cout << "(data) [Store] (UUID: '" << storeUUID << "') Parse error: "
                                  << theModel->lastError ().message ().toStdString () << endl;
                         }
                         ++theStatus;
                     }
 
-                    cout << "(database) [Store] (UUID: '" << storeUUID << "') Parsing elapsed in ";
+                    cout << "(data) [Store] (UUID: '" << storeUUID << "') Parsing elapsed in ";
                 }
 
-                cout << "(database) [Store] (UUID: '" << storeUUID << "') " << statementList.count() << " concepts recognized. " << endl;
+                cout << "(data) [Store] (UUID: '" << storeUUID << "') " << statementList.count() << " concepts recognized. " << endl;
             }
 
             void Store::saveInstance( const Instance& theInstance, const bool& canOverwrite ) {}

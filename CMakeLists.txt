@@ -9,10 +9,6 @@ set(WNTRDATA_VERSION
 include(WinterDefaults)
 include(WinterLibsDependencies)
 include(WinterMacros)
-include(FindPythonLibs)
-include(FindPkgConfig)
-include(FindQt4)
-include(FindQJSON)
 
 #
 # Custom modules
@@ -29,6 +25,8 @@ find_package(Boost 1.40 COMPONENTS
     python
     REQUIRED)
 
+find_package(PythonLibs REQUIRED)
+
 find_package(Qt4 4.4.3 COMPONENTS
     QtCore
     QtXml
@@ -44,10 +42,12 @@ pkg_search_module(Soprano REQUIRED soprano)
 #
 # Main variables
 #
-set(VS_KEYWORD Qt4VSv1.0) # Visual Studio, huh? (Only to make working in Qt Creator a bit more natural :])
+set(VS_KEYWORD Qt4VSv1.0)
 set(VS_SCC_PROJECTNAME "Wintermute Database")
 set(WNTRDATA_LIB_DIR "${WINTER_LIB_INSTALL_DIR}")
-set(WNTRDATA_DATA_DIR "${WINTER_DATA_INSTALL_DIR}")
+set(WNTRDATA_DATA_DIR "${WINTER_DATA_INSTALL_DIR}" CACHE PATH "The directory where Wintermute's data files will be installed.")
+set(WNTRDATA_LING_DIR "ling" CACHE PATH "The name of the folder that contains the linguistics information. There should be no trailing or leading slashes.")
+set(WNTRDATA_ONTO_DIR "onto" CACHE PATH "The name of the folder that contains the ontology information. There should be no trailing or leading slashes.")
 set(WNTRDATA_INCLUDE_DIR "${WINTER_INCLUDE_INSTALL_DIR}/wntr/data")
 set(WNTRDATA_INCLUDE_DIRS "${WNTRDATA_INCLUDE_DIR}"
     ${PYTHON_INCLUDE_DIR}
@@ -121,7 +121,7 @@ configure_file("${PROJECT_SOURCE_DIR}/cmake/WntrDataConfigVersion.cmake.in"
     "${PROJECT_BINARY_DIR}/InstallFiles/WntrDataConfigVersion.cmake" @ONLY)
 
 configure_file("${PROJECT_SOURCE_DIR}/config.hpp.in"
-    "${PROJECT_BINARY_DIR}/config.hpp")
+    "${PROJECT_SOURCE_DIR}/include/wntr/data/config.hpp")
 
 configure_file("${PROJECT_SOURCE_DIR}/wntrdata.pc.in"
     "${PROJECT_BINARY_DIR}/InstallFiles/wntrdata.pc" @ONLY)
@@ -142,7 +142,7 @@ install(FILES "${PROJECT_BINARY_DIR}/InstallFiles/WntrDataConfig.cmake"
 install(FILES "${PROJECT_BINARY_DIR}/InstallFiles/WntrDataConfigVersion.cmake"
     DESTINATION "${WNTRDATA_CMAKE_DIR}")
 
-install(FILES ${WNTRDATA_SHPP} "${PROJECT_BINARY_DIR}/config.hpp"
+install(FILES ${WNTRDATA_SHPP}
     DESTINATION "${WNTRDATA_INCLUDE_DIR}"
     COMPONENT dev)
 
@@ -152,14 +152,5 @@ install(FILES ${CMAKE_MODULES}
 install(FILES "${PROJECT_BINARY_DIR}/InstallFiles/wntrdata.pc"
     DESTINATION "${WINTER_LIB_INSTALL_DIR}/pkgconfig/")
 
-install(FILES ${WNTRDATA_LINGUISTICS_FILES}
-    DESTINATION "${WNTRDATA_DATA_DIR}")
-
-install(DIRECTORY data/linguistics
-    DESTINATION "${WNTRDATA_DATA_DIR}")
-
-install(DIRECTORY data/ontology
-    DESTINATION "${WNTRDATA_DATA_DIR}")
-
-install(FILES ${WNTRDATA_FILES}
+install(DIRECTORY "data/${WNTRDATA_LING_DIR}" "data/${WNTRDATA_ONTO_DIR}" ${WNTRDATA_FILES}
     DESTINATION "${WNTRDATA_DATA_DIR}")
