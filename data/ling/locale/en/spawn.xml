@@ -69,6 +69,27 @@
         <Link ontoid="0" flags="Aeo3#*" />
         <Link ontoid="0" flags="Aeo3!*" />
     </Lexicon>
+    <Lexicon symbol="my">
+        <Link ontoid="0" flags="Ap1" />
+    </Lexicon>
+    <Lexicon symbol="yours">
+        <Link ontoid="0" flags="Ap2" />
+        <Link ontoid="0" flags="Ap2*" />
+    </Lexicon>
+    <Lexicon symbol="theirs">
+        <Link ontoid="0" flags="Ap3" />
+        <Link ontoid="0" flags="Ap3*" />
+    </Lexicon>
+    <Lexicon symbol="his">
+        <Link ontoid="0" flags="Ap2@" />
+    </Lexicon>
+    <Lexicon symbol="hers">
+        <Link ontoid="0" flags="Ap2#" />
+    </Lexicon>
+    <Lexicon symbol="its">
+        <Link ontoid="0" flags="Ap2!" />
+    </Lexicon>
+
     <!-- end English personal pronouns -->
 
 	<!-- start English demonstrative pronouns -->

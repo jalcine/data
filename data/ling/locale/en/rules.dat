@@ -27,15 +27,19 @@
         <Bind width="B" />
     </Rule>
 
-    <Rule type="B">
-        <Bind with="D,E,F" skipWord="no" />
-        <Bind with="B,C" postAction="reverse" />
+    <Rule type="Bp">
+        <Bind with="Bp" skipWord="no" />
     </Rule>
 
     <Rule type="Bz">
+        <Bind with="Ad" skipWord="no" />
         <Bind with="Bz" hide="yes" />
         <Bind with="D,E,F" skipWord="no" />
-        <Bind with="Ad" skipWord="no" />
+    </Rule>
+
+    <Rule type="B">
+        <Bind with="D,E,F" skipWord="no" />
+        <Bind with="B,C" postAction="reverse" />
     </Rule>
 
     <Rule type="C">
@@ -52,7 +56,8 @@
     </Rule>
 
     <Rule type="Fm">
-        <Bind with="F+" skipWord="no" hide="yes" />
+        <Bind with="F+" skipWord="no" hide="yes" typeHas="-" />
+        <Bind with="F-" skipWord="no" hide="yes" typeHas="+" />
     </Rule>
 
     <Rule type="F">

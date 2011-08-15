@@ -21,10 +21,9 @@
 
 #include "serializer.hpp"
 
-namespace Wintermute
-{
-     namespace Data
-     {
-	  
-     } // namespaces
+namespace Wintermute {
+    namespace Data {
+
+    } // namespaces
 }
+// kate: indent-mode cstyle; space-indent on; indent-width 4; 

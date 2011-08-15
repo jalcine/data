@@ -59,19 +59,19 @@ namespace Wintermute {
              * @class Configuration ontology.hpp "include/wntr/data/ontology.hpp"
              */
             class Configuration {
-            public:
-                /**
-                 * @brief
-                 *
-                 * @fn Initialize
-                 */
-                static void Initialize();
-                /**
-                 * @brief
-                 *
-                 * @fn Deinitialize
-                 */
-                static void Deinitialize();
+                public:
+                    /**
+                     * @brief
+                     *
+                     * @fn Initialize
+                     */
+                    static void Initialize();
+                    /**
+                     * @brief
+                     *
+                     * @fn Deinitialize
+                     */
+                    static void Deinitialize();
             };
 
             /**
@@ -87,9 +87,9 @@ namespace Wintermute {
              * @todo Apply serialization and deserialization of this class.
              */
             class Store {
-                friend struct Concept;
-                friend struct Instance;
-                friend struct Link;
+                    friend struct Concept;
+                    friend struct Instance;
+                    friend struct Link;
                 private:
                     string _uuid;
                     Model* _model;
@@ -108,7 +108,7 @@ namespace Wintermute {
                      * @fn Store
                      * @param  uuid The UUID of the Store to load.
                      */
-                    Store( const string& );
+                    Store ( const string& );
 
                     ~Store();
                 public:
@@ -118,21 +118,21 @@ namespace Wintermute {
                      * @fn hasConcept
                      * @param
                      */
-                    void hasConcept(const string& );
+                    void hasConcept ( const string& );
                     /**
                      * @brief
                      *
                      * @fn hasLink
                      * @param
                      */
-                    void hasLink(const string& );
+                    void hasLink ( const string& );
                     /**
                      * @brief
                      *
                      * @fn hasInstance
                      * @param
                      */
-                    void hasInstance(const string& );
+                    void hasInstance ( const string& );
                     /**
                      * @brief Save instance to store.
                      * Saves a reference of an Instance to this Store; overwriting it if necessary.
@@ -140,7 +140,7 @@ namespace Wintermute {
                      * @param Instance|instance The instance to save.
                      * @param bool|canOverwrite Determines whether or not this can be overwritten (defaults to true, can be omitted).
                      */
-                    void saveInstance( const Instance&, const bool& = true );
+                    void saveInstance ( const Instance&, const bool& = true );
                     /**
                      * @brief
                      *
@@ -148,7 +148,7 @@ namespace Wintermute {
                      * @param
                      * @param
                      */
-                    void saveLink( const Link&, const bool& = true );
+                    void saveLink ( const Link&, const bool& = true );
                     /**
                      * @brief
                      *
@@ -156,7 +156,7 @@ namespace Wintermute {
                      * @param
                      * @param
                      */
-                    void saveConcept( const Concept&, const bool& = true );
+                    void saveConcept ( const Concept&, const bool& = true );
                     //void save();
                     /**
                      * @brief
@@ -164,7 +164,7 @@ namespace Wintermute {
                      * @fn obtain
                      * @param
                      */
-                    static Store* obtain( const string& );
+                    static Store* obtain ( const string& );
                     /**
                      * @brief
                      *
@@ -172,7 +172,7 @@ namespace Wintermute {
                      * @param
                      * @param
                      */
-                    static const Concept* obtainConcept( const string&, const string& );
+                    static const Concept* obtainConcept ( const string&, const string& );
                     /**
                      * @brief
                      *
@@ -180,7 +180,7 @@ namespace Wintermute {
                      * @param
                      * @param
                      */
-                    static Instance* obtainInstance( const string&, const string& );
+                    static Instance* obtainInstance ( const string&, const string& );
             };
 
             /**
@@ -199,62 +199,62 @@ namespace Wintermute {
                     string _uuid;
                     LinkList* _links;
 
-					template<class Archive>
-					void serialize( Archive&, const unsigned int );
-					/**
-					 * @brief Initializes concept.
-					 * Does initialization work for the Concept.
-					 * @fn initialize
-					 */
-					virtual void initialize();
-					/**
-					 * @brief Default constructor.
-					 * Creates a new empty Concept.
-					 * @fn Concept
-					 */
-					explicit Concept();
-					/**
-					 * @brief Default copy constructor.
-					 * Creates a copy of a previously existing Concept.
-					 * @fn Concept
-					 * @param Concept|copiedConcept The concept to be copied.
-					 */
-					Concept( const Concept& );
-					/**
-					 * @brief Constructs from deserialization.
-					 * Creates a new Concept from an UUID.
-					 * @fn Concept
-					 * @param conceptUUID The UUID of the Concept to load.
-					 */
-					Concept( const string& );
-					~Concept();
-				public:
-					/**
-					 * @brief Return UUID.
-					 * Obtains the UUID of this Concept.
-					 * @fn getUUID
-					 * @return string The UUID.
-					 */
-					virtual const string& getUUID() const;
-					/**
-					 * @brief Obtain link.
-					 * Obtains the Link determined by the specified UUID.
-					 * @fn getLink
-					 * @param  The UUID of the link to obtained.
-					 * @return Link* A pointer to the found link or NULL.
-					 */
-					const Link* getLink( const string& ) const;
-					/**
-					 * Obtains all of the Links that this Concept has.
-					 * @return LinkList* The links of this Concept or NULL.
-					 */
-					const LinkList* getLinks() const;
-					/**
-					 * Obtains a Concept; creates it if not already created.
-					 * @return Concept* The Concept found (or created).
-					 */
-					static const Concept* obtain( const string& );
-			};
+                    template<class Archive>
+                    void serialize ( Archive&, const unsigned int );
+                    /**
+                     * @brief Initializes concept.
+                     * Does initialization work for the Concept.
+                     * @fn initialize
+                     */
+                    virtual void initialize();
+                    /**
+                     * @brief Default constructor.
+                     * Creates a new empty Concept.
+                     * @fn Concept
+                     */
+                    explicit Concept();
+                    /**
+                     * @brief Default copy constructor.
+                     * Creates a copy of a previously existing Concept.
+                     * @fn Concept
+                     * @param Concept|copiedConcept The concept to be copied.
+                     */
+                    Concept ( const Concept& );
+                    /**
+                     * @brief Constructs from deserialization.
+                     * Creates a new Concept from an UUID.
+                     * @fn Concept
+                     * @param conceptUUID The UUID of the Concept to load.
+                     */
+                    Concept ( const string& );
+                    ~Concept();
+                public:
+                    /**
+                     * @brief Return UUID.
+                     * Obtains the UUID of this Concept.
+                     * @fn getUUID
+                     * @return string The UUID.
+                     */
+                    virtual const string& getUUID() const;
+                    /**
+                     * @brief Obtain link.
+                     * Obtains the Link determined by the specified UUID.
+                     * @fn getLink
+                     * @param  The UUID of the link to obtained.
+                     * @return Link* A pointer to the found link or NULL.
+                     */
+                    const Link* getLink ( const string& ) const;
+                    /**
+                     * Obtains all of the Links that this Concept has.
+                     * @return LinkList* The links of this Concept or NULL.
+                     */
+                    const LinkList* getLinks() const;
+                    /**
+                     * Obtains a Concept; creates it if not already created.
+                     * @return Concept* The Concept found (or created).
+                     */
+                    static const Concept* obtain ( const string& );
+            };
 
             /**
              * Represents the bond formed by linking a parent concept to a child concept, by means of
@@ -265,125 +265,125 @@ namespace Wintermute {
                     friend class boost::serialization::access;
                     static LinkList* allLinks;
 
-					string _uuid;
-					const Concept* _parent;
-					const Concept* _relation;
-					const Concept* _child;
+                    string _uuid;
+                    const Concept* _parent;
+                    const Concept* _relation;
+                    const Concept* _child;
 
-					template<class Archive>
-					void serialize(Archive& , const unsigned int );
-					/**
-					 * @brief
-					 * Does the initialization work for the Link.
-					 */
-					virtual void initialize();
-					/**
-					 * @brief
-					 * Creates an empty Link.
-					 */
-					Link();
-					/**
-					 * @brief
-					 * Creates a Link by copying a previously existing Link.
-					 * @param Link& The Link to be copied.
-					 */
-					Link( const Link& );
-					/**
-					 * @brief
-					 * Binds two node concepts by a relationship concept and returns the result in the form of a Link.
-					 * @param Concept* The l-concept.
-					 * @param Concept* The r-concept.
-					 * @param Concept* The relating concept.
-					 */
-					Link( const Concept*, const Concept*, const Concept* );
-					/**
-					 * @brief
-					 * Obtains a Link from disk by its UUID.
-					 */
-					Link( const string& );
-					~Link();
-				public:
+                    template<class Archive>
+                    void serialize ( Archive& , const unsigned int );
+                    /**
+                     * @brief
+                     * Does the initialization work for the Link.
+                     */
+                    virtual void initialize();
+                    /**
+                     * @brief
+                     * Creates an empty Link.
+                     */
+                    Link();
+                    /**
+                     * @brief
+                     * Creates a Link by copying a previously existing Link.
+                     * @param Link& The Link to be copied.
+                     */
+                    Link ( const Link& );
+                    /**
+                     * @brief
+                     * Binds two node concepts by a relationship concept and returns the result in the form of a Link.
+                     * @param Concept* The l-concept.
+                     * @param Concept* The r-concept.
+                     * @param Concept* The relating concept.
+                     */
+                    Link ( const Concept*, const Concept*, const Concept* );
+                    /**
+                     * @brief
+                     * Obtains a Link from disk by its UUID.
+                     */
+                    Link ( const string& );
+                    ~Link();
+                public:
 
-					/**
-					 * @brief
-					 *
-					 * @fn getParentConcept
-					 */
-					const Concept* getParentConcept() const;
+                    /**
+                     * @brief
+                     *
+                     * @fn getParentConcept
+                     */
+                    const Concept* getParentConcept() const;
 
-					/**
-					 * @brief
-					 *
-					 * @fn getChildConcept
-					 */
-					const Concept* getChildConcept() const;
+                    /**
+                     * @brief
+                     *
+                     * @fn getChildConcept
+                     */
+                    const Concept* getChildConcept() const;
 
-					/**
-					 * @brief
-					 *
-					 * @fn getRelationship
-					 */
-					const Concept* getRelationship() const;
+                    /**
+                     * @brief
+                     *
+                     * @fn getRelationship
+                     */
+                    const Concept* getRelationship() const;
 
-					/**
-					 * @brief
-					 *
-					 * @fn getUUID
-					 */
-					const string& getUUID() const;
+                    /**
+                     * @brief
+                     *
+                     * @fn getUUID
+                     */
+                    const string& getUUID() const;
 
-					/**
-					 * @brief
-					 *
-					 * @fn setParentConcept
-					 * @param
-					 */
-					const Link* setParentConcept( const Concept* );
+                    /**
+                     * @brief
+                     *
+                     * @fn setParentConcept
+                     * @param
+                     */
+                    const Link* setParentConcept ( const Concept* );
 
-					/**
-					 * @brief
-					 *
-					 * @fn setChildConcept
-					 * @param
-					 */
-					const Link* setChildConcept( const Concept* );
+                    /**
+                     * @brief
+                     *
+                     * @fn setChildConcept
+                     * @param
+                     */
+                    const Link* setChildConcept ( const Concept* );
 
-					/**
-					 * @brief
-					 *
-					 * @fn setRelationship
-					 * @param
-					 */
-					const Link* setRelationship( const Concept* );
+                    /**
+                     * @brief
+                     *
+                     * @fn setRelationship
+                     * @param
+                     */
+                    const Link* setRelationship ( const Concept* );
 
-					/**
-					 * @brief
-					 *
-					 * @fn obtain
-					 * @param
-					 */
-					static const Link* obtain( const string& );
+                    /**
+                     * @brief
+                     *
+                     * @fn obtain
+                     * @param
+                     */
+                    static const Link* obtain ( const string& );
 
-					/**
-					 * @brief
-					 *
-					 * @fn form
-					 * @param
-					 * @param
-					 * @param
-					 */
-					static const Link* form( const Concept*, const Concept*, const Concept* );
+                    /**
+                     * @brief
+                     *
+                     * @fn form
+                     * @param
+                     * @param
+                     * @param
+                     */
+                    static const Link* form ( const Concept*, const Concept*, const Concept* );
 
-					/**
-					 * @brief
-					 *
-					 * @fn form
-					 * @param
-					 * @param
-					 * @param
-					 */
-					static const Link* form( const string&, const string&, const string& );
-			};
+                    /**
+                     * @brief
+                     *
+                     * @fn form
+                     * @param
+                     * @param
+                     * @param
+                     */
+                    static const Link* form ( const string&, const string&, const string& );
+            };
 
             /**
              * @brief An editable instance of an Concept.
@@ -399,7 +399,7 @@ namespace Wintermute {
                     static InstanceList* allInstances;
                     friend class boost::serialization::access;
                     template<class Archive>
-                    void serialize(Archive& , const unsigned int );
+                    void serialize ( Archive& , const unsigned int );
 
                     /**
                      * @brief
@@ -423,7 +423,7 @@ namespace Wintermute {
                      * @fn Instance
                      * @param
                      */
-                    Instance( const Concept& );
+                    Instance ( const Concept& );
 
                     /**
                      * @brief
@@ -431,7 +431,7 @@ namespace Wintermute {
                      * @fn Instance
                      * @param
                      */
-                    Instance( const string& );
+                    Instance ( const string& );
 
                     /**
                      * @brief
@@ -440,7 +440,7 @@ namespace Wintermute {
                      * @param
                      * @param
                      */
-                    void setLink( const string&, const Link* );
+                    void setLink ( const string&, const Link* );
 
                     /**
                      * @brief
@@ -448,7 +448,7 @@ namespace Wintermute {
                      * @fn setLinks
                      * @param
                      */
-                    void setLinks( const LinkList* );
+                    void setLinks ( const LinkList* );
 
                     /**
                      * @brief
@@ -456,7 +456,7 @@ namespace Wintermute {
                      * @fn obtain
                      * @param
                      */
-                    static const Instance* obtain( const string& );
+                    static const Instance* obtain ( const string& );
 
                     /**
                      * @brief
@@ -464,19 +464,20 @@ namespace Wintermute {
                      * @fn create
                      * @param
                      */
-                    static const Instance* create( const Concept* );
+                    static const Instance* create ( const Concept* );
 
-					/**
-					 * @brief
-					 *
-					 * @fn create
-					 * @param
-					 */
-					static const Instance* create( const string& );
-			};
-		}
-	}
+                    /**
+                     * @brief
+                     *
+                     * @fn create
+                     * @param
+                     */
+                    static const Instance* create ( const string& );
+            };
+        }
+    }
 }
 
 #endif	/* ONTOLOGY_HPP */
 
+// kate: indent-mode cstyle; space-indent on; indent-width 4; 

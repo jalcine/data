@@ -57,59 +57,63 @@ namespace Wintermute {
              * are defined here.
              */
             class Configuration {
-            private:
-                /* Storage directory and locale variables */
-                static string _storageDir;
-                static string _locale;
+                private:
+                    /* Storage directory and locale variables */
+                    static string _storageDir;
+                    static string _locale;
 
-            public:
-                /**
-                 * @brief Initialization.
-                 * Initializes the system by running prerequisite code.
-                 * @fn Initialize
-                 * @param storageDir The directory where storage data are located.
-                 * @param locale The locale that should be initially loaded.
-                 */
-                static void Initialize(string const = _storageDir, string const = _locale);
+                public:
+                    /**
+                     * @brief Changes the locale.
+                     * Sets the default locale to be used as the standard locale.
+                     * @param locale The locale to set.
+                     */
+                    static void setLocale ( string const );
 
-                /**
-                 * @brief Deinitialization.
-                 * Deinitializes the system by freeing up resources used by the system.
-                 * @fn Deinitialize
-                 */
-                static void Deinitialize();
+                    /**
+                     * @brief Changes root directory.
+                     * Sets the root directory to find data for linguistics from.
+                     * @param root The root directory.
+                     */
+                    static void setDirectory ( string const );
 
-                /**
-                 * @brief Changes the locale.
-                 * Sets the default locale to be used as the standard locale.
-                 * @param locale The locale to set.
-                 */
-                static void setLocale(string const = _locale);
+                    /**
+                     * @brief Gets current locale used.
+                     * Returns the locale considered to be the standard of the linguistics system.
+                     * @fn getLocale
+                     * @return string String with the current locale.
+                     */
+                    static string locale() {
+                        return _locale;
+                    }
 
-                /**
-                 * @brief Changes root directory.
-                 * Sets the root directory to find data for linguistics from.
-                 * @param root The root directory.
-                 */
-                static void setDirectory(string const = _storageDir);
+                    /**
+                     * @brief Gets linguistics directory.
+                     * Returns the directory that's considered to be the absolute directory for loading linguistics information.
+                     * @fn getDirectory
+                     * @return string
+                     */
+                    static string directory() {
+                        return _storageDir;
+                    }
+                    /**
+                     * @brief Initialization.
+                     * Initializes the system by running prerequisite code.
+                     * @fn Initialize
+                     * @param storageDir The directory where storage data are located.
+                     * @param locale The locale that should be initially loaded.
+                     */
+                    static void Initialize ( string const = _storageDir, string const = locale ());
 
-                /**
-                 * @brief Gets current locale used.
-                 * Returns the locale considered to be the standard of the linguistics system.
-                 * @fn getLocale
-                 * @return string String with the current locale.
-                 */
-                 static string locale() { return _locale; }
-
-                /**
-                 * @brief Gets linguistics directory.
-                 * Returns the directory that's considered to be the absolute directory for loading linguistics information.
-                 * @fn getDirectory
-                 * @return string
-                 */
-                 static string directory() { return _storageDir; }
+                    /**
+                     * @brief Deinitialization.
+                     * Deinitializes the system by freeing up resources used by the system.
+                     * @fn Deinitialize
+                     */
+                    static void Deinitialize();
             };
         } // namespaces
     }
 }
 #endif	/* LINGUISTICS_HPP */
+// kate: indent-mode cstyle; space-indent on; indent-width 4;

@@ -42,49 +42,47 @@ using boost::archive::xml_iarchive;
 using boost::archive::xml_oarchive;
 
 namespace Wintermute {
-	 namespace Data {
-	  namespace Linguistics {
-		   string Configuration::_storageDir = string("./") + string(WNTRDATA_LING_DIR);
-		   string Configuration::_locale = "en";
+    namespace Data {
+        namespace Linguistics {
+            string Configuration::_storageDir = string ( "./" ) + string ( WNTRDATA_LING_DIR );
+            string Configuration::_locale = "en";
 
-		   void Configuration::Initialize(const string storageDir, const string locale)
-		   {
-			//cout << "(data) [Ling:Config] Initializing data.." << endl;
-			Configuration::setDirectory(storageDir);
-			Configuration::setLocale(locale);
+            void Configuration::Initialize ( const string storageDir, const string locale ) {
+                //cout << "(data) [Ling:Config] Initializing data.." << endl;
+                Configuration::setDirectory ( storageDir );
+                Configuration::setLocale ( locale );
 
-			//cout << "(data) [Ling:Config] Setting up linguistics data sources... " << endl;
-			Storage::addDataSource(LocalStorage::create,LocalStorage::exists);
-			Storage::addDataSource(XMLStorage::create,XMLStorage::exists);
+                //cout << "(data) [Ling:Config] Setting up linguistics data sources... " << endl;
+                Storage::addDataSource ( LocalStorage::create,LocalStorage::exists );
+                Storage::addDataSource ( XMLStorage::create,XMLStorage::exists );
 
-			//cout << "(data) [Ling:Config] Parsing sources.. " << endl;
-			LocalStorage::spawn();
-			XMLStorage::spawn();
-		   }
+                //cout << "(data) [Ling:Config] Parsing sources.. " << endl;
+                LocalStorage::spawn();
+                XMLStorage::spawn();
+            }
 
-		   void Configuration::Deinitialize(){
+            void Configuration::Deinitialize() {
 
-		   }
+            }
 
-		   void Configuration::setLocale(string const locale)
-		   {
-			if (locale.size() == 0)
-			 return;
+            void Configuration::setLocale ( string const locale ) {
+                if ( locale.size() == 0 )
+                    return;
 
-			Configuration::_locale = locale;
-			cout << "(data) [Ling:Config] ## Global locale set to " << locale << endl;
-		   }
+                Configuration::_locale = locale;
+                cout << "(data) [Ling:Config] ## Global locale set to " << locale << endl;
+            }
 
-		   void Configuration::setDirectory(string const configDir)
-		   {
-			if (configDir.size() == 0)
-			 return;
+            void Configuration::setDirectory ( string const configDir ) {
+                if ( configDir.size() == 0 )
+                    return;
 
-			boost::filesystem::path newConfigDir(configDir);
-			Configuration::_storageDir = newConfigDir.string();
+                boost::filesystem::path newConfigDir ( configDir );
+                Configuration::_storageDir = newConfigDir.string();
 
-			cout << "(data) [Ling:Config] ## Root directory set to " << configDir << endl;
-		   }
-	  } // namespaces
-	 }
+                cout << "(data) [Ling:Config] ## Root directory set to " << configDir << endl;
+            }
+        } // namespaces
+    }
 }
+// kate: indent-mode cstyle; space-indent on; indent-width 4;

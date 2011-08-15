@@ -20,10 +20,9 @@
 
 #include "iterator.hpp"
 
-namespace Wintermute
-{
-    namespace Data
-    {
+namespace Wintermute {
+    namespace Data {
 
     } // namespaces
 }
+// kate: indent-mode cstyle; space-indent on; indent-width 4; 

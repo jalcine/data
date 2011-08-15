@@ -22,12 +22,11 @@
 #ifndef __ITERATOR_HPP__
 #define __ITERATOR_HPP__
 
-namespace Wintermute
-{
-    namespace Data
-    {
+namespace Wintermute {
+    namespace Data {
 
     } // namespaces
 }
 
 #endif // __ITERATOR_HPP__
+// kate: indent-mode cstyle; space-indent on; indent-width 4; 

@@ -2,8 +2,8 @@
  * File providing compile-time data about runtime-configuration.
  */
 
-#ifndef __CONFIG_HPP__
-#define __CONFIG_HPP__
+#ifndef __WNTRDATA_CONFIG_HPP__
+#define __WNTRDATA_CONFIG_HPP__
 
 #cmakedefine DEBUG
 
@@ -20,30 +20,33 @@ using std::string;
 namespace Wintermute {
     namespace Data {
         /**
-         * @brief
+         * @brief Manages the data location representing WntrData.
          * @class Configuration config.hpp "config.hpp"
          */
         class Configuration {
-        public:
-            /**
-             * @brief
-             * @fn getDirectory
-             * @return const string
-             */
-            static const string getDirectory(){ return WNTRDATA_DATA_DIR;}
-            /**
-             * @brief
-             * @fn Initialize
-             */
-            static void Initialize();
-            /**
-             * @brief
-             * @fn Deinitialize
-             */
-            static void Deinitialize();
+            public:
+                /**
+                 * @brief Obtains the directory that of which the data files are stored.
+                 * @fn getDirectory
+                 * @return const string
+                 */
+                static const string getDirectory() {
+                    return WNTRDATA_DATA_DIR;
+                }
+                /**
+                 * @brief Initializes the data services.
+                 * @fn Initialize
+                 */
+                static void Initialize();
+                /**
+                 * @brief Deinitializes the data services.
+                 * @fn Deinitialize
+                 */
+                static void Deinitialize();
         };
     }
 }
 
-#endif // __CONFIG_HPP__
+#endif // __WNTRDATA_CONFIG_HPP__
 
+// kate: indent-mode cstyle; space-indent on; indent-width 4;

@@ -22,16 +22,17 @@
 #ifndef __WNTRDATA_HPP__
 #define __WNTRDATA_HPP__
 
-#include "md5.hpp"
 #include "config.hpp"
+#include "md5.hpp"
 #include "ontology.hpp"
 #include "linguistics.hpp"
 #include "models.hpp"
 
 namespace Wintermute {
-	namespace Data {
+    namespace Data {
 
-	}
+    }
 }
 
 #endif /* __WNTRDATA_HPP__ */
+// kate: indent-mode cstyle; space-indent on; indent-width 4;

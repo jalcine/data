@@ -31,36 +31,34 @@ using namespace std;
 using std::vector;
 using std::ofstream;
 
-namespace Wintermute
-{
-    namespace Data
-    {
+namespace Wintermute {
+    namespace Data {
         /**
          * @brief Class for generic objects serialization.
          * This class is a base for every class that provides serialization capabilities.
          * @todo Think about serializers managing, maybe as plugins or something.
          */
-        class Serializer
-        {
-        public:
-            /**
-             * @brief
-             *
-             * @param it
-             * @param outStream
-             */
-            virtual void serialize(Linguistics::LLexicalIterator it, ofstream& outStream);
-            /**
-             * @brief
-             *
-             * @fn serialize
-             * @param it
-             * @param outStream
-             */
-            virtual void serialize(Linguistics::XLexicalIterator it, ofstream& outStream);
+        class Serializer {
+            public:
+                /**
+                 * @brief
+                 *
+                 * @param it
+                 * @param outStream
+                 */
+                virtual void serialize ( Linguistics::LLexicalIterator it, ofstream& outStream );
+                /**
+                 * @brief
+                 *
+                 * @fn serialize
+                 * @param it
+                 * @param outStream
+                 */
+                virtual void serialize ( Linguistics::XLexicalIterator it, ofstream& outStream );
         };
 
     } // namespaces
 }
 
 #endif // __SERIALIZER_HPP__
+// kate: indent-mode cstyle; space-indent on; indent-width 4; 
