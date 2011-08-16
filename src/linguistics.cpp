@@ -53,12 +53,13 @@ namespace Wintermute {
                 Configuration::setLocale ( locale );
 
                 //cout << "(data) [Ling:Config] Setting up linguistics data sources... " << endl;
-                Storage::addDataSource ( LocalStorage::create,LocalStorage::exists );
-                Storage::addDataSource ( XMLStorage::create,XMLStorage::exists );
+                Storage::addDataSource ( LocalStorage::create , LocalStorage::exists );
+                Storage::addDataSource ( XMLStorage::create , XMLStorage::exists );
 
                 //cout << "(data) [Ling:Config] Parsing sources.. " << endl;
                 LocalStorage::spawn();
                 XMLStorage::spawn();
+
             }
 
             void Configuration::Deinitialize() {

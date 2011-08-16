@@ -5,6 +5,13 @@
   This document represents the means of converting linguistics into
   ontological information in the English language. God be with us.
 
+  15 Aug 2011 2:26 AM
+  ===================
+  Biggest issue right now, if there's a rule defined for 'B' and there's a rule defined
+  for 'Bz' and the node in question *is* 'Bz', the 'B' rule will have precedence ONLY if it
+  comes before 'Bz' in the document. At the moment, you must put sub-rules (or rules targeted at
+  specific types of words) before the general definition.
+
  -->
 <RuleSet locale="en">
     <Rule type="Ad">
@@ -23,18 +30,8 @@
     </Rule>
 
     <Rule type="Ax">
-        <Bind with="D,E,F" skipWord="no" hideOther="yes" hideFilter="B,D,E,F," />
+        <Bind with="D,E,F" skipWord="no" hideOther="yes" hideFilter="B,D,E,F" />
         <Bind width="B" />
-    </Rule>
-
-    <Rule type="Bp">
-        <Bind with="Bp" skipWord="no" />
-    </Rule>
-
-    <Rule type="Bz">
-        <Bind with="Ad" skipWord="no" />
-        <Bind with="Bz" hide="yes" />
-        <Bind with="D,E,F" skipWord="no" />
     </Rule>
 
     <Rule type="B">
@@ -42,8 +39,14 @@
         <Bind with="B,C" postAction="reverse" />
     </Rule>
 
+    <Rule type="Bz">
+        <Bind with="Bz" hide="yes" />
+        <Bind with="D,E,F" skipWord="no" />
+        <Bind with="Ad" skipWord="no" />
+    </Rule>
+
     <Rule type="C">
-        <Bind with="A,B,C,F" hideOther="no" />
+        <Bind with="A,B,C" hideOther="no" />
         <Bind with="D,E,F" skipWord="no"/>
     </Rule>
 

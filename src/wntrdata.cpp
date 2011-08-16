@@ -23,6 +23,7 @@
 #include "wntrdata.hpp"
 
 using namespace boost::python;
+using namespace Wintermute::Data::Linguistics;
 
 namespace Wintermute {
     namespace Data {
@@ -38,12 +39,19 @@ namespace Wintermute {
 
         BOOST_PYTHON_MODULE ( wntrdata ) {
             class_<Configuration> ( "Configuration",no_init )
-            .def ( "Initialize",Configuration::Initialize )
-            .def ( "Deinitialize",Configuration::Deinitialize );
+            .def ( "Initialize", Configuration::Initialize )
+            .def ( "Deinitialize", Configuration::Deinitialize );
 
-            //class_<SaveModel>("SaveModel",no_init).def("save",SaveModel::save);
-            //class_<LoadModel>("LoadModel",no_init).def("load",LoadModel::load);
+            //class_<Model, boost::noncopyable>("Model",no_init);
+
+            /*class_<SaveModel, boost::noncopyable, bases<Model> >("SaveModel",no_init)
+                    .def("save",&SaveModel::save)
+            ;
+
+            class_<LoadModel, boost::noncopyable, bases<Model> >("LoadModel",no_init)
+                    .def("load",&LoadModel::load)
+            ;*/
         }
     }
 }
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 
+// kate: indent-mode cstyle; space-indent on; indent-width 4;

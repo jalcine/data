@@ -99,9 +99,16 @@ namespace Wintermute {
              * @brief Wrapper class for lexical data.
              * This class represents the lexical information such as locale, lexical ID, lexical symbol and
              * the syntactic flags that represents the semantic tenses of a word.
-             * @class LexicalInformation models.hpp "include/wntr/data/models.hpp"
+             * @class Lexidata models.hpp "include/wntr/data/models.hpp"
              */
-            class Lexidata {
+            class Lexidata : public QObject {
+                Q_OBJECT
+
+                Q_PROPERTY(const string symbol READ symbol)
+                Q_PROPERTY(const string id READ id)
+                Q_PROPERTY(const string locale READ locale)
+                Q_PROPERTY(const Leximap* flags READ flags)
+
                 friend class boost::serialization::access;
                 private:
                     string m_id;
@@ -158,10 +165,13 @@ namespace Wintermute {
              * @brief Foundational class of I/O handles for lexical information.
              * @class Model models.hpp "include/wntr/data/models.hpp"
              */
-            class Model {
-                    friend class boost::serialization::access;
+            class Model : public QObject {
+                Q_OBJECT
+                friend class boost::serialization::access;
+                public:
+                    ~Model() { }
                 protected:
-                    Lexidata m_lxdata;
+                    Lexidata* m_lxdata;
                     /**
                      * @brief Null constructor.
                      * @fn Model
@@ -172,13 +182,13 @@ namespace Wintermute {
                      * @fn Model
                      * @param info The data to fill itself with.
                      */
-                    Model ( const Lexidata& p_info ) : m_lxdata ( p_info ) { }
+                    Model ( Lexidata* p_info ) : m_lxdata ( p_info ) { }
                     /**
                      * @brief
                      * @fn Model
                      * @param
                      */
-                    Model ( const Model& p_mdl ) : m_lxdata ( p_mdl.m_lxdata ) { }
+                    Model ( const Model* p_mdl ) : m_lxdata ( p_mdl->m_lxdata ) { }
 
                 private:
                     template<class Archive>
@@ -191,7 +201,8 @@ namespace Wintermute {
              * @brief Model used to save lexical information.
              */
             class SaveModel : public Model {
-                    friend class boost::serialization::access;
+                Q_OBJECT
+                friend class boost::serialization::access;
                 protected:
                     /**
                      * @brief
@@ -205,21 +216,21 @@ namespace Wintermute {
                      * @fn SaveModel
                      * @param p_lxin
                      */
-                    SaveModel ( const Lexidata& p_lxin ) : Model ( p_lxin ) {}
+                    SaveModel ( Lexidata* p_lxin ) : Model ( p_lxin ) {}
                     /**
                      * @brief
                      *
                      * @fn SaveModel
                      * @param p_mod
                      */
-                    SaveModel ( const Model& p_mod ) : Model ( p_mod ) {}
+                    SaveModel ( const Model* p_mod ) : Model ( p_mod ) {}
                     /**
                      * @brief
                      *
                      * @fn SaveModel
                      * @param p_smod
                      */
-                    SaveModel ( const SaveModel& p_smod ) : Model ( p_smod ) {}
+                    SaveModel ( const SaveModel* p_smod ) : Model ( p_smod ) {}
 
                 public:
                     /**
@@ -239,8 +250,11 @@ namespace Wintermute {
              * @brief Model used to load lexical information.
              * @class LoadModel models.hpp "include/wntr/data/models.hpp"
              */
-            class LoadModel : public Model {
-                    friend class boost::serialization::access;
+            class LoadModel : public Model{
+                Q_OBJECT
+                Q_PROPERTY(Lexidata* lexicalData READ lexicalData)
+
+                friend class boost::serialization::access;
                 protected:
                     /**
                      * @brief
@@ -254,21 +268,21 @@ namespace Wintermute {
                      * @fn LoadModel
                      * @param map
                      */
-                    LoadModel ( const Lexidata& p_in ) : Model ( p_in ) { }
+                    LoadModel ( Lexidata* p_in ) : Model ( p_in ) { }
                     /**
                      * @brief
                      *
                      * @fn LoadModel
                      * @param loadModel
                      */
-                    LoadModel ( const LoadModel& loadModel ) : Model ( loadModel ) { }
+                    LoadModel ( const LoadModel* loadModel ) : Model ( loadModel ) { }
                     /**
                      * @brief
 
                      * @fn LoadModel
                      * @param model
                      */
-                    LoadModel ( const Model& model ) : Model ( model ) { }
+                    LoadModel ( const Model* model ) : Model ( model ) { }
 
                 public:
                     /**
@@ -281,8 +295,8 @@ namespace Wintermute {
                      * @brief
                      * @fn getLexicalMap
                      */
-                    Lexidata* const lexicalData() {
-                        return &this->Model::m_lxdata;
+                    Lexidata* lexicalData() {
+                        return this->Model::m_lxdata;
                     }
 
                 private:
@@ -298,7 +312,7 @@ namespace Wintermute {
              * @class StorageModel models.hpp "include/wntr/data/models.hpp"
              */
             class Storage : virtual public SaveModel, virtual public LoadModel {
-                    friend class boost::serialization::access;
+                friend class boost::serialization::access;
                 public:
                     /**
                      * @brief
@@ -320,14 +334,14 @@ namespace Wintermute {
                      * @fn StorageModel
                      * @param map
                      */
-                    Storage ( const Lexidata& map ) : SaveModel ( map ), LoadModel ( map ) {}
+                    Storage ( Lexidata* map ) : SaveModel ( map ), LoadModel ( map ) {}
 
                     /**
                      * @brief
                      * @fn StorageModel
                      * @param model
                      */
-                    Storage ( const Model& model ) : SaveModel ( model ), LoadModel ( model ) {}
+                    Storage ( const Model* model ) : SaveModel ( model ), LoadModel ( model ) {}
 
                 private:
                     template<class Archive>
@@ -364,13 +378,13 @@ namespace Wintermute {
                      * @brief
                      * @typedef LexicalSignalObtainer
                      */
-                    typedef boost::signals2::signal<Storage* ( const Lexidata& ), solo_value<Storage*> > StorageObtainSignal;
+                    typedef boost::signals2::signal<Storage* ( Lexidata* ), solo_value<Storage*> > StorageObtainSignal;
 
                     /**
                      * @brief
                      * @typedef StorageExistsSignal
                      */
-                    typedef boost::signals2::signal<bool ( const Lexidata& ), solo_value<bool> > StorageExistsSignal;
+                    typedef boost::signals2::signal<bool ( Lexidata* ), solo_value<bool> > StorageExistsSignal;
 
                     static StorageObtainSignal s_sigObtain;
                     static StorageExistsSignal s_sigExists;
@@ -384,7 +398,7 @@ namespace Wintermute {
                     * @param locale The locale of the Storage object.
                     * @return Return a pointer to a formed Storage object or NULL if it cannot be found.
                     */
-                    static Storage* obtain ( const Lexidata& );
+                    static Storage* obtain ( const Lexidata* );
 
                     /**
                      * @brief Determines existence of a Storage object.
@@ -392,7 +406,7 @@ namespace Wintermute {
                      * @param id The ID of the Storage object.
                      * @param locale The locale of the Storage object.
                      */
-                    static const bool exists ( const Lexidata& );
+                    static const bool exists ( const Lexidata* );
 
                     /**
                      * @brief Adds source of data.
@@ -409,11 +423,11 @@ namespace Wintermute {
              * @brief Abstract class defining interface for every object representing local data.
              * The purpose of this class is to standarize interface for all classes
              * intended for using as representations of data placed locally, e.g node files.
-             * @todo|closed Should this inherit from Model? (Hmm, good question; if it does, the methods in LocalSaveModel and LocalReadModel could be moved into this then..) [No, it shouldn't.]
-             * @todo think about replacing this by more network-transparent interfaces in serializer/lexical classes/models. (If it's local; then why have a transparency for network resources? Shouldn't they have network capabilities in the background?)
              */
             class LocalBackend {
-                    friend class LocalStorage;
+                friend class LocalStorage;
+                public:
+                    ~LocalBackend() { }
                 protected:
                     /**
                      * @brief Null constructor.
@@ -471,7 +485,7 @@ namespace Wintermute {
                      * @param path
                      * @param info
                      */
-                    LocalSaveModel ( const string& m_pth, const Lexidata& p_in ) : SaveModel ( p_in ), LocalBackend ( m_pth ) {}
+                    LocalSaveModel ( const string& m_pth, Lexidata* p_in ) : SaveModel ( p_in ), LocalBackend ( m_pth ) {}
 
                     /**
                      * @brief
@@ -479,7 +493,7 @@ namespace Wintermute {
                      * @fn LocalSaveModel
                      * @param info
                      */
-                    LocalSaveModel ( const Lexidata& );
+                    LocalSaveModel ( Lexidata* );
 
                     /**
                      * @brief
@@ -487,7 +501,7 @@ namespace Wintermute {
                      * @fn LocalSaveModel
                      * @param model
                      */
-                    LocalSaveModel ( const Model& );
+                    LocalSaveModel ( const Model* );
 
                 public:
                     /**
@@ -533,7 +547,7 @@ namespace Wintermute {
                      * @param path
                      * @param info
                      */
-                    LocalLoadModel ( const string& m_pth, const Lexidata& p_in ) : LoadModel ( p_in ), LocalBackend ( m_pth ) {
+                    LocalLoadModel ( const string& m_pth, Lexidata* p_in ) : LoadModel ( p_in ), LocalBackend ( m_pth ) {
                         this->LocalLoadModel::load();
                     }
                     /**
@@ -542,7 +556,7 @@ namespace Wintermute {
                      * @fn LocalLoadModel
                      * @param info
                      */
-                    LocalLoadModel ( const Lexidata& );
+                    LocalLoadModel ( Lexidata* );
 
                     /**
                      * @brief
@@ -550,7 +564,7 @@ namespace Wintermute {
                      * @fn LocalLoadModel
                      * @param model
                      */
-                    LocalLoadModel ( const Model& );
+                    LocalLoadModel ( const Model* );
 
                 public:
                     /**
@@ -589,7 +603,7 @@ namespace Wintermute {
                      * @fn LocalStorageModel
                      * @param map
                      */
-                    LocalStorage ( const Lexidata& p_in ) : Storage ( p_in ),
+                    LocalStorage ( Lexidata* p_in ) : Storage ( p_in ),
                             LocalLoadModel ( ( LocalStorage::formPath ( p_in ) ), p_in ),
                             LocalSaveModel ( ( LocalStorage::formPath ( p_in ) ) ,p_in ) {  }
 
@@ -599,7 +613,7 @@ namespace Wintermute {
                      * @fn LocalStorageModel
                      * @param model
                      */
-                    LocalStorage ( const Model& p_mod ) : Storage ( p_mod ),
+                    LocalStorage ( const Model* p_mod ) : Storage ( p_mod ),
                             LocalLoadModel ( p_mod ),
                             LocalSaveModel ( p_mod ) { }
 
@@ -628,7 +642,7 @@ namespace Wintermute {
                      * @fn create
                      * @param
                      */
-                    static Storage* create ( const Lexidata& );
+                    static Storage* create ( const Lexidata* );
 
                     /**
                      * @brief Determines local lexical existence.
@@ -636,7 +650,7 @@ namespace Wintermute {
                      * @fn exists
                      * @param
                      */
-                    static const bool exists ( const Lexidata & );
+                    static const bool exists ( const Lexidata* );
 
                     /**
                      * @brief
@@ -644,7 +658,7 @@ namespace Wintermute {
                      * @fn serializeToDisk
                      * @param
                      */
-                    static void serializeToDisk ( const Lexidata& );
+                    static void serializeToDisk ( const Lexidata* );
 
                     /**
                      * @brief
@@ -659,7 +673,7 @@ namespace Wintermute {
                      * @fn formPath
                      * @param
                      */
-                    static const string formPath ( const Lexidata& );
+                    static const string formPath ( const Lexidata* );
 
                 private:
                     template<class Archive>
@@ -690,6 +704,7 @@ namespace Wintermute {
                      * @param node
                      */
                     XMLBackend ( QDomElement* p_nod ) : m_nod ( p_nod ) {}
+                    ~XMLBackend() { }
             };
 
             /**
@@ -697,7 +712,8 @@ namespace Wintermute {
              * @class XMLSaveModel models.hpp "include/wntr/data/models.hpp"
              */
             class XMLSaveModel : public SaveModel, public XMLBackend {
-                    friend class boost::serialization::access;
+                Q_OBJECT
+                friend class boost::serialization::access;
                 protected:
                     /**
                      * @brief
@@ -711,7 +727,7 @@ namespace Wintermute {
                      * @fn XMLSaveModel
                      * @param map
                      */
-                    XMLSaveModel ( const Lexidata& p_in ) : SaveModel ( p_in ), XMLBackend() {}
+                    XMLSaveModel ( Lexidata* p_in ) : SaveModel ( p_in ), XMLBackend() {}
                     /**
                      * @brief
                      *
@@ -726,7 +742,7 @@ namespace Wintermute {
                      * @param node
                      * @param map
                      */
-                    XMLSaveModel ( QDomElement *p_nod, const Lexidata& p_in ) : SaveModel ( p_in ), XMLBackend ( p_nod ) {}
+                    XMLSaveModel ( QDomElement *p_nod, Lexidata* p_in ) : SaveModel ( p_in ), XMLBackend ( p_nod ) {}
 
                 public:
                     /**
@@ -749,7 +765,8 @@ namespace Wintermute {
              * @class XMLLoadModel models.hpp "include/wntr/data/models.hpp"
              */
             class XMLLoadModel : public LoadModel, public XMLBackend {
-                    friend class boost::serialization::access;
+                Q_OBJECT
+                friend class boost::serialization::access;
                 protected:
                     /**
                      * @brief
@@ -764,7 +781,7 @@ namespace Wintermute {
                      * @fn XMLLoadModel
                      * @param map
                      */
-                    XMLLoadModel ( const Lexidata& p_in ) : LoadModel ( p_in ), XMLBackend() {}
+                    XMLLoadModel ( Lexidata* p_in ) : LoadModel ( p_in ), XMLBackend() {}
 
                     /**
                      * @brief
@@ -781,7 +798,7 @@ namespace Wintermute {
                      * @param node
                      * @param map
                      */
-                    XMLLoadModel ( QDomElement *p_nod, const Lexidata& p_in ) : LoadModel ( p_in ), XMLBackend ( p_nod ) {}
+                    XMLLoadModel ( QDomElement *p_nod, Lexidata* p_in ) : LoadModel ( p_in ), XMLBackend ( p_nod ) {}
 
                 public:
                     /**
@@ -802,10 +819,8 @@ namespace Wintermute {
              * @brief
              * @class XMLStorageModel models.hpp "include/wntr/data/models.hpp"
              */
-            class XMLStorage : public virtual XMLLoadModel,
-                        public virtual XMLSaveModel,
-                        public Storage {
-                    friend class boost::serialization::access;
+            class XMLStorage : public virtual XMLLoadModel, public virtual XMLSaveModel, public Storage {
+                friend class boost::serialization::access;
                 protected:
                     /**
                      * @brief
@@ -819,14 +834,14 @@ namespace Wintermute {
                      * @fn XMLStorage
                      * @param info
                      */
-                    XMLStorage ( const Lexidata& info ) : Storage ( info ) {}
+                    XMLStorage ( Lexidata* info ) : Storage ( info ) {}
                     /**
                      * @brief
                      *
                      * @fn XMLStorage
                      * @param model
                      */
-                    XMLStorage ( const Model& model ) : Storage ( model ) {}
+                    XMLStorage ( const Model* model ) : Storage ( model ) {}
                     /**
                      * @brief
                      *
@@ -845,7 +860,7 @@ namespace Wintermute {
                      * @param locale
                      * @return Lexical *
                      */
-                    static Storage* create ( const Lexidata& );
+                    static Storage* create ( const Lexidata* );
 
                     /**
                      * @brief
@@ -853,7 +868,7 @@ namespace Wintermute {
                      * @fn exists
                      * @param
                      */
-                    static const bool exists ( const Lexidata & );
+                    static const bool exists ( const Lexidata* );
 
                     /**
                      * @brief Adds document to system.

@@ -71,33 +71,33 @@ namespace Wintermute {
                 s_sigExists.connect ( p_slotExists );
             }
 
-            Storage* Storage::obtain ( const Lexidata& p_lxin ) {
-                return s_sigObtain ( p_lxin );
+            Storage* Storage::obtain ( const Lexidata* p_lxin ) {
+                return s_sigObtain ( const_cast<Lexidata*>(p_lxin) );
             }
 
-            const bool Storage::exists ( const Lexidata& p_lxin ) {
-                return s_sigExists ( p_lxin );
+            const bool Storage::exists ( const Lexidata* p_lxin ) {
+                return s_sigExists ( const_cast<Lexidata*>(p_lxin) );
             }
 
-            Storage* LocalStorage::create ( const Lexidata& p_lxin ) {
-                return new LocalStorage ( p_lxin );
+            Storage* LocalStorage::create ( const Lexidata* p_lxin ) {
+                return new LocalStorage ( const_cast<Lexidata*>(p_lxin) );
             }
 
-            const bool LocalStorage::exists ( const Lexidata& p_lxin ) {
+            const bool LocalStorage::exists ( const Lexidata* p_lxin ) {
                 const string l_pth ( LocalStorage::formPath ( p_lxin ) );
                 QFile* l_lex = new QFile ( l_pth.c_str () );
                 //cout << "(data) [LocalStorage] Lexicon: (" << l_lex->size () << ") " << l_pth << endl;
                 return l_lex->exists ();
             }
 
-            const string LocalStorage::formPath ( const Lexidata& p_lxin ) {
-                return Configuration::directory() + "/locale/" + p_lxin.locale() + "/node/" + p_lxin.id();
+            const string LocalStorage::formPath ( const Lexidata* p_lxin ) {
+                return Configuration::directory() + "/locale/" + p_lxin->locale() + "/node/" + p_lxin->id();
             }
 
-            void LocalStorage::serializeToDisk ( const Lexidata& lxin ) {
+            void LocalStorage::serializeToDisk ( const Lexidata* lxin ) {
                 if ( !exists ( lxin ) ) {
-                    LocalSaveModel newStorage ( LocalStorage::formPath ( lxin ),lxin );
-                    newStorage.save ();
+                    LocalSaveModel *newStorage = new LocalSaveModel(LocalStorage::formPath ( const_cast<Lexidata*>(lxin) ), const_cast<Lexidata*>(lxin) );
+                    newStorage->save ();
                 }
             }
 
@@ -110,40 +110,40 @@ namespace Wintermute {
                 const char* thePath = this->url().c_str();
                 QFile* theFile = new QFile ( thePath );
                 if ( theFile->open ( QIODevice::WriteOnly | QIODevice::Truncate ) ) {
-                    cout << "(data) [LocalSaveModel] Saving '" <<  m_lxdata.id() << "' ..." << endl;
+                    cout << "(data) [LocalSaveModel] Saving '" <<  m_lxdata->id() << "' ..." << endl;
                     ostringstream outLexidata;
-                    outLexidata << m_lxdata.symbol() << endl;
+                    outLexidata << m_lxdata->symbol() << endl;
 
-                    const Leximap* flags = m_lxdata.flags();
+                    const Leximap* flags = m_lxdata->flags();
                     for ( Leximap::const_iterator itr = flags->begin (); itr != flags->end (); itr++ )
                         outLexidata << itr->first << " " << itr->second << endl;
 
-                    cout << flags->size () << " flags written for (" << m_lxdata.symbol() << ")." << endl;
+                    cout << flags->size () << " flags written for (" << m_lxdata->symbol() << ")." << endl;
                     const char* data = outLexidata.str ().c_str ();
                     theFile->write ( data );
                     theFile->close ();
                 } else {
-                    cout << "(data) [LocalSaveModel] Failed to save '" << m_lxdata.id() << "'! Error: " << theFile->errorString ().toStdString () << endl;
+                    cout << "(data) [LocalSaveModel] Failed to save '" << m_lxdata->id() << "'! Error: " << theFile->errorString ().toStdString () << endl;
                 }
             }
 
-            LocalLoadModel::LocalLoadModel ( const Lexidata &p_info ) : LoadModel ( p_info ),
+            LocalLoadModel::LocalLoadModel ( Lexidata *p_info ) : LoadModel ( p_info ),
                     LocalBackend ( LocalStorage::formPath ( p_info ) ) {
                 this->LocalLoadModel::load();
             }
 
-            LocalLoadModel::LocalLoadModel ( const Model &p_model ) : LoadModel ( p_model ),
+            LocalLoadModel::LocalLoadModel ( const Model *p_model ) : LoadModel ( p_model ),
                     LocalBackend() {
                 m_url = LocalStorage::formPath ( m_lxdata );
                 this->LocalLoadModel::load ();
             }
 
-            LocalSaveModel::LocalSaveModel ( const Model &p_model ) : SaveModel ( p_model ),
+            LocalSaveModel::LocalSaveModel ( const Model *p_model ) : SaveModel ( p_model ),
                     LocalBackend() {
                 m_url = LocalStorage::formPath ( m_lxdata );
             }
 
-            LocalSaveModel::LocalSaveModel ( const Lexidata &p_info ) : SaveModel ( p_info ),
+            LocalSaveModel::LocalSaveModel ( Lexidata *p_info ) : SaveModel ( p_info ),
                     LocalBackend ( LocalStorage::formPath ( p_info ) ) {
             }
 
@@ -171,7 +171,7 @@ namespace Wintermute {
                         //cout << "(data) [LocalLoadModel] WARNING: No flags loaded into the system." << endl << "(" <<  l_qhndl->size () << "): file:///" << l_pth << endl;
                     } else {
                         //cout << "(data) [LocalLoadModel] " << mapping.size () << " flags loaded for "<< _lxdata.getID() << " ( "<< symbol << " )." << endl;
-                        this->Model::m_lxdata = Lexidata ( m_lxdata.id(),m_lxdata.locale(), qPrintable ( l_sym ), l_map );
+                        this->Model::m_lxdata = new Lexidata ( m_lxdata->id(),m_lxdata->locale(), qPrintable ( l_sym ), l_map );
                     }
 
                     l_qhndl->close ();
@@ -181,13 +181,13 @@ namespace Wintermute {
             }
 
             /// @todo Finish definition of XMLStorage.
-            Storage* XMLStorage::create ( const Lexidata& p_lxinfo ) {
+            Storage* XMLStorage::create ( const Lexidata* p_lxinfo ) {
                 //return new XMLStorage(p_lxinfo);
                 return NULL;
             }
 
             /// @todo Use iteration to determine if this sect of data was already formed.
-            const bool XMLStorage::exists ( const Lexidata& p_lxinfo ) {
+            const bool XMLStorage::exists ( const Lexidata* p_lxinfo ) {
                 return false;
             }
 
@@ -216,7 +216,7 @@ namespace Wintermute {
                         QDomElement l_curEle = l_nodLst.at ( i ).toElement ();
                         const string l_sym = l_curEle.attribute ( "symbol" ).toStdString ();
 
-                        if ( !Storage::exists ( Lexidata ( md5 ( l_sym ),Configuration::locale() ) ) ) {
+                        if ( !Storage::exists ( (new Lexidata ( md5 ( l_sym ),Configuration::locale() ) ) ) ) {
                             QDomNodeList l_lnkLst = l_curEle.elementsByTagName ( "Link" );
 
                             if ( !l_lnkLst.isEmpty () ) {
@@ -230,7 +230,7 @@ namespace Wintermute {
                                     //cout << "(data) [XMLStorage] Parsed flagset #" << theMap.size ()<< ": " << ontoid << " " << flags << endl;
                                 }
 
-                                Lexidata theLex ( md5 ( l_sym ) , Configuration::locale() , l_sym , l_theMap );
+                                Lexidata *theLex = new Lexidata ( md5 ( l_sym ) , Configuration::locale() , l_sym , l_theMap );
                                 //cout << "(data) [XMLStorage] Size: " << theMap.size ()  << ":" << links.length () << endl;
                                 LocalStorage::serializeToDisk ( theLex );
                             } else ++l_cntSkip;
