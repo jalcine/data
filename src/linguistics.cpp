@@ -22,11 +22,9 @@
 #include <map>
 #include <string>
 #include <QFile>
+#include <QDir>
 #include <QDomDocument>
 #include <iostream>
-#include <QTextStream>
-#include <boost/filesystem.hpp>
-#include <boost/serialization/base_object.hpp>
 #include "md5.hpp"
 #include "config.hpp"
 #include "linguistics.hpp"
@@ -53,12 +51,12 @@ namespace Wintermute {
                 Configuration::setLocale ( locale );
 
                 //cout << "(data) [Ling:Config] Setting up linguistics data sources... " << endl;
-                Storage::addDataSource ( LocalStorage::create , LocalStorage::exists );
-                Storage::addDataSource ( XMLStorage::create , XMLStorage::exists );
+                Lexical::Storage::addDataSource ( Lexical::LocalStorage::create , Lexical::LocalStorage::exists );
+                Lexical::Storage::addDataSource ( Lexical::XMLStorage::create , Lexical::XMLStorage::exists );
 
                 //cout << "(data) [Ling:Config] Parsing sources.. " << endl;
-                LocalStorage::spawn();
-                XMLStorage::spawn();
+                Lexical::LocalStorage::spawn();
+                Lexical::XMLStorage::spawn();
 
             }
 
@@ -78,8 +76,8 @@ namespace Wintermute {
                 if ( configDir.size() == 0 )
                     return;
 
-                boost::filesystem::path newConfigDir ( configDir );
-                Configuration::_storageDir = newConfigDir.string();
+                QDir* d = new QDir(configDir.c_str ());
+                Configuration::_storageDir = d->absolutePath().toStdString ();
 
                 cout << "(data) [Ling:Config] ## Root directory set to " << configDir << endl;
             }

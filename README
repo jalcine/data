@@ -1,4 +1,4 @@
-Wintermute Database Module
+Wintermute Database Module (WntrData)
 ----------------------------
 
 1. Introduction
@@ -9,25 +9,27 @@ store and retrieve data via a flexible data framework.
 
 2. About WntrData
 
-We call the module (or library) orientated around Wintermute's data, WntrData
-(pronounced WinterData). This library contains many of the vital operations
-needed for the other libraries like WntrLing and WntrCore to carry out their tasks.
-Currently, the WntrData library only is useful to WntrData and loads linguistics
-information used to identify words in a sentence passed to a linguistics parser.
-Check the Doxygen documentation's TODO page and the TODO and HACKING failes to see
+We call the module (or library) orientated around Wintermute's data,
+WntrData (pronounced WinterData). This library contains many of the vital
+operations needed for the other libraries like WntrLing and WntrCore to carry
+out their tasks. Currently, the WntrData library only is useful to WntrData and
+loads linguistics information used to identify words in a sentence passed to a
+linguistics parser. Check the Doxygen documentation's TODO and BUG pages to see
 what you can do as a developer to modify, enhance, and repair this system.
 
 3. User Interactions
 
-At the moment, there's no real frontend for users aside from power users and developers
-to really interact and utilize the WntrData library. In the future, GUIs will provide a
-means of managing the data stored by Wintermute. Do note, that in the future, Wintermute's
-data mining services plan to use existing ontologies and other sources of semantic information installed
-on your system to rapidly and quickly add information to its database.
+At the moment, there's no real front-end for users aside from power users and
+developers to really interact and utilize the WntrData library. In the future,
+GUIs will provide a means of managing the data stored by Wintermute. Do note,
+that in the future, Wintermute's data mining services plan to use existing
+ontologies and other sources of semantic information installed on your system to
+rapidly and quickly add information to its database.
 
- 4. Reporting and Contributing to the Case
+4. Reporting and Contributing to the Cause
 
- We here at the Synthetic Intellect Institute, the makers and mainters of Wintermute,
- welcome all. If you want to chat with the guys responible for Wintermute or the Institute,
- drop us a message at <contact@thesii.org> or send us a message to our mailing list at
- <sii@lists.launchpad.net>. We hope to hear (or see or read) from you soon.
+ We here at the Synthetic Intellect Institute, the makers and maintainers
+of Wintermute, welcome all. If you want to chat with the guys responsible
+for Wintermute or the Institute, drop us a message at <contact@thesii.org> or
+send us a message to our mailing list at <sii@lists.launchpad.net>. We hope to
+hear (or see or read) from you soon.

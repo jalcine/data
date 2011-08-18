@@ -27,9 +27,6 @@
 #include <map>
 #include <string>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-
 #include <Soprano/Soprano>
 
 using namespace std;
@@ -193,14 +190,11 @@ namespace Wintermute {
             class Concept {
                 protected:
                     friend class Instance;
-                    friend class boost::serialization::access;
 
                     static ConceptList* allConcepts;
                     string _uuid;
                     LinkList* _links;
 
-                    template<class Archive>
-                    void serialize ( Archive&, const unsigned int );
                     /**
                      * @brief Initializes concept.
                      * Does initialization work for the Concept.
@@ -262,7 +256,6 @@ namespace Wintermute {
              */
             class Link {
                 private:
-                    friend class boost::serialization::access;
                     static LinkList* allLinks;
 
                     string _uuid;
@@ -270,8 +263,6 @@ namespace Wintermute {
                     const Concept* _relation;
                     const Concept* _child;
 
-                    template<class Archive>
-                    void serialize ( Archive& , const unsigned int );
                     /**
                      * @brief
                      * Does the initialization work for the Link.
@@ -397,9 +388,6 @@ namespace Wintermute {
             class Instance : public Concept {
                 private:
                     static InstanceList* allInstances;
-                    friend class boost::serialization::access;
-                    template<class Archive>
-                    void serialize ( Archive& , const unsigned int );
 
                     /**
                      * @brief
@@ -480,4 +468,4 @@ namespace Wintermute {
 
 #endif	/* ONTOLOGY_HPP */
 
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 
+// kate: indent-mode cstyle; space-indent on; indent-width 4;

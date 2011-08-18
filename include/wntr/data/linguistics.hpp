@@ -56,7 +56,9 @@ namespace Wintermute {
              * All configuration variables and their access methods specific for linguistic part of WntrData
              * are defined here.
              */
-            class Configuration {
+            class Configuration  : public QObject {
+                Q_OBJECT
+
                 private:
                     /* Storage directory and locale variables */
                     static string _storageDir;

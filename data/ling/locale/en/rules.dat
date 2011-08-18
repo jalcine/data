@@ -1,71 +1,143 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
 
-  Rule definition of standard English grammar for Wintermute.
-  This document represents the means of converting linguistics into
-  ontological information in the English language. God be with us.
+About
+====================
+This XML document represents the rule definition of standard English grammar for
+Wintermute. This document represents the means of converting linguistics into
+ontological information in the English language. God be with us. There's a
+document that will be posted to
+  <http://www.thesii.org/wiki/SII:Projects:Wintermute:LexicalBindings> soon. I
+(Jacky Alcine) have to convert the document from ODT to MediaWiki (or if
+someone's willing to; e-mail me at jacky.alcine@thesii.org and I'll send it to
+you.)
 
-  15 Aug 2011 2:26 AM
-  ===================
-  Biggest issue right now, if there's a rule defined for 'B' and there's a rule defined
-  for 'Bz' and the node in question *is* 'Bz', the 'B' rule will have precedence ONLY if it
-  comes before 'Bz' in the document. At the moment, you must put sub-rules (or rules targeted at
-  specific types of words) before the general definition.
+Documentation
+===================
+1. Rule Elements
+
+Rule elements are expected to only have the attribute 'type'. It should contain
+ONE (1) type or part of a specific type of node that should match it. In the
+future, rules will be allowed (and recommended) to be subset within each other
+in order of similiarity (ie: The rule 'A' would contain 'Ad', and 'Ae'. 'Ae'
+would contain 'Aen' and 'Aep'). This way, it'd make it possible to enable and
+disable certain rules by type.
+
+2. Bind Elements
+
+Bind elements are perhaps the most cruical and dynamic elements of the RuleSet
+document. They're required to have the 'with' attriubte, which specifys what
+happens to the nodes before, during, or after linking.
+
+2a. Pre-link Attributes
+These attributes effect the linking process before it happens. Currently, there
+aren't any attributes that fall in this category.
+
+2b. Concurrent Link Attributes
+These attribute effect the linking process while it happens.
+
+ > linkAction: A list of actions to take place during the linking process. This
+    attribute can contain a list of values or just one for ease of use. Values
+    include:
+
+    * reverse: This swaps the source node with the destination node and flips
+      the locale and flags of the link. Used for ontological link simplicity.
+
+    * othertype: This sets the flags of the link to the flags of the source
+      node.
+
+    * thistype: This sets the flags of the link to the flags of the destination
+      node.
+
+2c. Post-link Attributes
+These attributes effect the post results of linking.
+
+ > hide: [default = 'no'] Prevents this node (source node) from appearing on
+the next round of parsing.
+
+ > hideNext: [default = 'no'] Prevents the next node (destination node) from
+appearing on its next round of parsing (2 rounds from now).
+
+ > skipWord: [default = 'yes'] Doesn't allow the destination node to have a
+chance at being parsed.
+
+ > hideFilter: [default = ''] Hides a set of words from appearing on the next
+round of parsing; a wrapper for the 'hide' attribute.
+
+Changelog
+==================
+[#1] (15 Aug 2011 2:26 AM): Biggest issue right now, if there's a rule defined
+for 'B' and there's a rule defined for 'Bz' and the node in question *is* 'Bz',
+the 'B' rule will have precedence ONLY if it comes before 'Bz' in the document.
+At the moment, you must put sub-rules (or rules targeted at specific types of
+words) before the general definition.
+
+[#2] (15 Aug 2011 9:51 PM): Fixed issue in changelog entry #1 in script by
+using a rating system, but now adjectives don't link to anything after it. This
+might be a human or logical error. (APPEND) Yes, it's a logical error, because
+when I toggle the 'hide' attribute to 'no' (by deleting it), it generates an
+extra, useless link and the whole syntax is messed up. *sigh*
+
+[#3] (15 Aug 2011 11:37 PM): So, the issue in changelog entry #2 was a rule
+mistake. Apparently, the generic 'A' rule took over and messed this up. -___-
+
+[#4] (16 Aug 2011 12:18 AM): Incredible progress, the hideFilter attribute now
+works to full efficiency. And it really rox!
 
  -->
-<RuleSet locale="en">
-    <Rule type="Ad">
-        <Bind with="B" />
-        <Bind with="D,E,F" skipWord="no" />
-    </Rule>
+   <RuleSet locale="en">
+     <Rule type="Ad">
+       <Bind with="B" />
+       <Bind with="D,E,F" skipWord="no" />
+     </Rule>
 
-    <Rule type="Aen">
-        <Bind with="C" />
-        <Bind with="D" skipWord="no" />
-    </Rule>
+     <Rule type="Aen">
+       <Bind with="C" />
+       <Bind with="D" skipWord="no" />
+     </Rule>
 
-    <Rule type="Aep">
-        <Bind with="B" />
-        <Bind with="E" skipWord="no" />
-    </Rule>
+     <Rule type="Aep">
+       <Bind with="B" />
+       <Bind with="E" skipWord="no" />
+     </Rule>
 
-    <Rule type="Ax">
-        <Bind with="D,E,F" skipWord="no" hideOther="yes" hideFilter="B,D,E,F" />
-        <Bind width="B" />
-    </Rule>
+     <Rule type="Ax">
+       <Bind with="Bz,D,E,F" skipWord="no" hideNext="yes" hideFilter="Bz,D,E,F" />
+     </Rule>
 
-    <Rule type="B">
-        <Bind with="D,E,F" skipWord="no" />
-        <Bind with="B,C" postAction="reverse" />
-    </Rule>
+     <Rule type="B">
+       <Bind with="C" linkAction="reverse" />
+       <Bind with="B" skipWord="no" hideNext="yes" />
+       <Bind with="D,E,F" skipWord="no" hideNext="yes" />
+     </Rule>
 
-    <Rule type="Bz">
-        <Bind with="Bz" hide="yes" />
-        <Bind with="D,E,F" skipWord="no" />
-        <Bind with="Ad" skipWord="no" />
-    </Rule>
+     <Rule type="Bz">
+       <Bind with="Bz" hideNext="yes" skipWord="no" />
+       <Bind with="D,E,F" skipWord="no" hideNext="yes" />
+       <Bind with="Ad" skipWord="no" />
+     </Rule>
 
-    <Rule type="C">
-        <Bind with="A,B,C" hideOther="no" />
-        <Bind with="D,E,F" skipWord="no"/>
-    </Rule>
+     <Rule type="C">
+       <Bind with="A,B,C" hideNext="no" />
+       <Bind with="D,E,F" skipWord="no" hideNext="yes" />
+     </Rule>
 
-    <Rule type="D">
-        <Bind with="B,C,D,E,F" skipWord="no" postAction="otherType" hide="yes" />
-    </Rule>
+     <Rule type="D">
+       <Bind with="Ap,B,C,D,E,F" skipWord="no" linkAction="otherType" hide="yes" />
+     </Rule>
 
-    <Rule type="E">
-        <Bind with="B,C,D,E,F" skipWord="no" postAction="otherType" hide="yes" />
-    </Rule>
+     <Rule type="E">
+       <Bind with="Ap,B,C,D,E,F" skipWord="no" linkAction="otherType" hide="yes" />
+     </Rule>
 
-    <Rule type="Fm">
-        <Bind with="F+" skipWord="no" hide="yes" typeHas="-" />
-        <Bind with="F-" skipWord="no" hide="yes" typeHas="+" />
-    </Rule>
+     <Rule type="Fm">
+       <Bind with="F+" skipWord="no" typeHas="-" />
+       <Bind with="F-" skipWord="no" typeHas="+" />
+     </Rule>
 
-    <Rule type="F">
-        <Bind with="A,C,D" skipWord="no" hide="yes" />
-    </Rule>
+     <Rule type="F">
+       <Bind with="A,C,D" skipWord="no" hide="yes" />
+     </Rule>
 
-    <Added />
-</RuleSet>
+     <Added />
+   </RuleSet>

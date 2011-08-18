@@ -54,7 +54,6 @@ namespace Wintermute {
 
             Store::Store ( const string& storeUUID ) : _uuid ( storeUUID ), _model ( NULL ) {
                 //cout << "(data) [Store] (UUID: '" << storeUUID << "') Initializing.. " << endl;
-                Model *theModel = createModel();
                 const QString theUrl ( ( string ( Data::Configuration::getDirectory() + string ( "/" ) +  string ( WNTRDATA_ONTO_DIR ) + string ( "/" ) + storeUUID + string ( ".owl" ) ) ).c_str() );
                 const QUrl ontologyUrl ( theUrl );
 
@@ -134,12 +133,6 @@ namespace Wintermute {
                 return this->_uuid;
             }
 
-            template<class Archive>
-            void Concept::serialize ( Archive & ar, const unsigned int version ) {
-                ar & _uuid;
-                ar & _links;
-            }
-
             const Concept* Concept::obtain ( const string& conceptUUID ) {
                 if ( allConcepts->find ( conceptUUID ) == allConcepts->end() ) {
                     const Concept* aNewConcept = new Concept ( conceptUUID );
@@ -192,13 +185,6 @@ namespace Wintermute {
 
             Link::~Link() {}
 
-            template<class Archive>
-            void Link::serialize ( Archive & ar, const unsigned int version ) {
-                ar & _parent;
-                ar & _child;
-                ar & _relation;
-                ar & _uuid;
-            }
 
             void Link::initialize() {
                 /// @todo: Add code on how to load link information (or copy pre-existing information into this.)
@@ -277,4 +263,4 @@ namespace Wintermute {
         }
     }
 }
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 
+// kate: indent-mode cstyle; space-indent on; indent-width 4;
