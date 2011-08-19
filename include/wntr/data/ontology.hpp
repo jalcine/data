@@ -24,9 +24,8 @@
 #ifndef ONTOLOGY_HPP
 #define	ONTOLOGY_HPP
 
-#include <map>
-#include <string>
-
+#include <QMap>
+#include <QString>
 #include <Soprano/Soprano>
 
 using namespace std;
@@ -40,428 +39,54 @@ using Soprano::Model;
 namespace Wintermute {
     namespace Data {
         namespace Ontology {
-            struct Store;
-            struct Concept;
-            struct Instance;
-            struct Link;
             struct Configuration;
-            typedef map<const string, Store*> StoreList;
-            typedef map<const string, const Concept*> ConceptList;
-            typedef map<const string, const Link*> LinkList;
-            typedef map<const string, Instance*> InstanceList;
+            struct Concept;
+            struct Knowledge;
+            struct Repository;
 
             /**
              * @brief Management class for the ontologies.
              * This class manages every and anything having to deal with ontologies.
              * @class Configuration ontology.hpp "include/wntr/data/ontology.hpp"
              */
-            class Configuration {
+            class Configuration : public QObject {
+                Q_OBJECT
+
                 public:
                     /**
-                     * @brief
-                     *
+                     * @brief Initializes the ontology system.
+                     * Runs all of the necessary initialziation code to get the ontology system on its toes.
                      * @fn Initialize
                      */
-                    static void Initialize();
+                    Q_INVOKABLE static void Initialize();
                     /**
-                     * @brief
-                     *
+                     * @brief Deinitializes the ontology system/
+                     * Runs all of the necessary deinitialization code to have the ontology system be safely shut down.
                      * @fn Deinitialize
                      */
-                    static void Deinitialize();
+                    Q_INVOKABLE static void Deinitialize();
             };
 
             /**
-             * @brief Maintainer class for manipulating Concepts, Instances and Links.
-             * Represents the storage of all concepts. This provides a data store of
-             * sorts to hold concepts and instances; consider concepts books and this
-             * a bookshelf.
-             * @class Store ontology.hpp "include/wntr/data/ontology.hpp"
-             * @see Concept
-             * @see Instance
-             * @see Link
-             * @note This class should be able to be serialized and deserialized at whim (consider doing this asynchronously as well?)
-             * @todo Apply serialization and deserialization of this class.
-             */
-            class Store {
-                    friend struct Concept;
-                    friend struct Instance;
-                    friend struct Link;
-                private:
-                    string _uuid;
-                    Model* _model;
-
-                protected:
-                    static StoreList* allStores;
-                    /**
-                     * @brief Default constructor.
-                     * Creates a new empty Store.
-                     * @fn Store
-                     */
-                    explicit Store();
-                    /**
-                     * @brief Constructor, loads from UUID.
-                     * Creates a Store by loading it from a specified location by its designated UUID.
-                     * @fn Store
-                     * @param  uuid The UUID of the Store to load.
-                     */
-                    Store ( const string& );
-
-                    ~Store();
-                public:
-                    /**
-                     * @brief
-                     *
-                     * @fn hasConcept
-                     * @param
-                     */
-                    void hasConcept ( const string& );
-                    /**
-                     * @brief
-                     *
-                     * @fn hasLink
-                     * @param
-                     */
-                    void hasLink ( const string& );
-                    /**
-                     * @brief
-                     *
-                     * @fn hasInstance
-                     * @param
-                     */
-                    void hasInstance ( const string& );
-                    /**
-                     * @brief Save instance to store.
-                     * Saves a reference of an Instance to this Store; overwriting it if necessary.
-                     * @fn saveInstance
-                     * @param Instance|instance The instance to save.
-                     * @param bool|canOverwrite Determines whether or not this can be overwritten (defaults to true, can be omitted).
-                     */
-                    void saveInstance ( const Instance&, const bool& = true );
-                    /**
-                     * @brief
-                     *
-                     * @fn saveLink
-                     * @param
-                     * @param
-                     */
-                    void saveLink ( const Link&, const bool& = true );
-                    /**
-                     * @brief
-                     *
-                     * @fn saveConcept
-                     * @param
-                     * @param
-                     */
-                    void saveConcept ( const Concept&, const bool& = true );
-                    //void save();
-                    /**
-                     * @brief
-                     *
-                     * @fn obtain
-                     * @param
-                     */
-                    static Store* obtain ( const string& );
-                    /**
-                     * @brief
-                     *
-                     * @fn obtainConcept
-                     * @param
-                     * @param
-                     */
-                    static const Concept* obtainConcept ( const string&, const string& );
-                    /**
-                     * @brief
-                     *
-                     * @fn obtainInstance
-                     * @param
-                     * @param
-                     */
-                    static Instance* obtainInstance ( const string&, const string& );
-            };
-
-            /**
-             * @brief Individual topic.
-             * Represents a bit of information; an isolated idea. A concept is purely
-             * a lone nueron in a mind, without a link, only with its own meaning.
+             * @brief Represents a bit of data.
+             * Concepts are the most basic components of an ontology.
              * @class Concept ontology.hpp "include/wntr/data/ontology.hpp"
-             * @todo Wrap this class around Soprano::Statement and see how it can purely represent a concept.
              */
-            class Concept {
-                protected:
-                    friend class Instance;
-
-                    static ConceptList* allConcepts;
-                    string _uuid;
-                    LinkList* _links;
-
-                    /**
-                     * @brief Initializes concept.
-                     * Does initialization work for the Concept.
-                     * @fn initialize
-                     */
-                    virtual void initialize();
-                    /**
-                     * @brief Default constructor.
-                     * Creates a new empty Concept.
-                     * @fn Concept
-                     */
-                    explicit Concept();
-                    /**
-                     * @brief Default copy constructor.
-                     * Creates a copy of a previously existing Concept.
-                     * @fn Concept
-                     * @param Concept|copiedConcept The concept to be copied.
-                     */
-                    Concept ( const Concept& );
-                    /**
-                     * @brief Constructs from deserialization.
-                     * Creates a new Concept from an UUID.
-                     * @fn Concept
-                     * @param conceptUUID The UUID of the Concept to load.
-                     */
-                    Concept ( const string& );
-                    ~Concept();
-                public:
-                    /**
-                     * @brief Return UUID.
-                     * Obtains the UUID of this Concept.
-                     * @fn getUUID
-                     * @return string The UUID.
-                     */
-                    virtual const string& getUUID() const;
-                    /**
-                     * @brief Obtain link.
-                     * Obtains the Link determined by the specified UUID.
-                     * @fn getLink
-                     * @param  The UUID of the link to obtained.
-                     * @return Link* A pointer to the found link or NULL.
-                     */
-                    const Link* getLink ( const string& ) const;
-                    /**
-                     * Obtains all of the Links that this Concept has.
-                     * @return LinkList* The links of this Concept or NULL.
-                     */
-                    const LinkList* getLinks() const;
-                    /**
-                     * Obtains a Concept; creates it if not already created.
-                     * @return Concept* The Concept found (or created).
-                     */
-                    static const Concept* obtain ( const string& );
-            };
+            class Concept : public QObject { };
 
             /**
-             * Represents the bond formed by linking a parent concept to a child concept, by means of
-             * a relationship concept. This is considered knowledge. Links are practically concept triples.
+             * @brief Represents a link of concepts.
+             * @c Knowledge objects represent Concepts made useful; by giving it a sense of meaning.
+             * @class Knowledge ontology.hpp "include/wntr/data/ontology.hpp"
              */
-            class Link {
-                private:
-                    static LinkList* allLinks;
-
-                    string _uuid;
-                    const Concept* _parent;
-                    const Concept* _relation;
-                    const Concept* _child;
-
-                    /**
-                     * @brief
-                     * Does the initialization work for the Link.
-                     */
-                    virtual void initialize();
-                    /**
-                     * @brief
-                     * Creates an empty Link.
-                     */
-                    Link();
-                    /**
-                     * @brief
-                     * Creates a Link by copying a previously existing Link.
-                     * @param Link& The Link to be copied.
-                     */
-                    Link ( const Link& );
-                    /**
-                     * @brief
-                     * Binds two node concepts by a relationship concept and returns the result in the form of a Link.
-                     * @param Concept* The l-concept.
-                     * @param Concept* The r-concept.
-                     * @param Concept* The relating concept.
-                     */
-                    Link ( const Concept*, const Concept*, const Concept* );
-                    /**
-                     * @brief
-                     * Obtains a Link from disk by its UUID.
-                     */
-                    Link ( const string& );
-                    ~Link();
-                public:
-
-                    /**
-                     * @brief
-                     *
-                     * @fn getParentConcept
-                     */
-                    const Concept* getParentConcept() const;
-
-                    /**
-                     * @brief
-                     *
-                     * @fn getChildConcept
-                     */
-                    const Concept* getChildConcept() const;
-
-                    /**
-                     * @brief
-                     *
-                     * @fn getRelationship
-                     */
-                    const Concept* getRelationship() const;
-
-                    /**
-                     * @brief
-                     *
-                     * @fn getUUID
-                     */
-                    const string& getUUID() const;
-
-                    /**
-                     * @brief
-                     *
-                     * @fn setParentConcept
-                     * @param
-                     */
-                    const Link* setParentConcept ( const Concept* );
-
-                    /**
-                     * @brief
-                     *
-                     * @fn setChildConcept
-                     * @param
-                     */
-                    const Link* setChildConcept ( const Concept* );
-
-                    /**
-                     * @brief
-                     *
-                     * @fn setRelationship
-                     * @param
-                     */
-                    const Link* setRelationship ( const Concept* );
-
-                    /**
-                     * @brief
-                     *
-                     * @fn obtain
-                     * @param
-                     */
-                    static const Link* obtain ( const string& );
-
-                    /**
-                     * @brief
-                     *
-                     * @fn form
-                     * @param
-                     * @param
-                     * @param
-                     */
-                    static const Link* form ( const Concept*, const Concept*, const Concept* );
-
-                    /**
-                     * @brief
-                     *
-                     * @fn form
-                     * @param
-                     * @param
-                     * @param
-                     */
-                    static const Link* form ( const string&, const string&, const string& );
-            };
+            class Knowledge : public QObject { };
 
             /**
-             * @brief An editable instance of an Concept.
-             * Represents a concept that's been modified via means of changing the
-             * bonds of one or more of its links. The special thing about this class
-             * is that it's allowed to modify the links it has; unlike a typical Concept.
-             * The changes are not saved to the base concept and thus allows a specialized
-             * version of such a class.
-             * @class Instance ontology.hpp "include/wntr/data/ontology.hpp"
+             * @brief Represents a collection of @c Knowledge.
+             * @c Repository
+             * @class Repository ontology.hpp "include/wntr/data/ontology.hpp"
              */
-            class Instance : public Concept {
-                private:
-                    static InstanceList* allInstances;
-
-                    /**
-                     * @brief
-                     *
-                     * @fn initialize
-                     */
-                    virtual void initialize();
-
-                public:
-
-                    /**
-                     * @brief
-                     *
-                     * @fn Instance
-                     */
-                    Instance();
-
-                    /**
-                     * @brief
-                     *
-                     * @fn Instance
-                     * @param
-                     */
-                    Instance ( const Concept& );
-
-                    /**
-                     * @brief
-                     *
-                     * @fn Instance
-                     * @param
-                     */
-                    Instance ( const string& );
-
-                    /**
-                     * @brief
-                     *
-                     * @fn setLink
-                     * @param
-                     * @param
-                     */
-                    void setLink ( const string&, const Link* );
-
-                    /**
-                     * @brief
-                     *
-                     * @fn setLinks
-                     * @param
-                     */
-                    void setLinks ( const LinkList* );
-
-                    /**
-                     * @brief
-                     *
-                     * @fn obtain
-                     * @param
-                     */
-                    static const Instance* obtain ( const string& );
-
-                    /**
-                     * @brief
-                     *
-                     * @fn create
-                     * @param
-                     */
-                    static const Instance* create ( const Concept* );
-
-                    /**
-                     * @brief
-                     *
-                     * @fn create
-                     * @param
-                     */
-                    static const Instance* create ( const string& );
-            };
+            class Repository : public QObject { };
         }
     }
 }

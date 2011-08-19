@@ -69,7 +69,7 @@ namespace Wintermute {
                     return;
 
                 Configuration::_locale = locale;
-                cout << "(data) [Ling:Config] ## Global locale set to " << locale << endl;
+                cout << "(data) [Ling:Config] ## Global locale changed to " << locale << endl;
             }
 
             void Configuration::setDirectory ( string const configDir ) {
@@ -79,7 +79,7 @@ namespace Wintermute {
                 QDir* d = new QDir(configDir.c_str ());
                 Configuration::_storageDir = d->absolutePath().toStdString ();
 
-                cout << "(data) [Ling:Config] ## Root directory set to " << configDir << endl;
+                cout << "(data) [Ling:Config] ## Root directory changed to " << configDir << endl;
             }
         } // namespaces
     }

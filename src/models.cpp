@@ -88,7 +88,7 @@ namespace Wintermute {
                 void LocalSaveModel::save () {
                     if ( m_file->open ( QIODevice::WriteOnly | QIODevice::Truncate ) ) {
                         const Leximap flags = m_lxdt->flags();
-                        qDebug() << "(data) [LocalSaveModel] Saving '" <<  m_lxdt->id()->c_str() << "' ..." << endl;
+                        //qDebug() << "(data) [LocalSaveModel] Saving '" <<  m_lxdt->id()->c_str() << "' ..." << endl;
 
                         {
                             QTextStream l_strm(m_file);
@@ -101,12 +101,10 @@ namespace Wintermute {
                         }
 
 
-                        qDebug() << flags.size () << "flags written for (" << m_lxdt->symbol()->c_str() << ")." << endl
-                                 << m_file->readAll ();
-                    } else {
-                        qWarning () << "(data) [LocalSaveModel] Failed to save '" << m_lxdt->id()->c_str() << "'! Error: " << m_file->errorString () << endl
-                                     << "       File name:" << url().c_str ();
-                    }
+                        //qDebug() << flags.size () << "flags written for (" << m_lxdt->symbol()->c_str() << ")." << endl
+                        //         << m_file->readAll ();
+                    } else
+                        qWarning () << "(data) [LocalSaveModel] Failed to save" << m_lxdt->id()->c_str() << "; Error: " << m_file->errorString ();
 
                     m_file->close ();
                 }
@@ -127,7 +125,7 @@ namespace Wintermute {
                                     << m_file->errorString();
                         return NULL;
                     } else {
-                        qDebug() << "(data) [LocalLoadModel] Loading from '" << this->Model::m_lxdt->id ()->c_str () << "' (" << m_file->size () << " bytes )...";
+                        //qDebug() << "(data) [LocalLoadModel] Loading from '" << this->Model::m_lxdt->id ()->c_str () << "' (" << m_file->size () << " bytes )...";
                         QTextStream l_inLxDt ( m_file->readAll () );
                         QString l_sym, l_flg, l_ont;
                         Leximap l_map;
@@ -138,14 +136,14 @@ namespace Wintermute {
                             l_inLxDt >> l_ont >> l_flg;
                             if ( l_ont.isEmpty () || l_flg.isEmpty () )
                                 continue;
-                            qDebug() << "(data) [LocalLoadModel] Flagset: " << l_ont << l_flg;
+                            //qDebug() << "(data) [LocalLoadModel] Flagset: " << l_ont << l_flg;
                             l_map.insert ( Leximap::value_type(l_ont.toStdString (), l_flg.toStdString ()) );
                         }
 
                         m_file->close ();
 
                         if ( l_map.size () > 0 ) {
-                            qDebug() << "(data) [LocalLoadModel]" << l_map.size () << "flags loaded for" << m_lxdt->id ()->c_str () << "("<< l_sym << ").";
+                            //qDebug() << "(data) [LocalLoadModel]" << l_map.size () << "flags loaded for" << m_lxdt->id ()->c_str () << "("<< l_sym << ").";
                             const string* l_symStr = new string(l_sym.toStdString ().c_str ());
                             Lexidata* l_lxdt = new Lexidata ( m_lxdt->id() , m_lxdt->locale() , l_symStr , l_map );
                             Q_ASSERT(l_lxdt != NULL);
@@ -177,12 +175,12 @@ namespace Wintermute {
                     QDomDocument l_domDoc;
 
                     if ( !l_qhndl->open ( QIODevice::ReadOnly | QIODevice::Text ) ) {
-                        qWarning () << "(data) [XMLStorage] Failed to open '" << l_pthDoc.c_str ()<< "';" << l_qhndl->errorString ();
+                        qWarning () << "(data) [XMLStorage] Failed to open" << l_pthDoc.c_str ()<< ";" << l_qhndl->errorString ();
                         return;
                     }
 
                     if ( !l_domDoc.setContent ( l_qhndl ) ) {
-                        qWarning() << "(data) [XMLStorage] Failed to parse '" << l_pthDoc.c_str ()<< "';" << l_qhndl->errorString ();
+                        qWarning() << "(data) [XMLStorage] Failed to parse" << l_pthDoc.c_str ()<< ";" << l_qhndl->errorString ();
                         return;
                     }
 
@@ -207,22 +205,22 @@ namespace Wintermute {
                                         const QString l_ont = l_lnkEle.attribute ( "ontoid" );
                                         const QString l_flg = l_lnkEle.attribute ( "flags" );
 
-                                        l_map.insert ( Leximap::value_type(l_ont.toStdString (),l_flg.toStdString ()) ) ;
-                                        qDebug() << "(data) [XMLStorage] Parsed flagset #" << (l_map.size () + 1) << ": " << l_ont << l_flg << endl;
+                                        l_map.insert ( Leximap::value_type(l_ont.toStdString(),l_flg.toStdString()) ) ;
+                                        qDebug() << "(data) [XMLStorage] Parsed flagset #" << (l_map.size () + 1) << ": " << l_ont << l_flg;
                                     }
 
-                                    Lexidata *theLex = new Lexidata ( const_cast<const string*>(&md5(l_sym.toStdString ())), const_cast<const string*>(&p_lcl) , const_cast<const string*>(&l_sym.toStdString ()), l_map );
-                                    qDebug() << "(data) [XMLStorage] Size: " << l_map.size ()  << ":" << l_lnkLst.size () << endl;
+                                    Lexidata *theLex = new Lexidata ( const_cast<const string*>(&md5(l_sym.toStdString ())), &p_lcl , const_cast<const string*>(&l_sym.toStdString ()), l_map );
+                                    qDebug() << "(data) [XMLStorage] Size:" << l_map.size ()  << ":" << l_lnkLst.size ();
                                     LocalStorage::serializeToDisk ( theLex );
                                 } else ++l_cntSkip;
                             } else ++ l_cntSkip;
                         }
 
                         if ( l_nodLst.size () - l_cntSkip != 0 )
-                            qDebug() << "(data) [XMLStorage] Generated " << ( l_nodLst.size () - l_cntSkip ) << " lexicons, skipped " << l_cntSkip << ", parsed " << l_nodLst.length () << "." << endl;
+                            qDebug() << "(data) [XMLStorage] Generated" << ( l_nodLst.size () - l_cntSkip ) << "lexicons, skipped" << l_cntSkip << ", parsed" << l_nodLst.length () << ".";
                     }
 
-                    qDebug() << "(data) [XMLStorage] Rendered '" << l_pthDoc.c_str () << "'." << endl;
+                    qDebug() << "(data) [XMLStorage] Rendered" << l_pthDoc.c_str ();
                 }
 
                 void XMLStorage::addDocument ( const string& p_url ) {
