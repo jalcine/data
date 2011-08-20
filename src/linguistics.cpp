@@ -31,13 +31,9 @@
 #include "models.hpp"
 
 using namespace std;
-using namespace boost::serialization;
-using namespace boost::archive;
 using namespace Wintermute::Data;
 
 using std::string;
-using boost::archive::xml_iarchive;
-using boost::archive::xml_oarchive;
 
 namespace Wintermute {
     namespace Data {
@@ -46,18 +42,17 @@ namespace Wintermute {
             string Configuration::_locale = "en";
 
             void Configuration::Initialize ( const string storageDir, const string locale ) {
-                //cout << "(data) [Ling:Config] Initializing data.." << endl;
+                qDebug() << "(data) [Ling:Config] Initializing data..";
                 Configuration::setDirectory ( storageDir );
                 Configuration::setLocale ( locale );
 
-                //cout << "(data) [Ling:Config] Setting up linguistics data sources... " << endl;
+                qDebug() << "(data) [Ling:Config] Setting up linguistics data sources... ";
                 Lexical::Storage::addDataSource ( Lexical::LocalStorage::create , Lexical::LocalStorage::exists );
                 Lexical::Storage::addDataSource ( Lexical::XMLStorage::create , Lexical::XMLStorage::exists );
 
-                //cout << "(data) [Ling:Config] Parsing sources.. " << endl;
+                qDebug() << "(data) [Ling:Config] Parsing sources.. ";
                 Lexical::LocalStorage::spawn();
                 Lexical::XMLStorage::spawn();
-
             }
 
             void Configuration::Deinitialize() {
