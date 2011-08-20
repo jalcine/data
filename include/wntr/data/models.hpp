@@ -168,7 +168,7 @@ namespace Wintermute {
                          * @brief
                          * @fn ~Model
                          */
-                        ~Model() { }
+                        virtual ~Model() { }
                         /**
                          * @brief Null constructor.
                          * @fn Model
@@ -297,14 +297,6 @@ namespace Wintermute {
                  * @class StorageModel models.hpp "include/wntr/data/models.hpp"
                  */
                 class Storage : virtual public SaveModel, virtual public LoadModel {
-                    public:
-                        /**
-                         * @brief
-                         *
-                         * @fn showLexicalInformation
-                         * @return LexicalInformation*
-                         */
-
                     protected:
 
                         /**
@@ -396,11 +388,10 @@ namespace Wintermute {
                          * @param slotExists The slot to determine the existence of a possible Storage object.
                          */
                         static void addDataSource ( const StorageObtainSignal::slot_type &, const StorageExistsSignal::slot_type & );
-
                 };
 
                 /**
-                 * @brief Abstract class defining interface for every object representing local data.
+                 * @brief Framing class defining interface for every object representing local data.
                  * The purpose of this class is to standarize interface for all classes
                  * intended for using as representations of data placed locally, e.g node files.
                  */
@@ -557,7 +548,6 @@ namespace Wintermute {
                 /**
                  * @brief Model used to load and save lexical information from local repositiories.
                  * @class LocalStorageModel models.hpp "include/wntr/data/models.hpp"
-                 * @todo Implement type-casting to/from LocalLoadModel, LocalSaveModel, and Storage.
                  */
                 class LocalStorage : public virtual Storage,
                             public virtual LocalLoadModel,
@@ -837,20 +827,160 @@ namespace Wintermute {
 
             /// @todo Define these classes for the Binding, Rule, and RuleSet classes. This'll add some dynamic means of implementing a back-end.
             namespace Rules {
+                struct Syntax;
                 struct Model;
-                struct SaveModel;
                 struct LoadModel;
+                struct SaveModel;
                 struct Storage;
 
+                /// @todo The means of implementing this should be done with a set of locale documents (~/en.lcl); and within it, contains a list of the name of the binding files.
                 struct LocalBackend;
                 struct LocalLoadModel;
                 struct LocalSaveModel;
                 struct LocalStorage;
 
+                /// @todo This should reimplement the traditional means of discovering Bindings.
                 struct XMLBackend;
                 struct XMLLoadModel;
                 struct XMLSaveModel;
                 struct XMLStorage;
+
+                typedef QList<Syntax*> SyntaxList;
+
+                class Syntax : public QObject {
+                    Q_OBJECT
+                    Q_PROPERTY(string locale READ locale WRITE setLocale)
+                    Q_PROPERTY(string ruleText READ ruleText WRITE setRuleText)
+                    Q_PROPERTY(string linkText READ linkText WRITE setLinkText)
+
+                    private:
+                        string m_lcl;
+                        string m_rlTxt;
+                        string m_lnkTxt;
+
+                    public:
+                        Syntax() : QObject(NULL), m_lcl(), m_rlTxt(), m_lnkTxt() { }
+                        Syntax(const Syntax& p_syntx) : QObject(NULL), m_lcl(p_syntx.m_lcl), m_rlTxt(p_syntx.m_rlTxt), m_lnkTxt(p_syntx.m_lnkTxt) { }
+                        Syntax& operator= (const Syntax&);
+                        ~Syntax() { }
+                        void setLocale(string const);
+                        void setRuleText(string const);
+                        void setLinkText(string const);
+                        const string locale() const;
+                        const string ruleText() const;
+                        const string linkText() const;
+                };
+
+                /**
+                 * @brief
+                 * @class Model models.hpp "include/wntr/data/models.hpp"
+                 * @todo This should provide the practical methods of obtaining Bindings.
+                 */
+                class Model : public QObject {
+                    Q_OBJECT
+                    //Q_PROPERTY(Syntax syntax READ syntax WRITE setSyntax)
+
+                    private:
+                        Syntax m_syntx;
+
+                    protected:
+                        Model(const Syntax& p_syntx) : QObject(NULL), m_syntx(p_syntx) { }
+
+                    public:
+                        Model(const Model& p_1) : QObject(NULL), m_syntx(p_1.m_syntx) { }
+                        Model() : QObject(NULL) { }
+                        virtual ~Model() { }
+                        //void setSyntax(Syntax p_syntx) { m_syntx = p_syntx; }
+                        Syntax syntax() const { return m_syntx; }
+                };
+
+                /**
+                 * @brief
+                 * @class SaveModel models.hpp "include/wntr/data/models.hpp"
+                 */
+                class SaveModel : public Model {
+                    Q_OBJECT
+
+                    public slots:
+                        /**
+                         * @brief
+                         * @fn saved
+                         */
+                        void saved();
+
+                    public:
+                        /**
+                         * @brief
+                         * @fn save
+                         */
+                        virtual void save() = 0;
+
+                    protected:
+                        /**
+                         * @brief
+                         * @fn SaveModel
+                         */
+                        SaveModel() : Model() { }
+                        /**
+                         * @brief
+                         * @fn SaveModel
+                         * @param p_model
+                         */
+                        SaveModel(const Model& p_1) : Model(p_1) { }
+                        /**
+                         * @brief
+                         * @fn SaveModel
+                         * @param p_saveModel
+                         */
+                        SaveModel(const SaveModel& p_1) : Model(p_1) { }
+                };
+
+                /**
+                 * @brief
+                 * @class LoadModel models.hpp "include/wntr/data/models.hpp"
+                 */
+                class LoadModel : public Model {
+                    Q_OBJECT
+
+                    public slots:
+                        /**
+                         * @brief
+                         * @fn loaded
+                         */
+                        void loaded();
+
+                    public:
+                        /**
+                         * @brief
+                         * @fn load
+                         */
+                        virtual void load() = 0;
+
+                    protected:
+                        /**
+                         * @brief
+                         * @fn LoadModel
+                         */
+                        LoadModel() : Model() { }
+                        /**
+                         * @brief
+                         * @fn LoadModel
+                         * @param p_model
+                         */
+                        LoadModel(const Model& p_model) : Model(p_model) { }
+                        /**
+                         * @brief
+                         * @fn LoadModel
+                         * @param p_model
+                         */
+                        LoadModel(const LoadModel& p_model) : Model(p_model) { }
+                };
+
+                class Storage : virtual public SaveModel, virtual public LoadModel {
+                    public:
+                    protected:
+                    private:
+                };
             }
         }
     }

@@ -39,7 +39,7 @@ namespace Wintermute {
     namespace Data {
         namespace Linguistics {
             string Configuration::_storageDir = string ( "./" ) + string ( WNTRDATA_LING_DIR );
-            string Configuration::_locale = "en";
+            string Configuration::_locale = WNTRDATA_DEFAULT_LOCALE;
 
             void Configuration::Initialize ( const string storageDir, const string locale ) {
                 qDebug() << "(data) [Ling:Config] Initializing data..";
@@ -59,22 +59,22 @@ namespace Wintermute {
 
             }
 
-            void Configuration::setLocale ( string const locale ) {
-                if ( locale.size() == 0 )
+            void Configuration::setLocale ( string const p_lcl ) {
+                if ( p_lcl.empty() )
                     return;
 
-                Configuration::_locale = locale;
-                cout << "(data) [Ling:Config] ## Global locale changed to " << locale << endl;
+                Configuration::_locale = p_lcl;
+                qDebug() << "(data) [Ling:Config] ## Global locale changed to " << p_lcl.c_str ();
             }
 
-            void Configuration::setDirectory ( string const configDir ) {
-                if ( configDir.size() == 0 )
+            void Configuration::setDirectory ( string const p_configDir ) {
+                if ( p_configDir.empty() )
                     return;
 
-                QDir* d = new QDir(configDir.c_str ());
+                QDir* d = new QDir(p_configDir.c_str ());
                 Configuration::_storageDir = d->absolutePath().toStdString ();
 
-                cout << "(data) [Ling:Config] ## Root directory changed to " << configDir << endl;
+                qDebug() << "(data) [Ling:Config] ## Root directory changed to " << p_configDir.c_str ();
             }
         } // namespaces
     }

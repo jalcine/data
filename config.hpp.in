@@ -30,6 +30,7 @@
 #define WNTRDATA_DATA_DIR "@WNTRDATA_DATA_DIR@"
 #define WNTRDATA_LING_DIR "@WNTRDATA_LING_DIR@"
 #define WNTRDATA_ONTO_DIR "@WNTRDATA_ONTO_DIR@"
+#define WNTRDATA_DEFAULT_LOCALE "@WNTRDATA_LOCALE@"
 
 #include <string>
 
@@ -50,9 +51,7 @@ namespace Wintermute {
                  * @fn getDirectory
                  * @return const string
                  */
-                static const string getDirectory() {
-                    return WNTRDATA_DATA_DIR;
-                }
+                static const string getDirectory() { return WNTRDATA_DATA_DIR; }
                 /**
                  * @brief Initializes the data services.
                  * @fn Initialize

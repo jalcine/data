@@ -23,6 +23,7 @@
 #include <iomanip>
 
 #include <QFile>
+#include <QMetaType>
 #include <QtDebug>
 #include <QMultiMap>
 #include <QTextStream>
@@ -239,9 +240,28 @@ namespace Wintermute {
             }
 
             namespace Rules {
+                Syntax& Syntax::operator=(const Syntax& p_syntx){
+                    this->m_lcl = p_syntx.m_lcl;
+                    this->m_rlTxt = p_syntx.m_rlTxt;
+                    this->m_lnkTxt = p_syntx.m_lnkTxt;
+                    return *this;
+                }
 
+                void Syntax::setLocale(string p_lcl) { m_lcl = p_lcl; }
+                void Syntax::setLinkText(string p_lnkTxt) { m_lnkTxt = p_lnkTxt; }
+                void Syntax::setRuleText(string p_rlTxt) { m_rlTxt = p_rlTxt; }
+                const string Syntax::locale() const { return m_lcl; }
+                const string Syntax::ruleText() const { return m_rlTxt; }
+                const string Syntax::linkText() const { return m_lnkTxt; }
+
+                void LoadModel::loaded() { }
+                void SaveModel::saved() { }
             }
         } // namespaces
     }
 }
+
+Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Lexical::Model)
+Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Rules::Syntax)
+Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Rules::Model)
 // kate: indent-mode cstyle; space-indent on; indent-width 4;
