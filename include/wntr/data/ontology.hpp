@@ -19,22 +19,21 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  * @endlegalese
+ *
  */
 
 #ifndef ONTOLOGY_HPP
 #define	ONTOLOGY_HPP
 
-#include <QMap>
 #include <QString>
+#include <QVector>
 #include <Soprano/Soprano>
 
 using namespace std;
-using namespace Soprano;
 
 using std::map;
 using std::pair;
 using std::string;
-using Soprano::Model;
 
 namespace Wintermute {
     namespace Data {
@@ -72,21 +71,166 @@ namespace Wintermute {
              * Concepts are the most basic components of an ontology.
              * @class Concept ontology.hpp "include/wntr/data/ontology.hpp"
              */
-            class Concept : public QObject { };
+            class Concept : public QObject {
+                friend class Knowledge;
+                Q_OBJECT
+
+                public:
+                    /**
+                l_repo.load();
+                     * @brief
+                     * @fn Concept
+                     */
+                    Concept( QObject* = 0 );
+                    /**
+                     * @brief
+                     * @fn Concept
+                     * @param
+                     */
+                    Concept( const Concept& );
+                    /**
+                     * @brief
+                     * @fn ~Concept
+                     */
+                    virtual ~Concept();
+                    /**
+                     * @brief
+                     * @fn id
+                     */
+                    const quint64 id() const;
+
+                protected:
+                    /**
+                     * @brief
+                     * @fn Concept
+                     * @param
+                     */
+                    Concept( const Soprano::Node* , QObject* = 0 );
+
+                private:
+                    const Soprano::Node *m_nd; /**< The Soprano::Node being wrapped by this Concept. */
+            };
 
             /**
              * @brief Represents a link of concepts.
              * @c Knowledge objects represent Concepts made useful; by giving it a sense of meaning.
              * @class Knowledge ontology.hpp "include/wntr/data/ontology.hpp"
              */
-            class Knowledge : public QObject { };
+            class Knowledge : public QObject {
+                friend class Repository;
+                Q_OBJECT
+
+                public:
+                    /**
+                     * @brief
+                     * @fn Knowledge
+                     */
+                    Knowledge( QObject* = 0 );
+                    /**
+                     * @brief
+                     * @fn Knowledge
+                     * @param
+                     */
+                    Knowledge( const Knowledge& );
+                    /**
+                     * @brief
+                     * @fn ~Knowledge
+                     */
+                    virtual ~Knowledge();
+
+                protected:
+                    /**
+                     * @brief
+                     * @fn Knowledge
+                     * @param
+                     * @param
+                     * @param
+                     */
+                    Knowledge( const Soprano::Statement&, QObject* = 0 );
+
+                private:
+                    Concept* m_subjNod; /**< Represents a subject Concept. */
+                    Concept* m_predNod; /**< Represents a predicate Concept. */
+                    Concept* m_objNod;  /**< Represents an object Concept. */
+            };
 
             /**
              * @brief Represents a collection of @c Knowledge.
              * @c Repository
              * @class Repository ontology.hpp "include/wntr/data/ontology.hpp"
              */
-            class Repository : public QObject { };
+            class Repository : public QObject {
+                friend class Configuration;
+                Q_OBJECT
+
+                signals:
+                    /**
+                     * @brief
+                     * @fn loading
+                     */
+                    void loading();
+                    /**
+                     * @brief
+                     * @fn loadingProgress
+                     * @param double
+                     */
+                    void loadingProgress(const double = 0.0);
+                    /**
+                     * @brief
+                     * @fn loaded
+                     */
+                    void loaded();
+
+                public:
+                    Repository( const Repository& );
+                    /**
+                     * @brief
+                     * @fn ~Repository
+                     */
+                    virtual ~Repository();
+                    /**
+                     * @brief
+                     * @fn load
+                     * @param QString
+                     */
+                    void load(const QString = "");
+                    /**
+                     * @brief
+                     *
+                     * @fn obtain
+                     * @param QString
+                     */
+                    static Repository* obtain(const QString = "");
+
+                protected:
+                    /**
+                     * @brief
+                     * @fn Repository
+                     */
+                    Repository( QObject* = 0 );
+                    /**
+                     * @brief
+                     * @fn Repository
+                     * @param QString
+                     */
+                    Repository( const QString , QObject* = 0 );
+                    /**
+                     * @brief
+                     * @fn Repository
+                     * @param
+                     */
+
+                private:
+                    /**
+                     * @brief
+                     * @fn getPath
+                     */
+                    const QString getPath() const;
+                    QString m_repoName; /**< Represents the stored name of the ontology. */
+                    Soprano::Model* m_model; /**< Holds the Soprano model that contains every Statement. */
+                    QVector<Knowledge*> m_kwldVtr; /**< Holds a list of all of the Knowledge elements. */
+                    static QMap<const QString*, Repository*> s_repos; /**< Holds a mapping of all of the loaded repositories. */
+            };
         }
     }
 }

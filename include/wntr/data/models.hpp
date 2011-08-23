@@ -29,10 +29,10 @@
 #include "linguistics.hpp"
 #include "md5.hpp"
 
-#include <map>
 #include <boost/signals2/signal.hpp>
 #include <boost/signals2/slot.hpp>
 #include <QtDebug>
+#include <QMultiMap>
 #include <QtXml/QDomElement>
 
 using namespace std;
@@ -42,162 +42,182 @@ namespace Wintermute {
     namespace Data {
         namespace Linguistics {
             namespace Lexical {
+                struct Data;
+
                 struct Model;
                 struct SaveModel;
                 struct LoadModel;
                 struct Storage;
-
-                struct LocalBackend;
-                struct LocalSaveModel;
-                struct LocalLoadModel;
-                struct LocalStorage;
-
-                struct XMLBackend;
-                struct XMLSaveModel;
-                struct XMLLoadModel;
-                struct XMLStorage;
-
-                struct Lexidata;
+                struct Cache;
 
                 /**
-                 * @typedef Leximap
+                 * @brief
+                 *
+                 * @typedef DataMap
                  */
-                typedef multimap<const string, const string> Leximap;
+                typedef QMultiMap<const QString*, const QString*> DataFlagMap;
 
                 /**
-                 * @brief Wrapper class for lexical data.
-                 * This class represents the lexical information such as locale, lexical ID, lexical symbol and
-                 * the syntactic flags that represents the semantic tenses of a word.
-                 * @class Lexidata models.hpp "include/wntr/data/models.hpp"
+                 * @brief
+                 * @note This class can be considered this a POD of Wintermute; as it is used extensively.
+                 * @class Data models.hpp "include/wntr/data/models.hpp"
                  */
-                class Lexidata : public QObject {
+                class Data : public QObject {
                     Q_OBJECT
-                    Q_PROPERTY(const string symbol READ symbol)
-                    Q_PROPERTY(const string id READ id)
-                    Q_PROPERTY(const string locale READ locale)
-                    Q_PROPERTY(const Leximap flags READ flags)
+                    Q_PROPERTY(QString locale READ locale)
+                    Q_PROPERTY(QString symbol READ symbol)
+                    Q_PROPERTY(QString id READ id)
+                    Q_PROPERTY(DataFlagMap flags READ flags)
 
                     private:
-                        string m_id;
-                        string m_lcl;
-                        string m_sym;
-                        Leximap m_map;
+                        QString m_id;
+                        QString m_lcl;
+                        QString m_sym;
+                        DataFlagMap m_flg;
+
+                    protected:
+                        /**
+                         * @brief
+                         *
+                         * @fn Data
+                         * @param string
+                         * @param string
+                         * @param string
+                         * @param DataFlagMap
+                         */
+                        Data(const QString , const QString , const QString = "" , const DataFlagMap = DataFlagMap());
 
                     public:
                         /**
-                         * @brief Obtains lexical symbol.
-                         * @fn getSymbol
+                         * @brief
+                         *
+                         * @fn Data
                          */
-                        const string* symbol() const { return &m_sym; }
-
-                        /**
-                         * @brief Obtains lexical ID.
-                         * @fn getID
-                         */
-                        const string* id() const { return &m_id; }
-
-                        /**
-                         * @brief Obtains locale.
-                         * @fn getLocale
-                         */
-                        const string* locale() const { return &m_lcl; }
-
-                        /**
-                         * @brief Obtains syntactic flags.
-                         * @fn getFlags
-                         */
-                        const Leximap flags() const { return m_map; }
-
+                        Data();
                         /**
                          * @brief
+                         *
+                         * @fn Data
+                         * @param
+                         */
+                        Data(const Data&);
+                        /**
+                         * @brief
+                         *
+                         * @fn operator ==
+                         * @param
+                         */
+                        bool operator==(const Data&);
+                        /**
+                         * @brief
+                         *
                          * @fn operator =
-                         * @param p_lxdt
+                         * @param
                          */
-                        void operator= (const Lexidata& p_lxdt) {
-                            this->m_id = p_lxdt.m_id;
-                            this->m_lcl = p_lxdt.m_lcl;
-                            this->m_map = p_lxdt.m_map;
-                            this->m_sym = p_lxdt.m_sym;
-                        }
-
-                        /**
-                         * @brief Default constructor.
-                         * @fn LexicalInformation
-                         */
-                        explicit Lexidata(const string *p_id, const string *p_lcl, const string *p_sym = new string, Leximap p_map = Leximap() ) : m_lcl(*p_lcl),
-                            m_id(*p_id), m_sym(*p_sym), m_map(p_map.begin (),p_map.end ()) {
-                        }
-
-                        Lexidata(const string &p_id, const string &p_lcl, const string &p_sym = string(""), Leximap p_map = Leximap() ) : m_lcl(p_lcl),
-                            m_id(p_id), m_sym(p_sym), m_map(p_map.begin (),p_map.end ()) {
-                        }
-
+                        Data& operator=(const Data&);
                         /**
                          * @brief
-                         * @fn Lexidata
-                         * @param p_lxdt
+                         *
+                         * @fn ~Data
                          */
-                        Lexidata(const Lexidata& p_lxdt) : m_id(p_lxdt.m_id), m_lcl(p_lxdt.m_lcl), m_sym(p_lxdt.m_sym), m_map(p_lxdt.m_map) { }
-
+                        virtual ~Data();
                         /**
                          * @brief
-                         * @fn Lexidata
+                         *
+                         * @fn id
                          */
-                        Lexidata() { }
-
+                        const QString id() const;
                         /**
                          * @brief
-                         * @fn ~Lexidata
+                         *
+                         * @fn locale
                          */
-                        ~Lexidata() { }
+                        const QString locale() const;
+                        /**
+                         * @brief
+                         *
+                         * @fn symbol
+                         */
+                        const QString symbol() const;
+                        /**
+                         * @brief
+                         *
+                         * @fn flags
+                         */
+                        const DataFlagMap flags() const;
+                        /**
+                         * @brief
+                         *
+                         * @fn isEmpty
+                         */
+                        const bool isEmpty() const;
+                        /**
+                         * @brief
+                         *
+                         * @fn createData
+                         * @param string
+                         * @param string
+                         * @param string
+                         * @param DataFlagMap
+                         */
+                        static const Data createData(const QString, const QString, const QString = "", const DataFlagMap = DataFlagMap());
+                        /**
+                         * @brief
+                         *
+                         * @fn idFromString
+                         * @param string
+                         */
+                        static const string idFromString(const QString);
+                        static const Data Null; /**< Represents an empty set of data. */
                 };
 
-
                 /**
-                 * @brief Foundational class of I/O handles for lexical information.
+                 * @brief
+                 *
                  * @class Model models.hpp "include/wntr/data/models.hpp"
                  */
                 class Model : public QObject {
                     Q_OBJECT
+                    Q_PROPERTY(Data* data READ data)
 
                     protected:
-                        Lexidata* m_lxdt;
+                        Data m_dt;
 
                     public:
                         /**
                          * @brief
                          * @fn ~Model
                          */
-                        virtual ~Model() { }
+                        virtual ~Model();
                         /**
                          * @brief Null constructor.
                          * @fn Model
                          */
-                        Model() {}
+                        Model();
                         /**
                          * @brief Constructor, using lexical data.
                          * @fn Model
                          * @param info The data to fill itself with.
                          */
-                        Model ( Lexidata* p_info ) : m_lxdt ( p_info ) { }
+                        Model ( Data* );
                         /**
                          * @brief
                          * @fn Model
                          * @param
                          */
-                        Model ( const Model& p_mdl ) : m_lxdt ( p_mdl.m_lxdt ) { }
+                        Model ( const Model& );
 
                         /**
                          * @brief
                          * @fn getLexicalMap
                          */
-                        Lexidata* lexicalData() {
-                            return m_lxdt;
-                        }
+                        Data* data();
                 };
 
                 /**
-                 * @brief Model used to save lexical information.
+                 * @brief
+                 *
+                 * @class SaveModel models.hpp "include/wntr/data/models.hpp"
                  */
                 class SaveModel : public Model {
                     Q_OBJECT
@@ -207,7 +227,7 @@ namespace Wintermute {
                          *
                          * @fn SaveModel
                          */
-                        SaveModel() : Model() {}
+                        SaveModel();
 
                         /**
                          * @brief
@@ -215,7 +235,7 @@ namespace Wintermute {
                          * @fn SaveModel
                          * @param p_lxin
                          */
-                        SaveModel ( Lexidata* p_lxin ) : Model ( p_lxin ) {}
+                        SaveModel ( Data* );
 
                         /**
                          * @brief
@@ -223,7 +243,7 @@ namespace Wintermute {
                          * @fn SaveModel
                          * @param p_mod
                          */
-                        SaveModel ( const Model& p_mod ) : Model ( p_mod ) {}
+                        SaveModel ( const Model& );
 
                         /**
                          * @brief
@@ -231,138 +251,94 @@ namespace Wintermute {
                          * @fn SaveModel
                          * @param p_smod
                          */
-                        SaveModel ( const SaveModel& p_smod ) : Model ( p_smod ) {}
+                        SaveModel ( const SaveModel& );
+                        /**
+                         * @brief
+                         *
+                         * @fn ~SaveModel
+                         */
+                        ~SaveModel();
 
                     public:
                         /**
-                         * @brief Saves information.
-                         * @todo Have this output to stdout.
+                         * @brief
+                         * @fn save
                          */
-                        virtual void save() = 0;
+                        virtual void save(QDomElement* = NULL) = 0;
+                        /**
+                         * @brief
+                         *
+                         * @fn saveFrom
+                         * @param
+                         */
+                        virtual void saveFrom(const Data& ) = 0;
                 };
 
                 /**
-                 * @brief Model used to load lexical information.
+                 * @brief
+                 *
                  * @class LoadModel models.hpp "include/wntr/data/models.hpp"
                  */
                 class LoadModel : public Model{
                     Q_OBJECT
-                    Q_PROPERTY(Lexidata* lexicalData READ lexicalData)
 
                     protected:
                         /**
                          * @brief
-                         *
                          * @fn LoadModel
                          */
-                        LoadModel() : Model() {}
+                        LoadModel();
 
                         /**
                          * @brief
-                         *
                          * @fn LoadModel
                          * @param map
                          */
-                        LoadModel ( Lexidata* p_in ) : Model ( p_in ) { }
+                        LoadModel ( Data* p_in );
 
                         /**
                          * @brief
-                         *
                          * @fn LoadModel
                          * @param loadModel
                          */
-                        LoadModel ( const LoadModel& loadModel ) : Model ( loadModel ) { }
+                        LoadModel ( const LoadModel& );
 
                         /**
                          * @brief
-
                          * @fn LoadModel
                          * @param model
                          */
-                        LoadModel ( const Model& model ) : Model ( model ) { }
-
-                    public:
-
+                        LoadModel ( const Model& );
                         /**
                          * @brief
-                         * @todo Have this get input from stdin.
+                         * @fn ~LoadModel
                          */
-                        virtual Lexidata* load() = 0;
+                        ~LoadModel();
 
-                };
-
-                /**
-                 * @brief Model used to load and save lexical information.
-                 * @todo When defining copy constructor; you'll run into ambigiousity for _map for SaveModel & LoadModel...
-                 * @class StorageModel models.hpp "include/wntr/data/models.hpp"
-                 */
-                class Storage : virtual public SaveModel, virtual public LoadModel {
-                    protected:
+                    public:
 
                         /**
                          * @brief
                          *
-                         * @fn StorageModel
+                         * @fn load
                          */
-                        Storage() : SaveModel(), LoadModel() {}
-
+                        virtual Data* load(QDomElement* = NULL) = 0;
                         /**
                          * @brief
-                         * @fn StorageModel
-                         * @param map
+                         *
+                         * @fn loadTo
+                         * @param
                          */
-                        Storage ( Lexidata* map ) : SaveModel ( map ), LoadModel ( map ) {}
+                        virtual bool loadTo(Data& ) = 0;
+                };
 
-                        /**
-                         * @brief
-                         * @fn StorageModel
-                         * @param model
-                         */
-                        Storage ( const Model& model ) : SaveModel ( model ), LoadModel ( model ) {}
-
-                    private:
-                        /**
-                          * @brief Used to agggregate the return value of the StorageObtainSignal and StorageExistsSignal. It dumps any NULL/false values and brings back the first non-NULL value, or returns NULL if all are NULL or if there's nothing there.
-                          * @class solo_value linguistics.hpp "include/wntr/data/linguistics.hpp"
-                          */
-                        template<typename T>
-                        struct solo_value {
-                            typedef T result_type;
-
-                            template<typename InputIterator>
-                            result_type operator() ( InputIterator p_fst, InputIterator p_lst ) {
-                                if ( p_fst == p_lst ) return NULL;
-                                InputIterator cur = p_fst;
-                                while ( cur != p_lst ) {
-                                    if ( ( *cur ) ) {
-                                        return *cur;
-                                        break;
-                                    } else
-                                        ++cur;
-                                }
-
-                                return NULL;
-                            }
-
-                        };
-
-                        /**
-                         * @brief
-                         * @typedef LexicalSignalObtainer
-                         */
-                        typedef boost::signals2::signal<Storage* ( Lexidata* ), solo_value<Storage*> > StorageObtainSignal;
-
-                        /**
-                         * @brief
-                         * @typedef StorageExistsSignal
-                         */
-                        typedef boost::signals2::signal<bool ( Lexidata* ), solo_value<bool> > StorageExistsSignal;
-
-                        static StorageObtainSignal s_sigObtain;
-                        static StorageExistsSignal s_sigExists;
-
+                /**
+                 * @brief
+                 * @todo Attempt to drop the Boost dependency here and find another means of implementing inherited interfaces to this class.
+                 * @class Storage models.hpp "include/wntr/data/models.hpp"
+                 */
+                class Storage : virtual public SaveModel, virtual public LoadModel {
                     public:
-
                         /**
                         * @brief Generates a Storage object.
                         * @fn obtain
@@ -370,7 +346,7 @@ namespace Wintermute {
                         * @param locale The locale of the Storage object.
                         * @return Return a pointer to a formed Storage object or NULL if it cannot be found.
                         */
-                        static Storage* obtain ( const Lexidata* );
+                        static Storage* obtain ( const Data* );
 
                         /**
                          * @brief Determines existence of a Storage object.
@@ -378,450 +354,238 @@ namespace Wintermute {
                          * @param id The ID of the Storage object.
                          * @param locale The locale of the Storage object.
                          */
-                        static const bool exists ( const Lexidata* );
+                        static const bool exists ( const Data* );
 
-                        /**
-                         * @brief Adds source of data.
-                         * Attaches a obtaining and existing qualifier to the slots.
-                         * @fn addSource
-                         * @param slotObtain The slot to obtain a new Storage object.
-                         * @param slotExists The slot to determine the existence of a possible Storage object.
-                         */
-                        static void addDataSource ( const StorageObtainSignal::slot_type &, const StorageExistsSignal::slot_type & );
-                };
-
-                /**
-                 * @brief Framing class defining interface for every object representing local data.
-                 * The purpose of this class is to standarize interface for all classes
-                 * intended for using as representations of data placed locally, e.g node files.
-                 */
-                class LocalBackend {
-                    friend class LocalStorage;
-                    public:
-                        ~LocalBackend() { }
-                    protected:
-                        /**
-                         * @brief Null constructor.
-                         * Creates an empty local model.
-                         */
-                        LocalBackend() : m_file(NULL) {}
-
-                        /**
-                         * @brief Default constructor
-                         * Constructor with path initialization.
-                         * @param path Path of the represented local data.
-                         */
-                        explicit LocalBackend ( string const& p_path ) : m_file( new QFile(QString::fromStdString (p_path)) ) { }
-
-
-                        /**
-                         * @brief Build backend from a QFile.
-                         * @fn LocalBackend
-                         * @param file The QFile to obtain data from.
-                         */
-                        LocalBackend( QFile& p_file ) : m_file( &p_file ) { }
-
-                        /**
-                         * @brief Obtains url of data.
-                         * Return path of the represented local data.
-                         * @return Path of the represented local data.
-                         */
-                        string url() {
-                            if (m_file) return m_file->fileName ().toStdString ();
-                            else return "";
-                        }
-
-                        QFile* m_file;
-                };
-
-                /**
-                 * @brief Model used to save lexical information locally.
-                 * @see SaveModel
-                 * @see LocalModel
-                 */
-                class LocalSaveModel : public SaveModel, public LocalBackend {
-                    friend class LocalStorage;
-                    Q_OBJECT
-                    Q_PROPERTY(string url READ url);
                     protected:
                         /**
                          * @brief
                          *
-                         * @fn LocalSaveModel
+                         * @fn GenericStorage
                          */
-                        LocalSaveModel() : SaveModel(), LocalBackend() {}
+                        Storage();
 
                         /**
                          * @brief
                          *
-                         * @fn LocalSaveModel
-                         * @param path
-                         */
-                        LocalSaveModel ( const string& m_pth ) : SaveModel(), LocalBackend ( m_pth ) {}
-
-                        /**
-                         * @brief
-                         *
-                         * @fn LocalSaveModel
-                         * @param path
-                         * @param info
-                         */
-                        LocalSaveModel ( const string& m_pth, Lexidata* p_in ) : SaveModel ( p_in ), LocalBackend ( m_pth ) {}
-
-                        /**
-                         * @brief
-                         *
-                         * @fn LocalSaveModel
-                         * @param info
-                         */
-                        LocalSaveModel ( Lexidata * );
-
-                        /**
-                         * @brief
-                         *
-                         * @fn LocalSaveModel
-                         * @param model
-                         */
-                        LocalSaveModel ( const Model & );
-
-                    public:
-                        /**
-                         * @brief
-                         */
-                        Q_INVOKABLE void save();
-                };
-
-                /**
-                 * @brief Model used to load lexical information from local repositiories.
-                 * This model permits the loading of lexical data from the more readily avialable data location;
-                 * this location is configured upon installation of WntrData.
-                 * @class LocalLoadModel models.hpp "include/wntr/data/models.hpp"
-                 */
-                class LocalLoadModel : public LoadModel, public LocalBackend {
-                    friend class LocalStorage;
-                    Q_OBJECT
-                    Q_PROPERTY(string url READ url);
-                    protected:
-                        /**
-                         * @brief
-                         *
-                         * @fn LocalLoadModel
-                         */
-                        LocalLoadModel() : LoadModel(), LocalBackend() {}
-                        /**
-                         * @brief
-                         *
-                         * @fn LocalLoadModel
-                         * @param path
-                         */
-                        LocalLoadModel ( const string& m_pth ) : LoadModel(), LocalBackend ( m_pth ) { this->LocalLoadModel::load(); }
-                        /**
-                         * @brief
-                         *
-                         * @fn LocalLoadModel
-                         * @param path
-                         * @param info
-                         */
-                        LocalLoadModel ( const string& m_pth, Lexidata* p_in ) : LoadModel ( p_in ), LocalBackend ( m_pth ) { this->LocalLoadModel::load(); }
-
-                        /**
-                         * @brief
-                         * @fn LocalLoadModel
-                         * @param p_info
-                         */
-                        LocalLoadModel ( Lexidata * );
-                        /**
-                         * @brief
-                         *
-                         * @fn LocalLoadModel
-                         * @param model
-                         */
-                        LocalLoadModel ( const Model & );
-
-                    public:
-                        /**
-                         * @brief
-                         */
-                        Q_INVOKABLE Lexidata* load();
-                };
-
-                /**
-                 * @brief Model used to load and save lexical information from local repositiories.
-                 * @class LocalStorageModel models.hpp "include/wntr/data/models.hpp"
-                 */
-                class LocalStorage : public virtual Storage,
-                            public virtual LocalLoadModel,
-                            public virtual LocalSaveModel {
-                    protected:
-                        /**
-                         * @brief
-                         *
-                         * @fn LocalStorageModel
-                         */
-                        LocalStorage() : Storage() {}
-
-                        /**
-                         * @brief
-                         *
-                         * @fn LocalStorageModel
-                         * @param map
-                         */
-                        LocalStorage ( Lexidata* p_in ) : Storage ( p_in ),
-                                LocalLoadModel ( ( LocalStorage::formPath ( p_in ) ), p_in ),
-                                LocalSaveModel ( ( LocalStorage::formPath ( p_in ) ) ,p_in ) {  }
-
-                        /**
-                         * @brief
-                         *
-                         * @fn LocalStorageModel
-                         * @param model
-                         */
-                        LocalStorage ( const Model& p_mod ) : Storage ( p_mod ),
-                                LocalLoadModel ( p_mod ),
-                                LocalSaveModel ( p_mod ) { }
-
-                        /**
-                         * @brief
-                         *
-                         * @fn LocalStorageModel
-                         * @param path
-                         */
-                        LocalStorage ( const string& m_pth ) : Storage(),
-                                LocalLoadModel ( m_pth ),
-                                LocalSaveModel ( m_pth ) { }
-
-                    public:
-                        Q_INVOKABLE inline void save() { this->LocalSaveModel::save (); }
-
-                        Q_INVOKABLE inline Lexidata* load() { this->LocalLoadModel::load (); }
-
-                        /**
-                         * @brief Generates a local storage.
-                         * Gets you a local storage system that can be used to load and save information for a specific bit of lexical information.
-                         * @fn create
+                         * @fn GenericStorage
                          * @param
                          */
-                        static Storage* create ( const Lexidata* );
-
-                        /**
-                         * @brief Determines local lexical existence.
-                         * Finds out if specific lexical information is avialable locally.
-                         * @fn exists
-                         * @param
-                         */
-                        static const bool exists ( const Lexidata* );
+                        Storage ( Data* );
 
                         /**
                          * @brief
                          *
-                         * @fn serializeToDisk
+                         * @fn GenericStorage
                          * @param
                          */
-                        static void serializeToDisk ( const Lexidata* );
-
+                        Storage ( const Model& );
                         /**
                          * @brief
                          *
-                         * @fn spawn
+                         * @fn Storage
+                         * @param
                          */
-                        static void spawn( const string & = Configuration::locale() );
-
+                        Storage ( const Storage& );
                         /**
                          * @brief
                          *
-                         * @fn formPath
-                         * @param
+                         * @fn ~GenericStorage
                          */
-                        static const string formPath ( const Lexidata* );
+                        virtual ~Storage();
                 };
 
                 /**
                  * @brief
-                 * @class XMLModel models.hpp "include/wntr/data/models.hpp"
+                 *
+                 * @class Cache models.hpp "include/wntr/data/models.hpp"
                  */
-                class XMLBackend {
+                class Cache {
+
+                };
+
+                /**
+                 * @brief
+                 * @class XmlBackend models.hpp "include/wntr/data/models.hpp"
+                 */
+                class XmlBackend {
+                    public:
+                        /**
+                         * @brief
+                         *
+                         * @fn XmlBackend
+                         */
+                        XmlBackend();
+                        /**
+                         * @brief
+                         *
+                         * @fn XmlBackend
+                         * @param
+                         */
+                        XmlBackend(QDomElement* );
+                        /**
+                         * @brief
+                         *
+                         * @fn XmlBackend
+                         * @param
+                         */
+                        XmlBackend(const XmlBackend&);
+                        /**
+                         * @brief
+                         *
+                         * @fn ~XmlBackend
+                         */
+                        virtual ~XmlBackend();
+
                     private:
-                        QDomElement *m_nod;
-
-                    public:
-                        /**
-                         * @brief
-                         *
-                         * @fn XMLModel
-                         */
-                        XMLBackend();
-                        /**
-                         * @brief
-                         *
-                         * @fn XMLModel
-                         * @param node
-                         */
-                        XMLBackend ( QDomElement* p_nod ) : m_nod ( p_nod ) {}
-                        ~XMLBackend() { }
+                        QDomElement* m_ele; /**< Represents the XML data of the object. */
                 };
 
                 /**
                  * @brief
-                 * @class XMLSaveModel models.hpp "include/wntr/data/models.hpp"
+                 *
+                 * @class XmlLoadModel models.hpp "include/wntr/data/models.hpp"
                  */
-                class XMLSaveModel : public SaveModel, public XMLBackend {
-                    Q_OBJECT
-                    protected:
-                        /**
-                         * @brief
-                         *
-                         * @fn XMLSaveModel
-                         */
-                        XMLSaveModel() : SaveModel(), XMLBackend() {}
-                        /**
-                         * @brief
-                         *
-                         * @fn XMLSaveModel
-                         * @param map
-                         */
-                        XMLSaveModel ( Lexidata* p_in ) : SaveModel ( p_in ), XMLBackend() {}
-                        /**
-                         * @brief
-                         *
-                         * @fn XMLSaveModel
-                         * @param node
-                         */
-                        XMLSaveModel ( QDomElement* p_nod ) : SaveModel(), XMLBackend ( p_nod ) {}
-                        /**
-                         * @brief
-                         *
-                         * @fn XMLSaveModel
-                         * @param node
-                         * @param map
-                         */
-                        XMLSaveModel ( QDomElement *p_nod, Lexidata* p_in ) : SaveModel ( p_in ), XMLBackend ( p_nod ) {}
-
+                class XmlLoadModel : public LoadModel, public XmlBackend {
                     public:
+                        /**
+                         * @brief
+                         *
+                         * @fn XmlLoadModel
+                         */
+                        XmlLoadModel();
+                        /**
+                         * @brief
+                         *
+                         * @fn XmlLoadModel
+                         * @param
+                         */
+                        XmlLoadModel(QDomElement* );
+                        /**
+                         * @brief
+                         *
+                         * @fn XmlLoadModel
+                         * @param
+                         */
+                        XmlLoadModel(const XmlLoadModel&);
+                        /**
+                         * @brief
+                         *
+                         * @fn ~XmlLoadModel
+                         */
+                        virtual ~XmlLoadModel();
+                        /**
+                         * @brief
+                         *
+                         * @fn load
+                         * @param
+                         */
+                        virtual Data* load(QDomElement* = NULL);
+                        /**
+                         * @brief
+                         *
+                         * @fn loadTo
+                         * @param
+                         */
+                        virtual bool loadTo(Data&);
+
+                };
+
+                /**
+                 * @brief
+                 *
+                 * @class XmlSaveModel models.hpp "include/wntr/data/models.hpp"
+                 */
+                class XmlSaveModel : public SaveModel, public XmlBackend {
+                    public:
+                        /**
+                         * @brief
+                         *
+                         * @fn XmlSaveModel
+                         */
+                        XmlSaveModel();
+                        /**
+                         * @brief
+                         *
+                         * @fn XmlSaveModel
+                         * @param
+                         */
+                        XmlSaveModel(QDomElement* );
+                        /**
+                         * @brief
+                         *
+                         * @fn XmlSaveModel
+                         * @param
+                         */
+                        XmlSaveModel(const XmlSaveModel&);
+                        /**
+                         * @brief
+                         *
+                         * @fn ~XmlSaveModel
+                         */
+                        virtual ~XmlSaveModel();
                         /**
                          * @brief
                          *
                          * @fn save
-                         * @todo Override this method.
-                         */
-                        void save();
-                };
-
-                /**
-                 * @brief
-                 * @class XMLLoadModel models.hpp "include/wntr/data/models.hpp"
-                 */
-                class XMLLoadModel : public LoadModel, public XMLBackend {
-                    Q_OBJECT
-                    protected:
-                        /**
-                         * @brief
-                         *
-                         * @fn XMLLoadModel
-                         */
-                        XMLLoadModel() : LoadModel(), XMLBackend() {}
-
-                        /**
-                         * @brief
-                         *
-                         * @fn XMLLoadModel
-                         * @param map
-                         */
-                        XMLLoadModel ( Lexidata* p_in ) : LoadModel ( p_in ), XMLBackend() {}
-
-                        /**
-                         * @brief
-                         *
-                         * @fn XMLLoadModel
-                         * @param node
-                         */
-                        XMLLoadModel ( QDomElement* p_nod ) : LoadModel(), XMLBackend ( p_nod ) {}
-
-                        /**
-                         * @brief
-                         *
-                         * @fn XMLLoadModel
-                         * @param node
-                         * @param map
-                         */
-                        XMLLoadModel ( QDomElement *p_nod, Lexidata* p_in ) : LoadModel ( p_in ), XMLBackend ( p_nod ) {}
-
-                    public:
-                        /**
-                         * @brief
-                         * @fn load
-                         * @todo Override this method.
-                         */
-                        Lexidata* load();
-                };
-
-                /**
-                 * @brief
-                 * @class XMLStorageModel models.hpp "include/wntr/data/models.hpp"
-                 */
-                class XMLStorage : public virtual XMLLoadModel, public virtual XMLSaveModel, public Storage {
-                    protected:
-                        /**
-                         * @brief
-                         *
-                         * @fn XMLStorage
-                         */
-                        XMLStorage() : Storage() {}
-                        /**
-                         * @brief
-                         *
-                         * @fn XMLStorage
-                         * @param info
-                         */
-                        XMLStorage ( Lexidata* info ) : Storage ( info ) {}
-                        /**
-                         * @brief
-                         *
-                         * @fn XMLStorage
-                         * @param model
-                         */
-                        XMLStorage ( const Model& model ) : Storage ( model ) {}
-                        /**
-                         * @brief
-                         *
-                         * @fn XMLStorage
-                         * @param node
-                         */
-                        XMLStorage ( QDomElement* node ) : XMLLoadModel ( node ), XMLSaveModel ( node ), Storage() {}
-                        static vector<QDomDocument> s_allDocs;
-
-                    public:
-                        /**
-                         * @brief
-                         *
-                         * @fn create
-                         * @param id
-                         * @param locale
-                         * @return Lexical *
-                         */
-                        static Storage* create ( const Lexidata* );
-
-                        /**
-                         * @brief
-                         *
-                         * @fn exists
                          * @param
                          */
-                        static const bool exists ( const Lexidata* );
-
-                        /**
-                         * @brief Adds document to system.
-                         * Loads a XML document from disc by the specified URI and if found, adds it to the system.
-                         * @fn addDocument
-                         * @param url
-                         */
-                        static void addDocument ( const string& );
-
+                        virtual void save(QDomElement* = NULL);
                         /**
                          * @brief
                          *
-                         * @fn spawn
+                         * @fn saveFrom
+                         * @param
                          */
-                        static void spawn( const string & = Configuration::locale() );
+                        virtual void saveFrom(const Data&);
+                };
+
+                /**
+                 * @brief
+                 *
+                 * @class XmlStorage models.hpp "include/wntr/data/models.hpp"
+                 */
+                class XmlStorage : public virtual XmlLoadModel, public virtual XmlSaveModel {
+                    public:
+                        /**
+                         * @brief
+                         *
+                         * @fn XmlStorage
+                         */
+                        XmlStorage();
+                        /**
+                         * @brief
+                         *
+                         * @fn XmlStorage
+                         * @param
+                         */
+                        XmlStorage(QDomElement* );
+                        /**
+                         * @brief
+                         *
+                         * @fn XmlStorage
+                         * @param
+                         */
+                        XmlStorage(Data*);
+                        /**
+                         * @brief
+                         *
+                         * @fn XmlStorage
+                         * @param
+                         */
+                        XmlStorage(const XmlStorage& );
+                        /**
+                         * @brief
+                         *
+                         * @fn XmlStorage
+                         * @param
+                         */
+                        XmlStorage(const Model& );
+                        /**
+                         * @brief
+                         *
+                         * @fn ~XmlStorage
+                         */
+                        virtual ~XmlStorage();
                 };
             }
 
@@ -833,20 +597,18 @@ namespace Wintermute {
                 struct SaveModel;
                 struct Storage;
 
-                /// @todo The means of implementing this should be done with a set of locale documents (~/en.lcl); and within it, contains a list of the name of the binding files.
-                struct LocalBackend;
-                struct LocalLoadModel;
-                struct LocalSaveModel;
-                struct LocalStorage;
+                /**
+                 * @brief
+                 *
+                 * @typedef SyntaxList
+                 */
+                typedef QList<Syntax> SyntaxList;
 
-                /// @todo This should reimplement the traditional means of discovering Bindings.
-                struct XMLBackend;
-                struct XMLLoadModel;
-                struct XMLSaveModel;
-                struct XMLStorage;
-
-                typedef QList<Syntax*> SyntaxList;
-
+                /**
+                 * @brief
+                 *
+                 * @class Syntax models.hpp "include/wntr/data/models.hpp"
+                 */
                 class Syntax : public QObject {
                     Q_OBJECT
                     Q_PROPERTY(string locale READ locale WRITE setLocale)
@@ -859,15 +621,61 @@ namespace Wintermute {
                         string m_lnkTxt;
 
                     public:
-                        Syntax() : QObject(NULL), m_lcl(), m_rlTxt(), m_lnkTxt() { }
-                        Syntax(const Syntax& p_syntx) : QObject(NULL), m_lcl(p_syntx.m_lcl), m_rlTxt(p_syntx.m_rlTxt), m_lnkTxt(p_syntx.m_lnkTxt) { }
-                        Syntax& operator= (const Syntax&);
-                        ~Syntax() { }
-                        void setLocale(string const);
-                        void setRuleText(string const);
-                        void setLinkText(string const);
+                        /**
+                         * @brief
+                         * @fn Syntax
+                         */
+                        Syntax();
+                        /**
+                         * @brief
+                         * @fn Syntax
+                         * @param p_syntx
+                         */
+                        Syntax(const Syntax&);
+                        /**
+                         * @brief
+                         * @fn ~Syntax
+                         */
+                        ~Syntax();
+                        /**
+                         * @brief
+                         *
+                         * @fn operator =
+                         * @param
+                         */
+                        Syntax& operator=(const Syntax& );
+                        /**
+                         * @brief
+                         * @fn setLocale
+                         * @param string
+                         */
+                        void setLocale(const string);
+                        /**
+                         * @brief
+                         * @fn setRuleText
+                         * @param string
+                         */
+                        void setRuleText(const string);
+                        /**
+                         * @brief
+                         * @fn setLinkText
+                         * @param string
+                         */
+                        void setLinkText(const string);
+                        /**
+                         * @brief
+                         * @fn locale
+                         */
                         const string locale() const;
+                        /**
+                         * @brief
+                         * @fn ruleText
+                         */
                         const string ruleText() const;
+                        /**
+                         * @brief
+                         * @fn linkText
+                         */
                         const string linkText() const;
                 };
 
@@ -878,20 +686,51 @@ namespace Wintermute {
                  */
                 class Model : public QObject {
                     Q_OBJECT
-                    //Q_PROPERTY(Syntax syntax READ syntax WRITE setSyntax)
-
-                    private:
-                        Syntax m_syntx;
+                    Q_PROPERTY(Syntax syntax READ syntax WRITE setSyntax)
 
                     protected:
-                        Model(const Syntax& p_syntx) : QObject(NULL), m_syntx(p_syntx) { }
+                        Syntax m_syntx; /**< Represents the information used to form a binding. */
+                        /**
+                         * @brief
+                         *
+                         * @fn Model
+                         * @param
+                         */
+                        Model(const Syntax& );
 
                     public:
-                        Model(const Model& p_1) : QObject(NULL), m_syntx(p_1.m_syntx) { }
-                        Model() : QObject(NULL) { }
-                        virtual ~Model() { }
-                        //void setSyntax(Syntax p_syntx) { m_syntx = p_syntx; }
-                        Syntax syntax() const { return m_syntx; }
+                        /**
+                         * @brief
+                         *
+                         * @fn Model
+                         */
+                        Model();
+                        /**
+                         * @brief
+                         *
+                         * @fn Model
+                         * @param
+                         */
+                        Model(const Model& );
+                        /**
+                         * @brief
+                         *
+                         * @fn ~Model
+                         */
+                        virtual ~Model();
+                        /**
+                         * @brief
+                         *
+                         * @fn syntax
+                         */
+                        const Syntax syntax() const;
+                        /**
+                         * @brief
+                         *
+                         * @fn setSyntax
+                         * @param
+                         */
+                        void setSyntax(Syntax& );
                 };
 
                 /**
@@ -901,7 +740,7 @@ namespace Wintermute {
                 class SaveModel : public Model {
                     Q_OBJECT
 
-                    public slots:
+                    signals:
                         /**
                          * @brief
                          * @fn saved
@@ -920,19 +759,24 @@ namespace Wintermute {
                          * @brief
                          * @fn SaveModel
                          */
-                        SaveModel() : Model() { }
+                        SaveModel();
                         /**
                          * @brief
                          * @fn SaveModel
                          * @param p_model
                          */
-                        SaveModel(const Model& p_1) : Model(p_1) { }
+                        SaveModel(const Model& );
                         /**
                          * @brief
                          * @fn SaveModel
                          * @param p_saveModel
                          */
-                        SaveModel(const SaveModel& p_1) : Model(p_1) { }
+                        SaveModel(const SaveModel& );
+                        /**
+                         * @brief
+                         * @fn ~SaveModel
+                         */
+                        virtual ~SaveModel() = 0;
                 };
 
                 /**
@@ -942,7 +786,7 @@ namespace Wintermute {
                 class LoadModel : public Model {
                     Q_OBJECT
 
-                    public slots:
+                    signals:
                         /**
                          * @brief
                          * @fn loaded
@@ -954,30 +798,38 @@ namespace Wintermute {
                          * @brief
                          * @fn load
                          */
-                        virtual void load() = 0;
+                        virtual void load() const = 0;
 
                     protected:
                         /**
                          * @brief
                          * @fn LoadModel
                          */
-                        LoadModel() : Model() { }
+                        LoadModel();
                         /**
                          * @brief
                          * @fn LoadModel
                          * @param p_model
                          */
-                        LoadModel(const Model& p_model) : Model(p_model) { }
+                        LoadModel(const Model& );
                         /**
                          * @brief
                          * @fn LoadModel
                          * @param p_model
                          */
-                        LoadModel(const LoadModel& p_model) : Model(p_model) { }
+                        LoadModel(const LoadModel& );
+                        /**
+                         * @brief
+                         *
+                         * @fn ~LoadModel
+                         */
+                        virtual ~LoadModel() = 0;
                 };
 
                 class Storage : virtual public SaveModel, virtual public LoadModel {
                     public:
+                        Storage();
+                        virtual ~Storage();
                     protected:
                     private:
                 };

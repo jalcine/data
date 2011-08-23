@@ -45,14 +45,6 @@ namespace Wintermute {
                 qDebug() << "(data) [Ling:Config] Initializing data..";
                 Configuration::setDirectory ( storageDir );
                 Configuration::setLocale ( locale );
-
-                qDebug() << "(data) [Ling:Config] Setting up linguistics data sources... ";
-                Lexical::Storage::addDataSource ( Lexical::LocalStorage::create , Lexical::LocalStorage::exists );
-                Lexical::Storage::addDataSource ( Lexical::XMLStorage::create , Lexical::XMLStorage::exists );
-
-                qDebug() << "(data) [Ling:Config] Parsing sources.. ";
-                Lexical::LocalStorage::spawn();
-                Lexical::XMLStorage::spawn();
             }
 
             void Configuration::Deinitialize() {

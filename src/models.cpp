@@ -21,247 +21,129 @@
 #include "linguistics.hpp"
 #include "models.hpp"
 #include <iomanip>
-
 #include <QFile>
 #include <QMetaType>
 #include <QtDebug>
 #include <QMultiMap>
+#include <QStringList>
 #include <QTextStream>
 #include <QDomDocument>
 #include <QDomElement>
+#include <boost/progress.hpp>
 
 namespace Wintermute {
     namespace Data {
         namespace Linguistics {
             namespace Lexical {
-                vector<QDomDocument> XMLStorage::s_allDocs;
-                Storage::StorageObtainSignal Storage::s_sigObtain;
-                Storage::StorageExistsSignal Storage::s_sigExists;
+                Data::Data() { }
 
-                void Storage::addDataSource ( const StorageObtainSignal::slot_type &p_slotObtain, const StorageExistsSignal::slot_type & p_slotExists ) {
-                    s_sigObtain.connect ( p_slotObtain );
-                    s_sigExists.connect ( p_slotExists );
+                Data::Data(const Data &p_dt) : m_id(p_dt.m_id),
+                    m_lcl(p_dt.m_lcl), m_sym(p_dt.m_sym), m_flg(p_dt.m_flg) { }
+
+                Data::Data(QString p_id, QString p_lcl, QString p_sym, DataFlagMap p_flg) : m_id(p_id),
+                    m_lcl(p_lcl), m_sym(p_sym), m_flg(p_flg) { }
+
+                const DataFlagMap Data::flags () const { return m_flg; }
+
+                const QString Data::symbol () const { return m_sym; }
+
+                const QString Data::id () const { return m_id; }
+
+                const QString Data::locale () const { return m_lcl; }
+
+                const Data Data::createData (const QString p_id, const QString p_lcl, const QString p_sym, const DataFlagMap p_flg) {
+                    return Data(p_id,p_lcl,p_sym,p_flg);
                 }
 
-                Storage* Storage::obtain ( const Lexidata* p_lxin ) {
-                    return s_sigObtain ( const_cast<Lexidata*>(p_lxin) );
-                }
+                Data::~Data () { }
 
-                const bool Storage::exists ( const Lexidata* p_lxin ) {
-                    return s_sigExists ( const_cast<Lexidata*>(p_lxin) );
-                }
+                Model::Model() { }
 
-                Storage* LocalStorage::create ( const Lexidata* p_lxin ) {
-                    return new LocalStorage ( const_cast<Lexidata*>(p_lxin) );
-                }
+                Model::Model( Data* p_dt ) : m_dt(*p_dt) { }
 
-                const bool LocalStorage::exists ( const Lexidata* p_lxin ) {
-                    return QFile::exists (QString::fromStdString (LocalStorage::formPath ( p_lxin )));
-                }
+                Model::Model( const Model& p_mdl ) : m_dt(p_mdl.m_dt) { }
 
-                const string LocalStorage::formPath ( const Lexidata* p_lxin ) {
-                    return Configuration::directory() + "/locale/"
-                        + *p_lxin->locale() + "/node/" + *p_lxin->id();
-                }
+                Data* Model::data() { return &m_dt; }
 
-                void LocalStorage::serializeToDisk ( const Lexidata* lxin ) {
-                    if ( !exists ( lxin ) ) {
-                        LocalSaveModel *newStorage = new LocalSaveModel(LocalStorage::formPath ( const_cast<Lexidata*>(lxin) ),
-                                                                        const_cast<Lexidata*>(lxin) );
-                        newStorage->save ();
-                    }
-                }
+                Model::~Model() { }
 
-                /// @todo Should this method invoke a 'not implemented' exception?
-                void LocalStorage::spawn(const string& p_lcl) { }
+                LoadModel::LoadModel() { }
 
-                LocalSaveModel::LocalSaveModel( Lexidata *p_info ) : SaveModel ( p_info ),
-                    LocalBackend ( LocalStorage::formPath ( p_info ) ) {
+                LoadModel::LoadModel( Data* p_dt ) : Model(p_dt) { }
 
-                }
+                LoadModel::LoadModel( const LoadModel& p_mdl ) : Model(p_mdl) { }
 
-                LocalSaveModel::LocalSaveModel( const Model& p_model ) : SaveModel ( p_model ) {
-                    m_file = new QFile(QString::fromStdString (LocalStorage::formPath ( m_lxdt )));
-                }
+                LoadModel::LoadModel( const Model& p_mdl ) : Model(p_mdl) { }
 
-                /// @todo The permissions of the 'wintermute' master executable has to be updated; it can't write to the base directory.
-                /// @bug Information recieved here to be saved isn't the same as passed by ::serializeToDisk!
-                void LocalSaveModel::save () {
-                    if ( m_file->open ( QIODevice::WriteOnly | QIODevice::Truncate ) ) {
-                        const Leximap flags = m_lxdt->flags();
-                        //qDebug() << "(data) [LocalSaveModel] Saving '" <<  m_lxdt->id()->c_str() << "' ..." << endl;
+                LoadModel::~LoadModel() { }
 
-                        {
-                            QTextStream l_strm(m_file);
-                            l_strm << m_lxdt->symbol ()->c_str() << endl;
+                SaveModel::SaveModel() { }
 
-                            for ( Leximap::const_iterator itr = flags.begin (); itr != flags.end (); itr++ ){
-                                l_strm << QString::fromStdString (itr->first)   << " "
-                                       << QString::fromStdString (itr->second)  << endl;
-                            }
-                        }
+                SaveModel::SaveModel( Data* p_dt ) : Model(p_dt) { }
 
+                SaveModel::SaveModel( const SaveModel& p_mdl ) : Model(p_mdl) { }
 
-                        //qDebug() << flags.size () << "flags written for (" << m_lxdt->symbol()->c_str() << ")." << endl
-                        //         << m_file->readAll ();
-                    } else
-                        qWarning () << "(data) [LocalSaveModel] Failed to save" << m_lxdt->id()->c_str() << "; Error: " << m_file->errorString ();
+                SaveModel::SaveModel( const Model& p_mdl ) : Model(p_mdl) { }
 
-                    m_file->close ();
-                }
+                SaveModel::~SaveModel() { }
 
-                LocalLoadModel::LocalLoadModel( Lexidata* p_info ): LoadModel ( p_info ),
-                    LocalBackend ( LocalStorage::formPath ( p_info ) ) {
-                    this->LocalLoadModel::load();
-                }
+                Storage::Storage() { }
 
-                LocalLoadModel::LocalLoadModel( const Model& p_model ) : LoadModel ( p_model ),
-                    LocalBackend(*(new QFile(QString::fromStdString (LocalStorage::formPath ( m_lxdt ))))) {
-                    this->LocalLoadModel::load ();
-                }
+                Storage::Storage( Data* p_dt ) : LoadModel(p_dt), SaveModel(p_dt) { }
 
-                Lexidata* LocalLoadModel::load() {
-                    if (!m_file->open (QIODevice::ReadOnly)){
-                        qWarning () << "(data) [LocalLoadModel] Failed to load '" << this->LoadModel::m_lxdt->id ()->c_str() << "'."
-                                    << m_file->errorString();
-                        return NULL;
-                    } else {
-                        //qDebug() << "(data) [LocalLoadModel] Loading from '" << this->Model::m_lxdt->id ()->c_str () << "' (" << m_file->size () << " bytes )...";
-                        QTextStream l_inLxDt ( m_file->readAll () );
-                        QString l_sym, l_flg, l_ont;
-                        Leximap l_map;
+                Storage::Storage( const Storage& p_mdl ) : LoadModel(p_mdl), SaveModel(p_mdl) { }
 
-                        l_inLxDt >> l_sym;
-
-                        while ( !l_inLxDt.atEnd () ) {
-                            l_inLxDt >> l_ont >> l_flg;
-                            if ( l_ont.isEmpty () || l_flg.isEmpty () )
-                                continue;
-                            //qDebug() << "(data) [LocalLoadModel] Flagset: " << l_ont << l_flg;
-                            l_map.insert ( Leximap::value_type(l_ont.toStdString (), l_flg.toStdString ()) );
-                        }
-
-                        m_file->close ();
-
-                        if ( l_map.size () > 0 ) {
-                            //qDebug() << "(data) [LocalLoadModel]" << l_map.size () << "flags loaded for" << m_lxdt->id ()->c_str () << "("<< l_sym << ").";
-                            const string* l_symStr = new string(l_sym.toStdString ().c_str ());
-                            Lexidata* l_lxdt = new Lexidata ( m_lxdt->id() , m_lxdt->locale() , l_symStr , l_map );
-                            Q_ASSERT(l_lxdt != NULL);
-                            return l_lxdt;
-                        } else {
-                            qWarning() << "(data) [LocalLoadModel] WARNING: No flags loaded into the system." << endl
-                                          << "(" <<  m_file->size () << "): " << url().c_str ();
-                            return NULL;
-                        }
-                    }
-                }
-
-                /// @todo Finish definition of XMLStorage.
-                Storage* XMLStorage::create ( const Lexidata* p_lxinfo ) {
-                    //return new XMLStorage(p_lxinfo);
+                Storage* Storage::obtain ( const Data* p_data ) {
                     return NULL;
                 }
 
-                /// @todo Use iteration to determine if this sect of data was already formed.
-                const bool XMLStorage::exists ( const Lexidata* p_lxinfo ) {
+                const bool Storage::exists ( const Data* p_data ) {
                     return false;
                 }
 
-                /// @bug Some of the information stored here gets passed along as malformed information.
-                /// @bug Two temporary memory locations are used here; need to drop those warnings..
-                void XMLStorage::spawn (const string& p_lcl) {
-                    const string l_pthDoc = Configuration::directory () + string ( "/locale/" ) + p_lcl + string ( "/spawn.xml" );
-                    QFile* l_qhndl = new QFile ( QString::fromStdString (l_pthDoc));
-                    QDomDocument l_domDoc;
-
-                    if ( !l_qhndl->open ( QIODevice::ReadOnly | QIODevice::Text ) ) {
-                        qWarning () << "(data) [XMLStorage] Failed to open" << l_pthDoc.c_str ()<< ";" << l_qhndl->errorString ();
-                        return;
-                    }
-
-                    if ( !l_domDoc.setContent ( l_qhndl ) ) {
-                        qWarning() << "(data) [XMLStorage] Failed to parse" << l_pthDoc.c_str ()<< ";" << l_qhndl->errorString ();
-                        return;
-                    }
-
-                    QDomElement l_rootEle = l_domDoc.documentElement ();
-                    QDomNodeList l_nodLst = l_rootEle.elementsByTagName ( "Lexicon" );
-
-                    {
-                        int l_cntSkip = 0;
-                        for ( int i = 0; i < l_nodLst.length (); i++ ) {
-                            QDomElement l_curEle = l_nodLst.at ( i ).toElement ();
-                            const QString l_sym = l_curEle.attribute ( "symbol" );
-                            const Lexidata l_tstLxdt(&md5(l_sym.toStdString ()),&p_lcl);
-
-                            if ( !Storage::exists ( &l_tstLxdt ) ){
-                                QDomNodeList l_lnkLst = l_curEle.elementsByTagName ( "Link" );
-
-                                if ( !l_lnkLst.isEmpty () ) {
-                                    Leximap l_map;
-
-                                    for ( unsigned int j = 0; j < l_lnkLst.length (); j++ ) {
-                                        QDomElement l_lnkEle = l_lnkLst.item ( j ).toElement ();
-                                        const QString l_ont = l_lnkEle.attribute ( "ontoid" );
-                                        const QString l_flg = l_lnkEle.attribute ( "flags" );
-
-                                        l_map.insert ( Leximap::value_type(l_ont.toStdString(),l_flg.toStdString()) ) ;
-                                        qDebug() << "(data) [XMLStorage] Parsed flagset #" << (l_map.size () + 1) << ": " << l_ont << l_flg;
-                                    }
-
-                                    Lexidata *theLex = new Lexidata ( const_cast<const string*>(&md5(l_sym.toStdString ())), &p_lcl , const_cast<const string*>(&l_sym.toStdString ()), l_map );
-                                    qDebug() << "(data) [XMLStorage] Size:" << l_map.size ()  << ":" << l_lnkLst.size ();
-                                    LocalStorage::serializeToDisk ( theLex );
-                                } else ++l_cntSkip;
-                            } else ++ l_cntSkip;
-                        }
-
-                        if ( l_nodLst.size () - l_cntSkip != 0 )
-                            qDebug() << "(data) [XMLStorage] Generated" << ( l_nodLst.size () - l_cntSkip ) << "lexicons, skipped" << l_cntSkip << ", parsed" << l_nodLst.length () << ".";
-                    }
-
-                    qDebug() << "(data) [XMLStorage] Rendered" << l_pthDoc.c_str ();
-                }
-
-                void XMLStorage::addDocument ( const string& p_url ) {
-                    QDomDocument l_domDoc;
-                    QFile *l_qhndl = new QFile ( p_url.c_str() );
-                    if ( l_qhndl->exists () && l_domDoc.setContent ( l_qhndl ) )
-                        s_allDocs.push_back ( l_domDoc );
-                }
-
-                /// @todo Replace/swap internal element's XML with the new one.
-                void XMLSaveModel::save() { }
-
-                /// @todo Pull XML data from document into this node.
-                Lexidata* XMLLoadModel::load() { }
-
-            }
+                Storage::~Storage() { }
+            } /** end namespace Lexical */
 
             namespace Rules {
-                Syntax& Syntax::operator=(const Syntax& p_syntx){
-                    this->m_lcl = p_syntx.m_lcl;
-                    this->m_rlTxt = p_syntx.m_rlTxt;
-                    this->m_lnkTxt = p_syntx.m_lnkTxt;
-                    return *this;
+                Syntax::Syntax() { }
+
+                Syntax::Syntax(const Syntax &p_synx) : m_lcl(p_synx.m_lcl),
+                    m_lnkTxt(p_synx.m_lnkTxt), m_rlTxt(p_synx.m_rlTxt) { }
+
+                void Syntax::setLinkText (const string p_lnkTxt) { m_lnkTxt = p_lnkTxt; }
+
+                void Syntax::setLocale (const string p_lcl) { m_lcl = p_lcl; }
+
+                void Syntax::setRuleText (const string p_rlTxt) { m_rlTxt = p_rlTxt; }
+
+                const string Syntax::locale () const { return m_lcl; }
+
+                const string Syntax::ruleText () const { return m_rlTxt; }
+
+                const string Syntax::linkText () const { return m_lnkTxt; }
+
+                Syntax& Syntax::operator = (const Syntax& p_synx) {
+                    return const_cast<Syntax&>(p_synx);
                 }
 
-                void Syntax::setLocale(string p_lcl) { m_lcl = p_lcl; }
-                void Syntax::setLinkText(string p_lnkTxt) { m_lnkTxt = p_lnkTxt; }
-                void Syntax::setRuleText(string p_rlTxt) { m_rlTxt = p_rlTxt; }
-                const string Syntax::locale() const { return m_lcl; }
-                const string Syntax::ruleText() const { return m_rlTxt; }
-                const string Syntax::linkText() const { return m_lnkTxt; }
+                Syntax::~Syntax () { }
 
-                void LoadModel::loaded() { }
-                void SaveModel::saved() { }
+                Model::Model() { }
+
+                Model::Model(const Model& p_mdl) : m_syntx(p_mdl.m_syntx) { }
+
+                void Model::setSyntax (Syntax &p_synx) { m_syntx = p_synx; }
+
+                const Syntax Model::syntax () const { return m_syntx; }
+
+                Model::~Model() { }
             }
-        } // namespaces
+        } /** end namespace Rules */
     }
 }
 
 Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Lexical::Model)
-Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Rules::Syntax)
+Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Lexical::Data)
 Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Rules::Model)
+Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Rules::Syntax)
 // kate: indent-mode cstyle; space-indent on; indent-width 4;

@@ -24,26 +24,99 @@
 
 #include "config.hpp"
 #include "ontology.hpp"
-#include <boost/timer.hpp>
+#include "wntrdata.hpp"
+#include "unctrl.h"
+#include <QtDebug>
 #include <boost/progress.hpp>
-#include <QUrl>
-#include <QtXml>
-
-using namespace Soprano;
-using namespace boost;
-
-using boost::progress_display;
 
 namespace Wintermute {
     namespace Data {
         namespace Ontology {
-           void Configuration::Initialize() {
-                //cout << "(data) [Ontology::Configuration] Loaded." << endl;
+            QMap<const QString*, Repository*> Repository::s_repos;
+            void Configuration::Initialize() {
+                Repository* l_repo = Repository::obtain("COSMO");
+                qDebug() << "(data) [Ontology::Configuration] Loaded.";
             }
 
             void Configuration::Deinitialize() {
-                //cout << "(data) [Ontology::Configuration] Unloaded." << endl;
+                QList<Repository*> l_repos = Repository::s_repos.values ();
+                foreach (Repository* l_repo, l_repos)
+                    delete l_repo;
+
+                qDebug() << "(data) [Ontology::Configuration] Unloaded.";
             }
+
+            Concept::Concept( QObject* parent) : QObject(parent), m_nd(NULL) { }
+
+            Concept::Concept( const Concept& p_concept ) : m_nd(p_concept.m_nd) { }
+
+            Concept::Concept( const Soprano::Node* p_nd, QObject* parent ) : QObject(parent), m_nd(p_nd) {
+            }
+
+            const quint64 Concept::id() const { return qHash(*m_nd); }
+
+            Concept::~Concept()  { qDebug() << "conc"; }
+
+            Knowledge::Knowledge( QObject* parent ) : QObject(parent) { }
+
+            Knowledge::Knowledge( const Knowledge& p_knl ) : m_subjNod(p_knl.m_subjNod),
+                m_predNod(p_knl.m_predNod), m_objNod(p_knl.m_objNod) {
+            }
+
+            /// @todo This constructor raises three warnings; want to make local copies?
+            Knowledge::Knowledge( const Soprano::Statement& p_stmt, QObject* parent ) : QObject(parent),
+                m_subjNod((new Concept(&p_stmt.subject (),this))), m_predNod((new Concept(&p_stmt.predicate (),this))),
+                m_objNod((new Concept(&p_stmt.object (),this))) {
+            }
+
+            Knowledge::~Knowledge() { qDebug() << "know"; }
+
+            Repository::Repository( QObject* parent ) : QObject(parent) { }
+
+            Repository::Repository( const Repository& p_repo ) : m_repoName(p_repo.m_repoName), m_model(p_repo.m_model) { }
+
+            Repository::Repository( QString p_repoName, QObject* parent ) : m_repoName(p_repoName), QObject(parent) { load(); }
+
+            Repository* Repository::obtain(QString p_repoName){
+                Repository* l_repo = new Repository(p_repoName);
+                Repository::s_repos.insert(&p_repoName,l_repo);
+                return l_repo;
+            }
+
+            const QString Repository::getPath() const {
+                return QString::fromStdString (Data::Configuration::getDirectory ()) + QString("/")
+                        + QString(WNTRDATA_ONTO_DIR) + QString("/") + m_repoName + QString(".owl");
+            }
+
+            void Repository::load(const QString p_repoName){
+                if (!p_repoName.isEmpty ())
+                    m_repoName = p_repoName;
+
+                if (!m_kwldVtr.empty())
+                    m_kwldVtr.clear();
+
+                const QString l_url = getPath();
+                const Soprano::Parser* l_rdfPrsr = Soprano::PluginManager::instance()->discoverParserForSerialization( Soprano::SerializationRdfXml );
+                Soprano::StatementIterator l_itr = l_rdfPrsr->parseFile( l_url , l_url, Soprano::SerializationRdfXml );
+                QList<Soprano::Statement> l_stats = l_itr.allStatements ();
+
+                qDebug() << "(data) [Repository] Loading ontology" << m_repoName << "...";
+                emit loading();
+                boost::progress_display show_progress( l_stats.length () );
+                {
+                    boost::progress_timer timer;
+                    foreach(Soprano::Statement l_st, l_stats){
+                        Knowledge* l_k = new Knowledge(l_st,this);
+                        m_kwldVtr.push_back(l_k);
+                        emit loadingProgress((double) show_progress.count() / (double) l_stats.length () );
+                        ++show_progress;
+                    }
+                }
+                emit loaded();
+                qDebug() << "(data) [Repository] Loading ontology" << m_repoName << ".";
+            }
+
+            Repository::~Repository() { qDebug() << "repo"; }
         }
     }
 }
