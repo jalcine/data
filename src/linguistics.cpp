@@ -21,14 +21,10 @@
 
 #include <map>
 #include <string>
-#include <QFile>
 #include <QDir>
-#include <QDomDocument>
-#include <iostream>
-#include "md5.hpp"
 #include "config.hpp"
-#include "linguistics.hpp"
 #include "models.hpp"
+#include "linguistics.hpp"
 
 using namespace std;
 using namespace Wintermute::Data;
@@ -38,35 +34,40 @@ using std::string;
 namespace Wintermute {
     namespace Data {
         namespace Linguistics {
-            string Configuration::_storageDir = string ( "./" ) + string ( WNTRDATA_LING_DIR );
+            string Configuration::_storageDir = string( WNTRDATA_DATA_DIR ) + "/" + string ( WNTRDATA_LING_DIR );
             string Configuration::_locale = WNTRDATA_DEFAULT_LOCALE;
 
             void Configuration::Initialize ( const string storageDir, const string locale ) {
-                qDebug() << "(data) [Ling:Config] Initializing data..";
                 Configuration::setDirectory ( storageDir );
                 Configuration::setLocale ( locale );
+
+                Lexical::Cache::addStorage ((new Lexical::DomStorage));
+                //Lexical::Cache::addStorage ((new Lexical::LocalStorage));
+
+                Lexical::Cache::generate();
+
+                qDebug() << "(ling) [Config] ## System configured.";
             }
 
-            void Configuration::Deinitialize() {
+            void Configuration::Deinitialize() {  }
 
-            }
-
-            void Configuration::setLocale ( string const p_lcl ) {
+            void Configuration::setLocale ( const string p_lcl ) {
                 if ( p_lcl.empty() )
                     return;
 
                 Configuration::_locale = p_lcl;
-                qDebug() << "(data) [Ling:Config] ## Global locale changed to " << p_lcl.c_str ();
+                qDebug() << "(ling) [Config] ## Default locale:" << p_lcl.c_str ();
             }
 
-            void Configuration::setDirectory ( string const p_configDir ) {
+            void Configuration::setDirectory ( const string p_configDir ) {
                 if ( p_configDir.empty() )
                     return;
 
                 QDir* d = new QDir(p_configDir.c_str ());
-                Configuration::_storageDir = d->absolutePath().toStdString ();
-
-                qDebug() << "(data) [Ling:Config] ## Root directory changed to " << p_configDir.c_str ();
+                if (d->exists ()){
+                    Configuration::_storageDir = d->absolutePath().toStdString ();
+                    qDebug() << "(ling) [Config] ## Root dir:" << p_configDir.c_str ();
+                }
             }
         } // namespaces
     }

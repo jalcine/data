@@ -23,7 +23,6 @@
 #define __WNTRDATA_HPP__
 
 #include "config.hpp"
-#include "md5.hpp"
 #include "ontology.hpp"
 #include "linguistics.hpp"
 #include "models.hpp"

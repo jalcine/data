@@ -24,27 +24,10 @@
 #ifndef LINGUISTICS_HPP
 #define	LINGUISTICS_HPP
 
-#include <boost/archive/xml_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-
-#include <boost/serialization/nvp.hpp>
-#include <boost/serialization/string.hpp>
-#include <boost/serialization/map.hpp>
-
-#include <boost/filesystem.hpp>
-
 #include <string>
-#include <vector>
-#include <map>
-#include <stdexcept>
+#include <QObject>
 
-#include <QFile>
-
-using namespace std;
 using std::string;
-using std::vector;
-using std::pair;
-using std::map;
 
 namespace Wintermute {
     namespace Data {
@@ -56,13 +39,10 @@ namespace Wintermute {
              * All configuration variables and their access methods specific for linguistic part of WntrData
              * are defined here.
              */
-            class Configuration  : public QObject {
-                Q_OBJECT
-
+            class Configuration {
                 private:
-                    /* Storage directory and locale variables */
-                    static string _storageDir;
-                    static string _locale;
+                    static string _storageDir; /**< Holds the location of the linguistic info. */
+                    static string _locale; /**< Holds the current locale in use. */
 
                 public:
                     /**
@@ -70,14 +50,14 @@ namespace Wintermute {
                      * Sets the default locale to be used as the standard locale.
                      * @param locale The locale to set.
                      */
-                    static void setLocale ( string const );
+                    static void setLocale ( const string );
 
                     /**
                      * @brief Changes root directory.
                      * Sets the root directory to find data for linguistics from.
                      * @param root The root directory.
                      */
-                    static void setDirectory ( string const );
+                    static void setDirectory ( const string );
 
                     /**
                      * @brief Gets current locale used.
@@ -85,9 +65,7 @@ namespace Wintermute {
                      * @fn getLocale
                      * @return string String with the current locale.
                      */
-                    static string locale() {
-                        return _locale;
-                    }
+                    static const inline string locale() { return _locale; }
 
                     /**
                      * @brief Gets linguistics directory.
@@ -95,9 +73,7 @@ namespace Wintermute {
                      * @fn getDirectory
                      * @return string
                      */
-                    static string directory() {
-                        return _storageDir;
-                    }
+                    static const inline string directory() { return _storageDir; }
                     /**
                      * @brief Initialization.
                      * Initializes the system by running prerequisite code.
@@ -105,7 +81,7 @@ namespace Wintermute {
                      * @param storageDir The directory where storage data are located.
                      * @param locale The locale that should be initially loaded.
                      */
-                    static void Initialize ( string const = _storageDir, string const = locale ());
+                    static void Initialize ( const string = _storageDir, const string = locale ());
 
                     /**
                      * @brief Deinitialization.

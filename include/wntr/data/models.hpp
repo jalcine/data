@@ -19,21 +19,15 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  * @endlegalese
- *
- * @todo When the plugin system is up-and-functional, remove all backends and storage systems (except for the local system) and implement each type of data in its own plugin.
  */
 
 #ifndef MODELS_HPP
 #define MODELS_HPP
 
-#include "linguistics.hpp"
-#include "md5.hpp"
-
-#include <boost/signals2/signal.hpp>
-#include <boost/signals2/slot.hpp>
 #include <QtDebug>
 #include <QMultiMap>
-#include <QtXml/QDomElement>
+#include <QtXml/QDomDocument>
+#include "linguistics.hpp"
 
 using namespace std;
 using std::multimap;
@@ -64,10 +58,10 @@ namespace Wintermute {
                  */
                 class Data : public QObject {
                     Q_OBJECT
-                    Q_PROPERTY(QString locale READ locale)
-                    Q_PROPERTY(QString symbol READ symbol)
-                    Q_PROPERTY(QString id READ id)
-                    Q_PROPERTY(DataFlagMap flags READ flags)
+                    Q_PROPERTY(QString Locale READ locale)
+                    Q_PROPERTY(QString Symbol READ symbol WRITE setSymbol)
+                    Q_PROPERTY(QString ID READ id)
+                    Q_PROPERTY(DataFlagMap Flags READ flags WRITE setFlags)
 
                     private:
                         QString m_id;
@@ -107,14 +101,14 @@ namespace Wintermute {
                          * @fn operator ==
                          * @param
                          */
-                        bool operator==(const Data&);
+                        bool operator==(const Data&) const;
                         /**
                          * @brief
                          *
                          * @fn operator =
                          * @param
                          */
-                        Data& operator=(const Data&);
+                        void operator=(const Data&);
                         /**
                          * @brief
                          *
@@ -148,6 +142,20 @@ namespace Wintermute {
                         /**
                          * @brief
                          *
+                         * @fn setSymbol
+                         * @param
+                         */
+                        void setSymbol( const QString& );
+                        /**
+                         * @brief
+                         *
+                         * @fn setFlags
+                         * @param
+                         */
+                        void setFlags( const DataFlagMap& );
+                        /**
+                         * @brief
+                         *
                          * @fn isEmpty
                          */
                         const bool isEmpty() const;
@@ -160,14 +168,15 @@ namespace Wintermute {
                          * @param string
                          * @param DataFlagMap
                          */
-                        static const Data createData(const QString, const QString, const QString = "", const DataFlagMap = DataFlagMap());
+                        static Data createData(const QString, const QString, const QString = "", const DataFlagMap = DataFlagMap());
                         /**
                          * @brief
                          *
                          * @fn idFromString
                          * @param string
                          */
-                        static const string idFromString(const QString);
+                        static const QString idFromString(const QString);
+
                         static const Data Null; /**< Represents an empty set of data. */
                 };
 
@@ -178,10 +187,10 @@ namespace Wintermute {
                  */
                 class Model : public QObject {
                     Q_OBJECT
-                    Q_PROPERTY(Data* data READ data)
+                    Q_PROPERTY(Data data READ data WRITE setData)
 
                     protected:
-                        Data m_dt;
+                        mutable Data m_dt; /**< TODO */
 
                     public:
                         /**
@@ -199,7 +208,7 @@ namespace Wintermute {
                          * @fn Model
                          * @param info The data to fill itself with.
                          */
-                        Model ( Data* );
+                        Model ( Data& );
                         /**
                          * @brief
                          * @fn Model
@@ -211,7 +220,15 @@ namespace Wintermute {
                          * @brief
                          * @fn getLexicalMap
                          */
-                        Data* data();
+                        const Data& data();
+
+                        /**
+                         * @brief
+                         *
+                         * @fn setData
+                         * @param
+                         */
+                        void setData(const Data& = Data::Null );
                 };
 
                 /**
@@ -235,7 +252,7 @@ namespace Wintermute {
                          * @fn SaveModel
                          * @param p_lxin
                          */
-                        SaveModel ( Data* );
+                        SaveModel ( Data& );
 
                         /**
                          * @brief
@@ -264,7 +281,7 @@ namespace Wintermute {
                          * @brief
                          * @fn save
                          */
-                        virtual void save(QDomElement* = NULL) = 0;
+                        virtual void save() = 0;
                         /**
                          * @brief
                          *
@@ -272,6 +289,14 @@ namespace Wintermute {
                          * @param
                          */
                         virtual void saveFrom(const Data& ) = 0;
+
+                    signals:
+                        /**
+                         * @brief
+                         *
+                         * @fn saved
+                         */
+                        void saved();
                 };
 
                 /**
@@ -279,7 +304,7 @@ namespace Wintermute {
                  *
                  * @class LoadModel models.hpp "include/wntr/data/models.hpp"
                  */
-                class LoadModel : public Model{
+                class LoadModel : public Model {
                     Q_OBJECT
 
                     protected:
@@ -288,13 +313,6 @@ namespace Wintermute {
                          * @fn LoadModel
                          */
                         LoadModel();
-
-                        /**
-                         * @brief
-                         * @fn LoadModel
-                         * @param map
-                         */
-                        LoadModel ( Data* p_in );
 
                         /**
                          * @brief
@@ -322,14 +340,22 @@ namespace Wintermute {
                          *
                          * @fn load
                          */
-                        virtual Data* load(QDomElement* = NULL) = 0;
+                        virtual const Data* load( ) const = 0;
                         /**
                          * @brief
                          *
                          * @fn loadTo
                          * @param
                          */
-                        virtual bool loadTo(Data& ) = 0;
+                        virtual bool loadTo(Data& ) const = 0;
+
+                    signals:
+                        /**
+                         * @brief
+                         *
+                         * @fn loaded
+                         */
+                        void loaded() const;
                 };
 
                 /**
@@ -337,61 +363,54 @@ namespace Wintermute {
                  * @todo Attempt to drop the Boost dependency here and find another means of implementing inherited interfaces to this class.
                  * @class Storage models.hpp "include/wntr/data/models.hpp"
                  */
-                class Storage : virtual public SaveModel, virtual public LoadModel {
+                class Storage {
                     public:
-                        /**
-                        * @brief Generates a Storage object.
-                        * @fn obtain
-                        * @param id The ID of the Storage object.
-                        * @param locale The locale of the Storage object.
-                        * @return Return a pointer to a formed Storage object or NULL if it cannot be found.
-                        */
-                        static Storage* obtain ( const Data* );
-
-                        /**
-                         * @brief Determines existence of a Storage object.
-                         * @fn exists
-                         * @param id The ID of the Storage object.
-                         * @param locale The locale of the Storage object.
-                         */
-                        static const bool exists ( const Data* );
-
-                    protected:
                         /**
                          * @brief
                          *
                          * @fn GenericStorage
                          */
                         Storage();
-
                         /**
                          * @brief
                          *
-                         * @fn GenericStorage
+                         * @fn operator ==
                          * @param
                          */
-                        Storage ( Data* );
-
+                        bool operator==(const Storage&) const;
                         /**
                          * @brief
                          *
-                         * @fn GenericStorage
+                         * @fn type
+                         */
+                        virtual const QString type() const = 0;
+                        /**
+                         * @brief
+                         *
+                         * @fn exists
                          * @param
                          */
-                        Storage ( const Model& );
+                        virtual const bool exists(const Data& ) const = 0;
                         /**
                          * @brief
                          *
-                         * @fn Storage
+                         * @fn loadTo
                          * @param
                          */
-                        Storage ( const Storage& );
+                        virtual void loadTo(Data&) const = 0;
                         /**
                          * @brief
                          *
-                         * @fn ~GenericStorage
+                         * @fn saveFrom
+                         * @param
                          */
-                        virtual ~Storage();
+                        virtual void saveFrom(const Data&) = 0;
+                        /**
+                         * @brief
+                         *
+                         * @fn generate
+                         */
+                        virtual void generate() = 0;
                 };
 
                 /**
@@ -400,136 +419,180 @@ namespace Wintermute {
                  * @class Cache models.hpp "include/wntr/data/models.hpp"
                  */
                 class Cache {
+                    friend class Storage;
+                    friend class Wintermute::Data::Linguistics::Configuration;
+                    typedef QList<Storage*> StorageList;
 
+                    private:
+                        static StorageList s_stores; /**< TODO */
+
+                        /**
+                         * @brief
+                         *
+                         * @fn addStorage
+                         * @param
+                         */
+                        static void addStorage(Storage*);
+
+                    public:
+                        ~Cache();
+                        /**
+                         * @brief
+                         *
+                         * @fn read
+                         * @param
+                         */
+                        static const bool read( Data & );
+                        /**
+                         * @brief
+                         *
+                         * @fn write
+                         * @param
+                         */
+                        static void write( const Data & );
+                        /**
+                         * @brief
+                         *
+                         * @fn exists
+                         * @param
+                         */
+                        static const bool exists( const Data& );
+                        /**
+                         * @brief
+                         *
+                         * @fn pseudo
+                         * @param
+                         */
+                        static void pseudo( Data & );
+                        /**
+                         * @brief
+                         *
+                         * @fn isPseudo
+                         * @param
+                         */
+                        static const bool isPseudo(const Data &);
+                        /**
+                         * @brief
+                         *
+                         * @fn generate
+                         */
+                        static void generate();
                 };
 
                 /**
                  * @brief
-                 * @class XmlBackend models.hpp "include/wntr/data/models.hpp"
+                 * @class DomBackend models.hpp "include/wntr/data/models.hpp"
                  */
-                class XmlBackend {
+                class DomBackend {
                     public:
                         /**
                          * @brief
                          *
-                         * @fn XmlBackend
+                         * @fn DomBackend
                          */
-                        XmlBackend();
+                        DomBackend();
                         /**
                          * @brief
                          *
-                         * @fn XmlBackend
+                         * @fn DomBackend
                          * @param
                          */
-                        XmlBackend(QDomElement* );
-                        /**
-                         * @brief
-                         *
-                         * @fn XmlBackend
-                         * @param
-                         */
-                        XmlBackend(const XmlBackend&);
-                        /**
-                         * @brief
-                         *
-                         * @fn ~XmlBackend
-                         */
-                        virtual ~XmlBackend();
+                        DomBackend(QDomElement* );
 
-                    private:
-                        QDomElement* m_ele; /**< Represents the XML data of the object. */
+                    protected:
+                        mutable QDomElement* m_ele; /**< Represents the Dom data of the object. */
                 };
 
                 /**
                  * @brief
                  *
-                 * @class XmlLoadModel models.hpp "include/wntr/data/models.hpp"
+                 * @class DomLoadModel models.hpp "include/wntr/data/models.hpp"
                  */
-                class XmlLoadModel : public LoadModel, public XmlBackend {
+                class DomLoadModel : public LoadModel, public DomBackend {
                     public:
                         /**
                          * @brief
                          *
-                         * @fn XmlLoadModel
+                         * @fn DomLoadModel
                          */
-                        XmlLoadModel();
+                        DomLoadModel();
                         /**
                          * @brief
                          *
-                         * @fn XmlLoadModel
+                         * @fn DomLoadModel
                          * @param
                          */
-                        XmlLoadModel(QDomElement* );
+                        DomLoadModel(QDomElement* );
                         /**
                          * @brief
                          *
-                         * @fn XmlLoadModel
+                         * @fn DomLoadModel
                          * @param
                          */
-                        XmlLoadModel(const XmlLoadModel&);
+                        DomLoadModel(const DomLoadModel&);
                         /**
                          * @brief
                          *
-                         * @fn ~XmlLoadModel
+                         * @fn ~DomLoadModel
                          */
-                        virtual ~XmlLoadModel();
+                        virtual ~DomLoadModel();
                         /**
                          * @brief
                          *
                          * @fn load
                          * @param
                          */
-                        virtual Data* load(QDomElement* = NULL);
+                        virtual const Data* load() const;
                         /**
                          * @brief
                          *
                          * @fn loadTo
                          * @param
                          */
-                        virtual bool loadTo(Data&);
+                        virtual bool loadTo(Data&) const;
 
                 };
 
                 /**
                  * @brief
                  *
-                 * @class XmlSaveModel models.hpp "include/wntr/data/models.hpp"
+                 * @class DomSaveModel models.hpp "include/wntr/data/models.hpp"
                  */
-                class XmlSaveModel : public SaveModel, public XmlBackend {
+                class DomSaveModel : public SaveModel, public DomBackend {
                     public:
                         /**
                          * @brief
                          *
-                         * @fn XmlSaveModel
+                         * @fn DomSaveModel
                          */
-                        XmlSaveModel();
+                        DomSaveModel();
                         /**
                          * @brief
                          *
-                         * @fn XmlSaveModel
+                         * @fn DomSaveModel
                          * @param
                          */
-                        XmlSaveModel(QDomElement* );
+                        DomSaveModel(QDomElement* );
                         /**
                          * @brief
                          *
-                         * @fn XmlSaveModel
+                         * @fn DomSaveModel
                          * @param
                          */
-                        XmlSaveModel(const XmlSaveModel&);
+                        DomSaveModel(const DomSaveModel&);
                         /**
                          * @brief
                          *
-                         * @fn ~XmlSaveModel
+                         * @fn ~DomSaveModel
                          */
-                        virtual ~XmlSaveModel();
+                        virtual ~DomSaveModel();
                         /**
                          * @brief
                          *
                          * @fn save
                          * @param
                          */
-                        virtual void save(QDomElement* = NULL);
+                        virtual void save();
                         /**
                          * @brief
                          *
@@ -542,56 +605,85 @@ namespace Wintermute {
                 /**
                  * @brief
                  *
-                 * @class XmlStorage models.hpp "include/wntr/data/models.hpp"
+                 * @class DomStorage models.hpp "include/wntr/data/models.hpp"
                  */
-                class XmlStorage : public virtual XmlLoadModel, public virtual XmlSaveModel {
+                class DomStorage : public Storage {
+                    private:
+                        QDomElement* m_doc;
+                        /**
+                         * @brief
+                         *
+                         * @fn getPath
+                         * @param
+                         */
+                        static const QString getPath(const Data&);
+                        /**
+                         * @brief
+                         *
+                         * @fn spawn
+                         * @param
+                         */
+                        static void spawn(const QDomDocument&);
+
                     public:
                         /**
                          * @brief
                          *
-                         * @fn XmlStorage
+                         * @fn DomStorage
                          */
-                        XmlStorage();
+                        DomStorage();
                         /**
                          * @brief
                          *
-                         * @fn XmlStorage
+                         * @fn DomStorage
                          * @param
                          */
-                        XmlStorage(QDomElement* );
+                        DomStorage(const DomStorage& );
                         /**
                          * @brief
                          *
-                         * @fn XmlStorage
+                         * @fn ~DomStorage
+                         */
+                        virtual ~DomStorage();
+                        /**
+                         * @brief
+                         *
+                         * @fn exists
                          * @param
                          */
-                        XmlStorage(Data*);
+                        virtual const bool exists (const Data &) const;
                         /**
                          * @brief
                          *
-                         * @fn XmlStorage
+                         * @fn type
+                         */
+                        virtual const QString type () const;
+                        /**
+                         * @brief
+                         *
+                         * @fn loadTo
                          * @param
                          */
-                        XmlStorage(const XmlStorage& );
+                        virtual void loadTo (Data &) const;
                         /**
                          * @brief
                          *
-                         * @fn XmlStorage
+                         * @fn saveFrom
                          * @param
                          */
-                        XmlStorage(const Model& );
+                        virtual void saveFrom (const Data &);
                         /**
                          * @brief
                          *
-                         * @fn ~XmlStorage
+                         * @fn generate
                          */
-                        virtual ~XmlStorage();
+                        virtual void generate ();
                 };
             }
 
             /// @todo Define these classes for the Binding, Rule, and RuleSet classes. This'll add some dynamic means of implementing a back-end.
             namespace Rules {
-                struct Syntax;
+                struct BondData;
                 struct Model;
                 struct LoadModel;
                 struct SaveModel;
@@ -602,14 +694,14 @@ namespace Wintermute {
                  *
                  * @typedef SyntaxList
                  */
-                typedef QList<Syntax> SyntaxList;
+                typedef QList<BondData> SyntaxList;
 
                 /**
                  * @brief
                  *
                  * @class Syntax models.hpp "include/wntr/data/models.hpp"
                  */
-                class Syntax : public QObject {
+                class BondData : public QObject {
                     Q_OBJECT
                     Q_PROPERTY(string locale READ locale WRITE setLocale)
                     Q_PROPERTY(string ruleText READ ruleText WRITE setRuleText)
@@ -625,25 +717,25 @@ namespace Wintermute {
                          * @brief
                          * @fn Syntax
                          */
-                        Syntax();
+                        BondData();
                         /**
                          * @brief
                          * @fn Syntax
                          * @param p_syntx
                          */
-                        Syntax(const Syntax&);
+                        BondData(const BondData&);
                         /**
                          * @brief
                          * @fn ~Syntax
                          */
-                        ~Syntax();
+                        ~BondData();
                         /**
                          * @brief
                          *
                          * @fn operator =
                          * @param
                          */
-                        Syntax& operator=(const Syntax& );
+                        BondData& operator=(const BondData& );
                         /**
                          * @brief
                          * @fn setLocale
@@ -686,17 +778,17 @@ namespace Wintermute {
                  */
                 class Model : public QObject {
                     Q_OBJECT
-                    Q_PROPERTY(Syntax syntax READ syntax WRITE setSyntax)
+                    Q_PROPERTY(BondData syntax READ syntax WRITE setSyntax)
 
                     protected:
-                        Syntax m_syntx; /**< Represents the information used to form a binding. */
+                        BondData m_syntx; /**< Represents the information used to form a binding. */
                         /**
                          * @brief
                          *
                          * @fn Model
                          * @param
                          */
-                        Model(const Syntax& );
+                        Model(const BondData& );
 
                     public:
                         /**
@@ -723,14 +815,14 @@ namespace Wintermute {
                          *
                          * @fn syntax
                          */
-                        const Syntax syntax() const;
+                        const BondData syntax() const;
                         /**
                          * @brief
                          *
                          * @fn setSyntax
                          * @param
                          */
-                        void setSyntax(Syntax& );
+                        void setSyntax(BondData& );
                 };
 
                 /**
