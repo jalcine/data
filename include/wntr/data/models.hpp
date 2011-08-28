@@ -1,6 +1,6 @@
 /**
  * @file models.hpp
- * @author Adrian Borucki <gentoolx@gmail.com>
+ * @author Wintermute Developers <wintermute-devel@lists.launchpad.net>
  * @date Fri, 13 May 21:54:16
  *
  * @legalese
@@ -24,13 +24,19 @@
 #ifndef MODELS_HPP
 #define MODELS_HPP
 
+#define DOMSTORAGE_MAXSTR 1.0
+
+#include <map>
+#include <QHash>
 #include <QtDebug>
-#include <QMultiMap>
+#include <QMultiHash>
+#include <QStringList>
 #include <QtXml/QDomDocument>
 #include "linguistics.hpp"
 
 using namespace std;
-using std::multimap;
+
+using std::map;
 
 namespace Wintermute {
     namespace Data {
@@ -49,7 +55,7 @@ namespace Wintermute {
                  *
                  * @typedef DataMap
                  */
-                typedef QMultiMap<const QString*, const QString*> DataFlagMap;
+                typedef QMultiHash<const QString, const QString> DataFlagMap;
 
                 /**
                  * @brief
@@ -411,6 +417,20 @@ namespace Wintermute {
                          * @fn generate
                          */
                         virtual void generate() = 0;
+                        /**
+                         * @brief
+                         *
+                         * @fn hasPseudo
+                         * @param
+                         */
+                        virtual const bool hasPseudo(const Data&) const = 0;
+                        /**
+                         * @brief
+                         *
+                         * @fn loadPseudo
+                         * @param
+                         */
+                        virtual void loadPseudo(Data&) const = 0;
                 };
 
                 /**
@@ -609,7 +629,6 @@ namespace Wintermute {
                  */
                 class DomStorage : public Storage {
                     private:
-                        QDomElement* m_doc;
                         /**
                          * @brief
                          *
@@ -678,97 +697,259 @@ namespace Wintermute {
                          * @fn generate
                          */
                         virtual void generate ();
+                        /**
+                         * @brief
+                         *
+                         * @fn hasPseudo
+                         * @param
+                         */
+                        virtual const bool hasPseudo(const Data &) const;
+                        /**
+                         * @brief
+                         *
+                         * @fn loadPseduo
+                         * @param
+                         */
+                        virtual void loadPseudo(Data&) const;
+                        /**
+                         * @brief
+                         *
+                         * @fn spawnDoc
+                         * @param
+                         */
+                        QDomDocument* getSpawnDoc(const Data&) const;
                 };
             }
 
-            /// @todo Define these classes for the Binding, Rule, and RuleSet classes. This'll add some dynamic means of implementing a back-end.
             namespace Rules {
-                struct BondData;
+                struct Bond;
+                struct Chain;
                 struct Model;
                 struct LoadModel;
                 struct SaveModel;
                 struct Storage;
+                struct Cache;
 
                 /**
-                 * @brief
-                 *
-                 * @typedef SyntaxList
+                 * @brief Represents a key-value list of strings.
+                 * @typedef StringMap
+                 * @bug Qt's container classes force us to use pointers instead of values,
+                 *      unlike the typical STL library. I want to use Qt for memory management,
+                 *      but that feature messes things up. This'll use the std::map until we
+                 *      find a work-around. (Apply the bug number here when reported).
                  */
-                typedef QList<BondData> SyntaxList;
+                typedef map<const QString, QString> StringMap;
 
                 /**
-                 * @brief
-                 *
-                 * @class Syntax models.hpp "include/wntr/data/models.hpp"
+                 * @brief Represents a list of Bonds.
+                 * @typedef BondVector
                  */
-                class BondData : public QObject {
+                typedef QList<Bond*> BondList;
+
+                /**
+                 * @brief Represents the syntactical data and rules needed to form a syntactic link.
+                 *
+                 * Bonds are used by the Parser to determine whether or not a word (of a specified parent rule)
+                 * can efficiently and properly bond with other words. Specificially, the Binding object uses
+                 * the Bond object to form specialized links:
+                 *
+                 * @code
+                 * const Link* l_lnk = Binding::obtain(p_nd, p_nd2);
+                 * @endcode
+                 *
+                 * @see Binding
+                 * @see Cache
+                 * @class Bond models.hpp "include/wntr/data/models.hpp"
+                 */
+                class Bond : public QObject {
                     Q_OBJECT
-                    Q_PROPERTY(string locale READ locale WRITE setLocale)
-                    Q_PROPERTY(string ruleText READ ruleText WRITE setRuleText)
-                    Q_PROPERTY(string linkText READ linkText WRITE setLinkText)
+                    Q_PROPERTY(QString With READ with WRITE setWith)
+                    Q_PROPERTY(StringMap Attributes READ attributes WRITE setAttributes)
+
+                    public:
+                        /**
+                         * @brief Empty constructor.
+                         * @fn Bond
+                         */
+                        Bond();
+
+                        /**
+                         * @brief Copy constructor.
+                         * @fn Bond
+                         * @param Bond The source Bond to be copied.
+                         */
+                        Bond(const Bond& );
+
+                        /**
+                         * @brief Assignment operator.
+                         * @fn operator =
+                         * @param Bond The source Bond to be copied.
+                         */
+                        void operator=(const Bond&);
+
+                        /**
+                         * @brief
+                         *
+                         * @fn operator ==
+                         * @param
+                         */
+                        bool operator==(const Bond&) const;
+                        /**
+                         * @brief
+                         *
+                         * @fn ~Bond
+                         */
+                        virtual ~Bond();
+                        /**
+                         * @brief
+                         *
+                         * @fn with
+                         */
+                        const QString with() const;
+                        /**
+                         * @brief
+                         *
+                         * @fn attribute
+                         * @param
+                         */
+                        const QString attribute(const QString& ) const;
+                        /**
+                         * @brief
+                         *
+                         * @fn attributes
+                         */
+                        const StringMap attributes() const;
+                        /**
+                         * @brief
+                         *
+                         * @fn hasAttribute
+                         * @param
+                         */
+                        const bool hasAttribute(const QString& ) const;
+                        /**
+                         * @brief
+                         *
+                         * @fn setWith
+                         * @param
+                         */
+                        void setWith( QString& );
+                        /**
+                         * @brief
+                         *
+                         * @fn setAttribute
+                         * @param
+                         * @param
+                         */
+                        void setAttribute(const QString& , QString& );
+                        /**
+                         * @brief
+                         *
+                         * @fn setAttributes
+                         * @param
+                         */
+                        void setAttributes(const StringMap& );
+                        /**
+                         * @brief
+                         *
+                         * @fn matches
+                         * @param
+                         * @param
+                         */
+                        static const double matches(const QString& , const QString& );
 
                     private:
-                        string m_lcl;
-                        string m_rlTxt;
-                        string m_lnkTxt;
+                        StringMap m_props; /**< Holds all of the attributes. */
+                };
+
+                /**
+                 * @brief
+                 *
+                 * @class Chain models.hpp "include/wntr/data/models.hpp"
+                 */
+                class Chain : public QObject {
+                    Q_OBJECT
+                    Q_PROPERTY(BondList Bonds READ bonds WRITE setBonds)
+                    Q_PROPERTY(QString Type READ type WRITE setType)
+                    Q_PROPERTY(QString Locale READ locale)
 
                     public:
                         /**
                          * @brief
-                         * @fn Syntax
+                         *
+                         * @fn Chain
                          */
-                        BondData();
+                        Chain();
                         /**
                          * @brief
-                         * @fn Syntax
-                         * @param p_syntx
+                         *
+                         * @fn Chain
+                         * @param
                          */
-                        BondData(const BondData&);
+                        Chain(const Chain&);
                         /**
                          * @brief
-                         * @fn ~Syntax
+                         *
+                         * @fn Chain
+                         * @param
+                         * @param
                          */
-                        ~BondData();
+                        explicit Chain(const QString&, const QString& = QString::null, const BondList& = BondList());
                         /**
                          * @brief
                          *
                          * @fn operator =
                          * @param
                          */
-                        BondData& operator=(const BondData& );
+                        void operator=(const Chain&);
                         /**
                          * @brief
-                         * @fn setLocale
-                         * @param string
+                         *
+                         * @fn ~Chain
                          */
-                        void setLocale(const string);
+                        virtual ~Chain();
                         /**
                          * @brief
-                         * @fn setRuleText
-                         * @param string
+                         *
+                         * @fn setBonds
+                         * @param
                          */
-                        void setRuleText(const string);
+                        void setBonds(const BondList&);
                         /**
                          * @brief
-                         * @fn setLinkText
-                         * @param string
+                         *
+                         * @fn setType
                          */
-                        void setLinkText(const string);
+                        void setType(const QString&);
                         /**
                          * @brief
+                         *
+                         * @fn bonds
+                         */
+                        const BondList bonds() const;
+                        /**
+                         * @brief
+                         *
                          * @fn locale
                          */
-                        const string locale() const;
+                        const QString locale() const;
                         /**
                          * @brief
-                         * @fn ruleText
+                         *
+                         * @fn type
                          */
-                        const string ruleText() const;
+                        const QString type() const;
                         /**
                          * @brief
-                         * @fn linkText
+                         *
+                         * @fn operator []
+                         * @param
                          */
-                        const string linkText() const;
+                        Bond operator[](const int&) const;
+
+                    private:
+                        BondList m_bndVtr; /**< Holds the bonds */
+                        QString m_lcl;
+                        QString m_typ;
                 };
 
                 /**
@@ -778,17 +959,17 @@ namespace Wintermute {
                  */
                 class Model : public QObject {
                     Q_OBJECT
-                    Q_PROPERTY(BondData syntax READ syntax WRITE setSyntax)
+                    Q_PROPERTY(Chain Chain READ chain WRITE setChain)
 
                     protected:
-                        BondData m_syntx; /**< Represents the information used to form a binding. */
+                        Chain m_chn; /**< Represents the information used to form a binding. */
                         /**
                          * @brief
                          *
                          * @fn Model
                          * @param
                          */
-                        Model(const BondData& );
+                        Model(const Bond& );
 
                     public:
                         /**
@@ -813,16 +994,16 @@ namespace Wintermute {
                         /**
                          * @brief
                          *
-                         * @fn syntax
+                         * @fn bond
                          */
-                        const BondData syntax() const;
+                        const Chain chain() const;
                         /**
                          * @brief
                          *
-                         * @fn setSyntax
+                         * @fn setBond
                          * @param
                          */
-                        void setSyntax(BondData& );
+                        void setChain(const Chain& );
                 };
 
                 /**
@@ -845,6 +1026,13 @@ namespace Wintermute {
                          * @fn save
                          */
                         virtual void save() = 0;
+                        /**
+                         * @brief
+                         *
+                         * @fn saveFrom
+                         * @param
+                         */
+                        virtual void saveFrom(const Chain&) = 0;
 
                     protected:
                         /**
@@ -858,12 +1046,6 @@ namespace Wintermute {
                          * @param p_model
                          */
                         SaveModel(const Model& );
-                        /**
-                         * @brief
-                         * @fn SaveModel
-                         * @param p_saveModel
-                         */
-                        SaveModel(const SaveModel& );
                         /**
                          * @brief
                          * @fn ~SaveModel
@@ -890,7 +1072,14 @@ namespace Wintermute {
                          * @brief
                          * @fn load
                          */
-                        virtual void load() const = 0;
+                        virtual const Chain* load() const = 0;
+                        /**
+                         * @brief
+                         *
+                         * @fn loadTo
+                         * @param
+                         */
+                        virtual void loadTo(Chain&) const = 0;
 
                     protected:
                         /**
@@ -906,29 +1095,399 @@ namespace Wintermute {
                         LoadModel(const Model& );
                         /**
                          * @brief
-                         * @fn LoadModel
-                         * @param p_model
-                         */
-                        LoadModel(const LoadModel& );
-                        /**
-                         * @brief
                          *
                          * @fn ~LoadModel
                          */
                         virtual ~LoadModel() = 0;
                 };
 
-                class Storage : virtual public SaveModel, virtual public LoadModel {
+                /**
+                 * @brief
+                 * @class Storage models.hpp "include/wntr/data/models.hpp"
+                 */
+                class Storage {
                     public:
+                        /**
+                         * @brief
+                         *
+                         * @fn Storage
+                         */
                         Storage();
+                        /**
+                         * @brief
+                         *
+                         * @fn Storage
+                         * @param
+                         * @param
+                         */
+                        Storage(const QString&, const QString&);
+                        /**
+                         * @brief
+                         *
+                         * @fn Storage
+                         * @param
+                         */
+                        Storage(const Storage&);
+                        /**
+                         * @brief
+                         *
+                         * @fn operator ==
+                         * @param
+                         */
+                        bool operator==(const Storage&);
+                        /**
+                         * @brief
+                         *
+                         * @fn loadTo
+                         * @param
+                         */
+                        virtual void loadTo(Chain&) const = 0;
+                        /**
+                         * @brief
+                         *
+                         * @fn saveFrom
+                         * @param
+                         */
+                        virtual void saveFrom(const Chain&) = 0;
+                        /**
+                         * @brief
+                         *
+                         * @fn exists
+                         * @param
+                         */
+                        virtual const bool exists(const QString, const QString) const = 0;
+                        /**
+                         * @brief
+                         *
+                         * @fn type
+                         */
+                        virtual const QString type() const = 0;
+                        /**
+                         * @brief
+                         *
+                         * @fn flag
+                         */
+                        virtual const QString flag() const;
+                        /**
+                         * @brief
+                         *
+                         * @fn locale
+                         */
+                        virtual const QString locale() const;
+                        /**
+                         * @brief
+                         *
+                         * @fn ~Storage
+                         */
                         virtual ~Storage();
-                    protected:
                     private:
+                        QString m_flg;
+                        QString m_lcl;
+                };
+
+                /**
+                 * @brief
+                 *
+                 * @class DomBackend models.hpp "include/wntr/data/models.hpp"
+                 */
+                class DomBackend {
+                    public:
+                        /**
+                         * @brief
+                         *
+                         * @fn DomBackend
+                         */
+                        DomBackend();
+                        /**
+                         * @brief
+                         *
+                         * @fn DomBackend
+                         * @param
+                         */
+                        DomBackend(const DomBackend&);
+                        /**
+                         * @brief
+                         *
+                         * @fn DomBackend
+                         * @param
+                         */
+                        explicit DomBackend(QDomElement* );
+                        /**
+                         * @brief
+                         *
+                         * @fn ~DomBackend
+                         */
+                        ~DomBackend();
+
+                    protected:
+                        QDomElement* m_elem;
+                };
+
+                /**
+                 * @brief
+                 *
+                 * @class DomLoadModel models.hpp "include/wntr/data/models.hpp"
+                 */
+                class DomLoadModel : public LoadModel, public DomBackend {
+                    Q_OBJECT
+                    public:
+                        /**
+                         * @brief
+                         *
+                         * @fn DomLoadModel
+                         */
+                        DomLoadModel();
+                        /**
+                         * @brief
+                         *
+                         * @fn DomLoadModel
+                         * @param
+                         */
+                        DomLoadModel(const DomLoadModel&);
+                        /**
+                         * @brief
+                         *
+                         * @fn DomLoadModel
+                         * @param
+                         */
+                        DomLoadModel(QDomElement* );
+                        /**
+                         * @brief
+                         *
+                         * @fn ~DomLoadModel
+                         */
+                        virtual ~DomLoadModel();
+                        /**
+                         * @brief
+                         *
+                         * @fn load
+                         */
+                        virtual const Chain* load () const;
+                        /**
+                         * @brief
+                         *
+                         * @fn loadTo
+                         * @param
+                         */
+                        virtual void loadTo (Chain &) const;
+                    private:
+                        /**
+                         * @brief
+                         *
+                         * @fn obtainType
+                         * @param QDomElement
+                         */
+                        const QString obtainType(QDomElement ) const;
+                        /**
+                         * @brief
+                         *
+                         * @fn obtainBonds
+                         * @param
+                         * @param QDomElement
+                         */
+                        void obtainBonds(BondList&, QDomElement) const;
+                };
+
+                /**
+                 * @brief
+                 *
+                 * @class DomSaveModel models.hpp "include/wntr/data/models.hpp"
+                 */
+                class DomSaveModel : public SaveModel, public DomBackend {
+                    Q_OBJECT
+                    public:
+                        /**
+                         * @brief
+                         *
+                         * @fn DomSaveModel
+                         */
+                        DomSaveModel();
+                        /**
+                         * @brief
+                         *
+                         * @fn DomSaveModel
+                         * @param
+                         */
+                        DomSaveModel(const DomSaveModel&);
+                        /**
+                         * @brief
+                         *
+                         * @fn DomSaveModel
+                         * @param
+                         */
+                        DomSaveModel(QDomElement* );
+                        /**
+                         * @brief
+                         *
+                         * @fn ~DomSaveModel
+                         */
+                        virtual ~DomSaveModel();
+                        /**
+                         * @brief
+                         *
+                         * @fn save
+                         */
+                        virtual void save ();
+                        /**
+                         * @brief
+                         *
+                         * @fn saveFrom
+                         * @param
+                         */
+                        virtual void saveFrom(const Chain &);
+
+                };
+
+                /**
+                 * @brief
+                 *
+                 * @class DomStorage models.hpp "include/wntr/data/models.hpp"
+                 */
+                class DomStorage : public Storage {
+                    public:
+                        /**
+                         * @brief
+                         *
+                         * @fn DomStorage
+                         */
+                        DomStorage();
+                        /**
+                         * @brief
+                         *
+                         * @fn DomStorage
+                         * @param
+                         */
+                        DomStorage(const Storage&);
+                        /**
+                         * @brief
+                         *
+                         * @fn ~DomStorage
+                         */
+                        virtual ~DomStorage();
+                        /**
+                         * @brief
+                         *
+                         * @fn loadTo
+                         * @param
+                         */
+                        virtual void loadTo (Chain &) const;
+                        /**
+                         * @brief
+                         *
+                         * @fn saveFrom
+                         * @param
+                         */
+                        virtual void saveFrom (const Chain &);
+                        /**
+                         * @brief
+                         *
+                         * @fn exists
+                         * @param
+                         */
+                        virtual const bool exists (const QString , const QString ) const;
+                        /**
+                         * @brief
+                         *
+                         * @fn type
+                         */
+                        virtual const QString type () const;
+                    private:
+                        mutable double m_min; /**< Represents the strength of matching. */
+                        /**
+                         * @brief
+                         *
+                         * @fn matches
+                         * @param
+                         * @param
+                         */
+                        static const double matches(const QString&, const QString&);
+                        /**
+                         * @brief
+                         *
+                         * @fn findElement
+                         * @param
+                         * @param QDomElement
+                         */
+                        QDomElement findElement(const Chain&, QDomElement ) const;
+                        /**
+                         * @brief
+                         *
+                         * @fn findElement
+                         * @param
+                         * @param QString
+                         */
+                        QDomElement findElement(const Chain&, QDomElement , QString) const;
+                        /**
+                         * @brief
+                         *
+                         * @fn getPath
+                         * @param
+                         */
+                        static const QString getPath(const Chain&);
+                        /**
+                         * @brief
+                         *
+                         * @fn loadDom
+                         * @param
+                         */
+                        static QDomDocument* loadDom(const Chain&);
+                };
+
+                /**
+                 * @brief
+                 *
+                 * @class Cache models.hpp "include/wntr/data/models.hpp"
+                 */
+                class Cache {
+                    /**
+                     * @brief
+                     *
+                     * @typedef StorageList
+                     */
+                    typedef QList<Storage*> StorageList;
+                    friend class Wintermute::Data::Linguistics::Configuration;
+
+                    private:
+                        static StorageList s_stores; /**< Holds the storage. */
+                        Cache();
+                        virtual ~Cache();
+                        /**
+                         * @brief
+                         *
+                         * @fn addStorage
+                         * @param
+                         */
+                        static void addStorage(Storage* );
+
+                    public:
+                        /**
+                         * @brief
+                         *
+                         * @fn write
+                         * @param
+                         */
+                        static void write(const Chain&);
+                        /**
+                         * @brief
+                         *
+                         * @fn exists
+                         * @param
+                         */
+                        static const bool exists(const QString&, const QString&);
+                        /**
+                         * @brief
+                         *
+                         * @fn read
+                         * @param
+                         */
+                        static const bool read(Chain&);
                 };
             }
         }
     }
 }
+
+
 
 #endif /* MODELS_HPP */
 // kate: indent-mode cstyle; space-indent on; indent-width 4;

@@ -28,13 +28,13 @@ using namespace Wintermute::Data::Linguistics;
 namespace Wintermute {
     namespace Data {
         void Configuration::Initialize ( void ) {
-            Wintermute::Data::Ontology::Configuration::Initialize();
             Wintermute::Data::Linguistics::Configuration::Initialize ( Configuration::getDirectory() + string ( "/" ) + string ( WNTRDATA_LING_DIR ) );
+            Wintermute::Data::Ontology::Configuration::Initialize();
         }
 
         void Configuration::Deinitialize ( void ) {
-            Wintermute::Data::Ontology::Configuration::Deinitialize();
             Wintermute::Data::Linguistics::Configuration::Deinitialize();
+            Wintermute::Data::Ontology::Configuration::Deinitialize();
         }
 
         BOOST_PYTHON_MODULE ( wntrdata ) {

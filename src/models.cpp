@@ -1,6 +1,6 @@
 /**
  * @file models.hpp
- * @author Adrian Borucki <gentoolx@gmail.com>
+Wintermute Developers <wintermute-devel@lists.launchpad.net>
  * @date Fri, 13 May 21:54:16
  *
  * @legalese
@@ -27,7 +27,10 @@
 #include <QFile>
 #include <QtDebug>
 #include <QMetaType>
+#include <algorithm>
 #include <boost/progress.hpp>
+
+using std::unique;
 
 namespace Wintermute {
     namespace Data {
@@ -169,7 +172,7 @@ namespace Wintermute {
 
                     foreach(QString l_str, l_lst){
                         const QString l_pth = d.absolutePath () + "/" + l_str + "/node.xml";
-                        QDomDocument l_spawnDom;
+                        QDomDocument l_spawnDom("Store");
                         QFile* l_file;
 
                         if (!QFile::exists (l_pth)){
@@ -230,18 +233,48 @@ namespace Wintermute {
                     cout << endl << endl;
                 }
 
-                DomStorage::~DomStorage() { }
+                QDomDocument* DomStorage::getSpawnDoc(const Data& p_dt) const {
+                    QDir d(QString::fromStdString (Configuration::directory ()));
+                    const QString l_pth = d.absolutePath () + "/" + p_dt.locale () + "/node.xml";
+                    QDomDocument* l_spawnDom = new QDomDocument("Storage");
+                    QFile* l_file = new QFile(l_pth);
 
-                const bool Cache::read (Data &p_dt) {
-                    foreach (Storage* l_str, Cache::s_stores){
-                        if (l_str->exists (p_dt)){
-                            l_str->loadTo (p_dt);
-                            return true;
-                        } else continue;
+                    if (!l_file->exists ()){
+                        qWarning() << "(data) [DomStorage] Can't find node cache for" << p_dt.locale ();
+                        return NULL;
                     }
 
-                    return false;
+                    if (!l_spawnDom->setContent (l_file)){
+                        qWarning() << "(data) [DomStorage] Parse error for" << p_dt.locale ();
+                        return NULL;
+                    }
+
+                    return l_spawnDom;
                 }
+
+                const bool DomStorage::hasPseudo(const Data& p_dt) const {
+                    QDomDocument* l_dom = getSpawnDoc(p_dt);
+                    QDomElement l_root = l_dom->documentElement ();
+                    QDomNodeList l_lst = l_root.elementsByTagName ("Pseudo");
+                    return !l_lst.isEmpty ();
+                }
+
+                void DomStorage::loadPseudo(Data& p_dt) const {
+                    if (!hasPseudo(p_dt))
+                        return;
+
+                    QDomDocument* l_dom = getSpawnDoc(p_dt);
+                    QDomElement l_root = l_dom->documentElement (), l_psElem;
+                    QDomNodeList l_lst = l_root.elementsByTagName ("Pseudo");
+                    l_psElem = l_lst.at (0).toElement ();
+
+                    DomLoadModel l_ldMdl(&l_psElem);
+                    const QString l_sym = p_dt.symbol ();
+                    l_ldMdl.loadTo (p_dt);
+                    p_dt.setSymbol (l_sym); // The loading process probably overwrote the symbol.
+                }
+
+                DomStorage::~DomStorage() { }
 
                 DomLoadModel::DomLoadModel(QDomElement* p_ele) : DomBackend(p_ele) { }
 
@@ -257,15 +290,17 @@ namespace Wintermute {
                 }
 
                 bool DomLoadModel::loadTo (Data &p_dt) const {
-                    if (this->DomBackend::m_ele == NULL || this->DomBackend::m_ele->isNull ())
+                    if (this->DomBackend::m_ele == NULL || this->DomBackend::m_ele->isNull ()){
+                        qWarning() << "(data) [DomLoadModel] Backend's empty.";
                         return false;
+                    }
 
                     DataFlagMap l_mp;
                     QDomNodeList l_ndlst = this->DomBackend::m_ele->elementsByTagName ("Flag");
 
                     for (int i = 0; i < l_ndlst.count (); i++){
                         QDomElement l_elem = l_ndlst.at (i).toElement ();
-                        l_mp.insert ((new QString (l_elem.attribute ("guid"))), (new QString (l_elem.attribute ("link"))));
+                        l_mp.insert (l_elem.attribute ("guid"),l_elem.attribute ("link"));
                     }
 
                     if (l_mp.isEmpty () || l_ndlst.isEmpty ()){
@@ -294,8 +329,8 @@ namespace Wintermute {
                     for(DataFlagMap::ConstIterator itr = this->Model::m_dt.flags ().begin ();
                         itr != this->Model::m_dt.flags ().end (); itr++) {
                         QDomElement l_ele = l_dom.createElement ("Flag");
-                        l_ele.setAttribute ("guid",*itr.key ());
-                        l_ele.setAttribute ("link",*itr.value ());
+                        l_ele.setAttribute ("guid",itr.key ());
+                        l_ele.setAttribute ("link",itr.value ());
                         this->DomBackend::m_ele->appendChild (l_ele);
                     }
 
@@ -335,15 +370,36 @@ namespace Wintermute {
                     return false;
                 }
 
+                const bool Cache::read (Data &p_dt) {
+                    foreach (Storage* l_str, Cache::s_stores){
+                        if (l_str->exists (p_dt)){
+                            l_str->loadTo (p_dt);
+                            return true;
+                        } else continue;
+                    }
+
+                    return false;
+                }
+
                 void Cache::pseudo (Data &p_psDt){
-                    DataFlagMap l_mp;
-                    l_mp.insert ((new QString("-1")),(new QString("`")));
-                    p_psDt.setFlags (l_mp);
+                    foreach (Storage* l_str, Cache::s_stores){
+                        if (l_str->hasPseudo (p_psDt)){
+                            l_str->loadPseudo(p_psDt);
+                            return;
+                        } else continue;
+                    }
                 }
 
                 const bool Cache::isPseudo(const Data& p_dt){
-                    DataFlagMap::ConstIterator itr = p_dt.flags ().begin ();
-                    return (p_dt.flags ().count () == 1 && (itr.key ()->toStdString() == "-1" && itr.value ()->toStdString() == "`"));
+                    foreach (Storage* l_str, Cache::s_stores){
+                        if (l_str->hasPseudo (p_dt)){
+                            Data l_dt;
+                            l_str->loadPseudo(l_dt);
+                            return (l_dt.id () == p_dt.id () && l_dt.flags () == p_dt.flags ());
+                        } else continue;
+                    }
+
+                    return false;
                 }
 
                 void Cache::addStorage(Storage* l_str){
@@ -364,38 +420,363 @@ namespace Wintermute {
             } /** end namespace Lexical */
 
             namespace Rules {
-                BondData::BondData() { }
+                Cache::StorageList Cache::s_stores;
 
-                BondData::BondData(const BondData &p_synx) : m_lcl(p_synx.m_lcl),
-                    m_lnkTxt(p_synx.m_lnkTxt), m_rlTxt(p_synx.m_rlTxt) { }
+                Bond::Bond() { }
 
-                void BondData::setLinkText (const string p_lnkTxt) { m_lnkTxt = p_lnkTxt; }
+                Bond::Bond(const Bond &p_bnd) : m_props(p_bnd.m_props) { }
 
-                void BondData::setLocale (const string p_lcl) { m_lcl = p_lcl; }
+				void Bond::setWith(QString& p_value) {
+			const QString l_with = "with";
+					setAttribute(l_with,p_value);
+				}
 
-                void BondData::setRuleText (const string p_rlTxt) { m_rlTxt = p_rlTxt; }
-
-                const string BondData::locale () const { return m_lcl; }
-
-                const string BondData::ruleText () const { return m_rlTxt; }
-
-                const string BondData::linkText () const { return m_lnkTxt; }
-
-                BondData& BondData::operator = (const BondData& p_synx) {
-                    return const_cast<BondData&>(p_synx);
+                void Bond::setAttribute(const QString& p_attr, QString& p_val) {
+                    if (m_props.find (p_attr) != m_props.end ())
+                        m_props.at (p_attr) = p_val;
+                    else
+                        m_props.insert (StringMap::value_type(p_attr,p_val));
                 }
 
-                BondData::~BondData () { }
+                const QString Bond::attribute(const QString& p_attr) const {
+                    if (hasAttribute(p_attr))
+                        return m_props.at (p_attr);
+                    else
+                        return QString::null;
+                }
+
+                void Bond::setAttributes(const StringMap& p_props) {
+                    m_props = p_props;
+                }
+
+                const bool Bond::hasAttribute(const QString& p_attr) const {
+                    return !(m_props.find (p_attr) == m_props.end ());
+                }
+
+                const QString Bond::with() const {
+                    return m_props.at ("with");
+                }
+
+                const StringMap Bond::attributes() const {
+                    return m_props;
+                }
+
+                /// @todo This might be the crowning jewel of the linking system.
+                const double Bond::matches(const QString& p_query, const QString& p_regex){
+                    const double l_max = (double) p_query.length () - 1;
+                    double l_cnt = 0.0;
+
+                    if (p_query.at (0) != p_regex.at (0))
+                        return 0.0;
+
+                    for (int i = 1; i < p_query.length (); i++){
+                        QChar l_chr = p_query.at (i);
+                        if (p_regex.contains (l_chr,Qt::CaseSensitive))
+                            l_cnt += 1.0;
+                    }
+
+                    return (l_cnt / l_max);
+                }
+
+                void Bond::operator=(const Bond& p_bnd) { m_props = p_bnd.m_props; }
+
+                Bond::~Bond () { }
+
+                Chain::Chain() { }
+
+                Chain::Chain(const QString& p_lcl, const QString& p_typ, const BondList &p_vtr) : m_bndVtr(p_vtr),
+                    m_typ(p_typ), m_lcl(p_lcl) { }
+
+                Chain::Chain(const Chain &p_chn) : m_bndVtr(p_chn.m_bndVtr), m_lcl(p_chn.m_lcl), m_typ(p_chn.m_typ) { }
+
+                void Chain::operator= (const Chain& p_chn) {
+                    m_bndVtr = p_chn.m_bndVtr;
+                    m_typ = p_chn.m_typ;
+                    m_lcl = p_chn.m_lcl;
+                }
+
+                const BondList Chain::bonds () const { return m_bndVtr; }
+
+                const QString Chain::type () const { return m_typ; }
+
+                const QString Chain::locale() const { return m_lcl; }
+
+                void Chain::setType (const QString &p_typ) {
+                    m_typ = p_typ;
+                }
+
+                void Chain::setBonds (const BondList &p_bnd) { m_bndVtr = p_bnd; }
+
+                Chain::~Chain () { }
 
                 Model::Model() { }
 
-                Model::Model(const Model& p_mdl) : m_syntx(p_mdl.m_syntx) { }
+                Model::Model(const Model &p_mod) : m_chn(p_mod.m_chn) { }
 
-                void Model::setSyntax (BondData &p_synx) { m_syntx = p_synx; }
+                LoadModel::LoadModel() { }
 
-                const BondData Model::syntax () const { return m_syntx; }
+                LoadModel::LoadModel(const Model &p_mdl) : Model(p_mdl) { }
 
-                Model::~Model() { }
+                LoadModel::~LoadModel() { }
+
+                SaveModel::SaveModel() { }
+
+                SaveModel::SaveModel(const Model &p_mdl) : Model(p_mdl) { }
+
+                SaveModel::~SaveModel() { }
+
+                Storage::Storage() { }
+
+                Storage::Storage(const QString& p_lcl, const QString& p_flg) : m_flg(p_flg), m_lcl(p_lcl) { }
+
+                Storage::Storage(const Storage &p_str) : m_flg(p_str.m_flg), m_lcl(p_str.m_lcl) { }
+
+                bool Storage::operator == (const Storage& p_str) { return type() == this->type (); }
+
+                const QString Storage::flag () const { return m_flg; }
+
+                const QString Storage::locale() const { return m_lcl; }
+
+                Storage::~Storage () { }
+
+                DomBackend::DomBackend() { }
+
+                DomBackend::DomBackend(const DomBackend &p_bnd) : m_elem(p_bnd.m_elem) { }
+
+                DomBackend::DomBackend(QDomElement *p_ele) : m_elem(p_ele) { }
+
+                DomBackend::~DomBackend () { }
+
+                DomLoadModel::DomLoadModel() { }
+
+                DomLoadModel::DomLoadModel(const DomLoadModel &p_mdl) : LoadModel(p_mdl), DomBackend(p_mdl.m_elem) { }
+
+                DomLoadModel::DomLoadModel(QDomElement *p_ele) : DomBackend(p_ele) { }
+
+                const Chain* DomLoadModel::load () const {
+                    Chain* l_chn = NULL;
+                    return l_chn;
+                }
+
+                void DomLoadModel::obtainBonds(BondList& p_bndVtr, QDomElement p_elem) const {
+                    if (p_elem.nodeName () != "Rule")
+                        return;
+
+                    QDomNodeList l_lst = p_elem.elementsByTagName ("Bind");
+
+                    for (int i = 0; i < l_lst.count (); i++){
+                        QDomElement l_elem = l_lst.at (i).toElement ();
+                        Bond* l_bnd = new Bond;
+                        QDomNamedNodeMap l_attrs = l_elem.attributes ();
+
+                        for (int i = 0; i < l_attrs.length (); i++){
+                            QDomAttr l_attr = l_attrs.item (i).toAttr ();
+                            const QString l_nm = l_attr.name ();
+                            QString l_vl = l_attr.value ();
+                            l_bnd->setAttribute (l_nm,l_vl);
+                        }
+
+                        p_bndVtr.push_back (l_bnd);
+                    }
+
+                    /*if (!p_elem.parentNode ().isNull ())
+                        obtainBonds(p_bndVtr,p_elem.parentNode ().toElement ());*/
+                }
+
+                const QString DomLoadModel::obtainType(QDomElement p_elem) const {
+                    QString l_type;
+                    while (!p_elem.isNull()){
+                        l_type.prepend(p_elem.attribute("type"));
+                        p_elem = p_elem.parentNode().toElement ();
+                    }
+
+                    return l_type;
+                }
+
+                /// @todo This needs to make a way to inherit rules.
+                void DomLoadModel::loadTo (Chain &p_chn) const {
+                    BondList l_bndVtr;
+                    obtainBonds(l_bndVtr,*m_elem);
+
+                    unique(l_bndVtr.begin (),l_bndVtr.end ());
+
+                    p_chn.setType (obtainType(*m_elem));
+                    p_chn.setBonds (l_bndVtr);
+                }
+
+                DomLoadModel::~DomLoadModel () { }
+
+                DomSaveModel::DomSaveModel() { }
+
+                DomSaveModel::DomSaveModel(QDomElement *p_ele) : DomBackend(p_ele) { }
+
+                DomSaveModel::DomSaveModel(const DomSaveModel &p_mdl) : SaveModel(p_mdl), DomBackend(p_mdl.m_elem) { }
+
+                void DomSaveModel::save () { }
+
+                void DomSaveModel::saveFrom (const Chain &p_chn) {
+
+                }
+
+                DomSaveModel::~DomSaveModel () { }
+
+                DomStorage::DomStorage() : m_min(DOMSTORAGE_MAXSTR) { }
+
+                DomStorage::DomStorage(const Storage &p_str) : Storage(p_str) { }
+
+                const QString DomStorage::getPath(const Chain& p_chn){
+                    return QString::fromStdString (Configuration::directory ()) + "/" + p_chn.locale () + "/grammar.xml";
+                }
+
+                QDomDocument* DomStorage::loadDom(const Chain& p_chn) {
+                    DomStorage l_str;
+                    if (!l_str.exists(p_chn.locale (),p_chn.type ())){
+                        qWarning() << "(data) [DomStorage] Can't find grammar for" << p_chn.locale ();
+                        return NULL;
+                    }
+
+                    const QString l_pth = getPath(p_chn);
+                    QDomDocument *l_dom = new QDomDocument;
+                    {
+                        QString l_errorString;
+                        int l_errorLine, l_errorColumn;
+                        if (!l_dom->setContent ((new QFile(l_pth)),&l_errorString,&l_errorLine,&l_errorColumn)){
+                            qWarning() << "(data) [DataStorage] Error loading grammar:" << l_errorLine << "at l." << l_errorLine << ", col." << l_errorColumn;
+                            return NULL;
+                        }
+                    }
+
+                    return l_dom;
+                }
+
+                const bool DomStorage::exists (const QString p_lcl, const QString p_flg) const {
+                    Chain l_chn(p_lcl,p_flg);
+                    const QString l_pth = getPath (l_chn);
+                    return QFile::exists (l_pth);
+                }
+
+                /// @todo We need to figure out a more approriate minimum value.
+                QDomElement DomStorage::findElement (const Chain& p_chn, QDomElement p_elem) const{
+                    QDomElement l_elem = findElement(p_chn,p_elem,"");
+                    const double l_minimum = (100 / (double) p_chn.type ().length ()) / 100;
+
+                    while (l_elem.isNull ()){
+                        m_min -= 0.01; // Decrease it by 1%.
+                        l_elem = findElement(p_chn,p_elem,"");
+
+                        if (!l_elem.isNull ())
+                            break;
+
+                        if (m_min == l_minimum)
+                            break;
+                    }
+
+                    qDebug() << "(data) [DomStorage] Minimum matching:" << l_minimum * 100 << "%";
+                    m_min = DOMSTORAGE_MAXSTR;
+                    return l_elem;
+                }
+
+                /// @todo Have this method round the results of matching up to the nearest whole number. (0.9 == 1, 1.1 == 2, etc). I can't remember if it's ceil or something else.
+                /// @todo Have this method use a cache to save at least 30 previous rules, to speed the searching process.`
+                QDomElement DomStorage::findElement(const Chain& p_chn, QDomElement p_elem, QString p_prefix) const {
+                    if (p_elem.hasAttribute ("type") && p_elem != p_elem.ownerDocument ().documentElement ()){
+                        const QString l_data = p_elem.attribute ("type");
+                        const QStringList l_lst = l_data.split (",");
+
+                        foreach (const QString l_part, l_lst){
+                            p_prefix.append (l_part);
+                            const int l_match = (int) (Bond::matches (p_chn.type (),p_prefix) * 100);
+                            if (l_match >= (int) (m_min * 100))
+                                return p_elem;
+                        }
+                    }
+
+                    QDomNodeList l_lst = p_elem.elementsByTagName ("Rule");
+
+                    for (int i = 0; i < l_lst.length (); i++){
+                        QDomElement l_elem = l_lst.at (i).toElement (), l_rtn;
+                        l_rtn = findElement(p_chn,l_elem,p_prefix);
+                        if (!l_rtn.isNull ())
+                            return l_rtn;
+                        else continue;
+                    }
+
+                    return *(new QDomElement);
+                }
+
+                void DomStorage::loadTo (Chain &p_chn) const {
+                    QDomDocument* l_dom = loadDom (p_chn);
+                    QDomElement l_elem = findElement(p_chn,l_dom->documentElement());
+                    if (l_elem.isNull()){
+                        qWarning() << "(data) [DataStorage] No rule can satisfy.";
+                        return;
+                    }
+                    DomLoadModel l_ldMdl(&l_elem);
+                    l_ldMdl.loadTo(p_chn);
+                }
+
+                void DomStorage::saveFrom(const Chain& p_chn) {
+                    QDomDocument* l_dom = loadDom (p_chn);
+                    QDomElement l_elem = findElement(p_chn,l_dom->documentElement());
+                    if (l_elem.isNull()){
+                        qWarning() << "(data) [DataStorage] No rule can satisfy.";
+                        return;
+                    }
+                    DomSaveModel l_svMdl(&l_elem);
+                    l_svMdl.saveFrom (p_chn);
+                }
+
+                const QString DomStorage::type () const { return "Dom"; }
+
+                DomStorage::~DomStorage() { }
+
+                void Model::setChain (const Chain &p_chn) { m_chn = p_chn; }
+
+                const Chain Model::chain () const { return m_chn; }
+
+                Model::~Model () { }
+
+                const bool Cache::read (Chain &p_chn) {
+                    foreach (Storage* l_str, Cache::s_stores){
+                        if (l_str->exists (p_chn.locale (),p_chn.type ())){
+                            l_str->loadTo (p_chn);
+                            return true;
+                        } else continue;
+                    }
+
+                    return false;
+                }
+
+                void Cache::write (const Chain& p_chn) {
+                    Storage* l_fdStr;
+                    foreach (Storage* l_str, Cache::s_stores){
+                        if (l_str->exists (p_chn.locale (),p_chn.type ()))
+                            l_fdStr = l_str;
+                        else continue;
+                    }
+
+                    if (l_fdStr)
+                        l_fdStr->saveFrom (p_chn);
+                    else {
+                        // save this locally. We consider the DOM storage to be local.
+                        l_fdStr = new DomStorage;
+                        l_fdStr->saveFrom (p_chn);
+                    }
+
+                }
+
+                const bool Cache::exists (const QString& p_lcl, const QString& p_flg) {
+                    foreach (Storage* l_str, Cache::s_stores){
+                        if (l_str->exists (p_lcl,p_flg))
+                            return true;
+                    }
+
+                    return false;
+                }
+
+                void Cache::addStorage (Storage *p_str){
+                    s_stores.push_back (p_str);
+                }
             }
         } /** end namespace Rules */
     }
@@ -404,5 +785,5 @@ namespace Wintermute {
 Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Lexical::Model)
 Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Lexical::Data)
 Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Rules::Model)
-Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Rules::BondData)
+Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Rules::Bond)
 // kate: indent-mode cstyle; space-indent on; indent-width 4;

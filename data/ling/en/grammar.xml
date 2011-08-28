@@ -104,16 +104,37 @@ the matching system is stiffer and more exact, it looks for 100% matching and
 works its way down, one at a time. I need to figure out to implement a means of
 inheriting some binds.
 
+[#9] (27 Aug 2011 5:41 PM) The parser's acting funny, the 'with' property
+doesn't get set correctly. EDIT: No worries, it was my miscalibration. It seems
+as if now the rule system became more specific. This means that'll take effort
+(of course) to get these rules linking properly. Maybe it's time I build the
+converter of LinkGrammar's rules for Wintermute. But it stated that it was
+designed for newspaper-like text. We want Wintermute to understand sentence
+fragments and conversation statements. That'll be in the future, I guess. Now
+to the ontology?
+
 -->
 <RuleSet locale="en">
   <Rule type="A">
     <!-- pronouns -->
     <Rule type="x">
       <Rule type="*">
-        <Bind with="Bcoa*" />
+        <Bind with="Bcoa*" skipWord="no" />
       </Rule>
       <Rule type="~">
-        <Bind with="Bcoaz" />
+        <Bind with="Bcoaz" skipWord="no" />
+      </Rule>
+    </Rule>
+    <Rule type="r">
+      <Rule with="e">
+        <Bind with="E" skipWord="no" />
+      </Rule>
+      <Rule type="b">
+        <Bind with="Ap*~123" skipWord="no" />
+        <Bind with="Bcoaz*~" skipWord="no" />
+      </Rule>
+      <Rule type="c">
+        <Bind with="Craf*~123" skipWord="no" />
       </Rule>
     </Rule>
     <Rule type="e,d">
@@ -126,26 +147,43 @@ inheriting some binds.
         </Rule>
       </Rule>
     </Rule>
+    <Rule type="p">
+      <Rule type="x">
+        
+      </Rule>
+    </Rule>
   </Rule>
 
   <Rule type="B">
     <!-- nouns -->
     <Rule type="z">
       <Bind with="Craf123*~" linkAction="reverse" />
-      <Bind with="Bz" />
+      <Bind with="Bz" hideNext="yes" />
     </Rule>
     <Rule type="coa*">
       <Bind with="Craf3*" linkAction="reverse" />
     </Rule>
     <Rule type="p">
-      <Bind with="Bpz" hideNext="yes" />
-      <Bind with="Craf3~" linkAction="reverse" skipWord="no" hide="yes" />
+      <Bind with="Bpz*~" hideNext="yes" />
+      <Rule type="~">
+        <Bind with="Craf3~" linkAction="reverse" />
+      </Rule>
+      <Rule type="*">
+        <Bind with="Craf3*" linkAction="reverse"/>
+      </Rule>
     </Rule>
   </Rule>
 
   <Rule type="C">
    <Rule type="*">
-     <Bind with="B*,A*" linkAction="reverse" />
+     <Bind with="B*" />"
+   </Rule>
+   <Rule type="raf~">
+     <Bind with="Bpz~" />
+     <Bind with="Aeo13~" />
+   </Rule>
+   <Rule type="raf*">
+     <Bind with="Bpz*" />
    </Rule>
  </Rule>
 

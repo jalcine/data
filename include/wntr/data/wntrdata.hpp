@@ -18,7 +18,20 @@
  * Boston, MA 02111-1307, USA.
  * @endlegalese
  */
-
+/**
+ * @mainpage Wintermute Data (WntrData) Documentation
+ * Wintermute relies on the aggregation and pooling of data resources
+ * to make sense of the (possibly) ten of hundreds of nodes of information
+ * it recieves. There's dedicated systems to obtaining information regarding
+ * syntax and linguistics for natural language processing (Wintermute::Data::Linguistics)
+ * and ontological resources (Wintermute::Data::Ontology).
+ * Currently, the language data system provides an abstract class system so that
+ * plug-in developers can implement new and foriegn sources of data for lexical
+ * and syntactic binding. Plug-in developers are encouraged to focus on data sources
+ * that introduce new sources of words aside from importing new syntactic information
+ * for the fact the syntactic system still needs a bit more work before it becomes as
+ * decently mature as the lexical system.
+ */
 #ifndef __WNTRDATA_HPP__
 #define __WNTRDATA_HPP__
 

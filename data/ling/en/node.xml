@@ -94,15 +94,41 @@
         <Flag guid="0" link="Ap3*" />
     </Data>
     <Data symbol="his">
-        <Flag guid="0" link="Ap2@" />
+        <Flag guid="0" link="Ap3@~" />
     </Data>
     <Data symbol="hers">
-        <Flag guid="0" link="Ap2#" />
+        <Flag guid="0" link="Ap3#~" />
     </Data>
     <Data symbol="its">
-        <Flag guid="0" link="Ap2!" />
+        <Flag guid="0" link="Ap3!~" />
     </Data>
-
+    <Data symbol="myself">
+      <Flag guid="0" link="Apq1~" />
+    </Data>
+    <Data symbol="herself">
+      <Flag guid="0" link="Apq3#~" />
+    </Data>
+    <Data symbol="himself">
+      <Flag guid="0" link="Apq3@~" />
+    </Data>
+    <Data symbol="itself">
+      <Flag guid="0" link="Apq3!~" />
+    </Data>
+    <Data symbol="yourself">
+      <Flag guid="0" link="Apq2!~" />
+    </Data>
+    <Data symbol="ourselves">
+      <Flag guid="0" link="Apq1*" />
+    </Data>
+    <Data symbol="yourselves">
+      <Flag guid="0" link="Apq2!*" />
+    </Data>
+    <Data symbol="themselves">
+      <Flag guid="0" link="Apq3!~" />
+      <Flag guid="0" link="Apq3#~" />
+      <Flag guid="0" link="Apq3@~" />
+    </Data>
+    
     <!-- end English personal pronouns -->
 
 	<!-- start English demonstrative pronouns -->
@@ -136,44 +162,115 @@
 	<!-- end English demonstrative pronouns -->
 
 	<!-- start English relative pronouns -->
-	<Data symbol="what"></Data>
-	<Data symbol="who"></Data>
+	<Data symbol="what">
+      <Flag guid="0" link="Arc~" />
+      <Flag guid="0" link="Arb~" />
+      <Flag guid="0" link="Arc*" />
+      <Flag guid="0" link="Arb*" />
+      <Flag guid="0" link="Are" />
+    </Data>
+    <!-- @todo What's the difference between who, whose, and whom? -->
 	<Data symbol="which"></Data>
+    <Data symbol="who"></Data> <!-- This seems to work only with verbs -->
 	<Data symbol="whom"></Data>
 	<Data symbol="whose"></Data>
 	<Data symbol="that"></Data>
 	<!-- end English relative pronouns -->
 
-	<!-- start English indefinite pronouns -->
-	<Data symbol="all"></Data>
-	<Data symbol="another"></Data>
-	<Data symbol="any"></Data>
-	<Data symbol="anybody"></Data>
-	<Data symbol="anyone"></Data>
-	<Data symbol="anything"></Data>
-	<Data symbol="both"></Data>
-	<Data symbol="each"></Data>
-	<Data symbol="either"></Data>
-	<Data symbol="everybody"></Data>
-	<Data symbol="everyone"></Data>
-	<Data symbol="everything"></Data>
-	<Data symbol="few"></Data>
-	<Data symbol="many"></Data>
-	<Data symbol="most"></Data>
-	<Data symbol="much"></Data>
-	<Data symbol="neither"></Data>
-	<Data symbol="nobody"></Data>
-	<Data symbol="none"></Data>
-	<Data symbol="nothing"></Data>
-	<Data symbol="one"></Data>
-	<Data symbol="other"></Data>
-	<Data symbol="several"></Data>
-	<Data symbol="some"></Data>
-	<Data symbol="some"></Data>
-	<Data symbol="somebody"></Data>
-	<Data symbol="someone"></Data>
-	<Data symbol="something"></Data>
-	<Data symbol="such"></Data>
+	<!--
+      start English indefinite pronouns
+      @note This pronouns share a lot of common properties with the typical
+            noun structure.
+      @todo This will need a bit of work, but I think the ambigious-ness would
+            be remove once we get the ontological references in place.
+    -->
+	<Data symbol="all">
+      <Flag guid="0" link="Aial" />
+    </Data>
+	<Data symbol="another">
+      <Flag guid="0" link="Aia" />
+    </Data>
+	<Data symbol="any">
+      <Flag guid="0" link="Aia" />
+    </Data>
+	<Data symbol="anybody">
+      <Flag guid="0" link="Aio" />
+    </Data>
+	<Data symbol="anyone">
+      <Flag guid="0" link="Aio" />
+    </Data>
+	<Data symbol="anything">
+      <Flag guid="0" link="Aia" />
+      <Flag guid="0" link="Aial" />
+    </Data>
+	<Data symbol="both">
+      <Flag guid="0" link="Aial" />
+    </Data>
+	<Data symbol="each">
+      <Flag guid="0" link="Aia" />
+    </Data>
+	<Data symbol="either">
+      <Flag guid="0" link="Aia" />
+    </Data>
+	<Data symbol="everybody">
+      <Flag guid="0" link="Aiol" />
+    </Data>
+	<Data symbol="everyone">
+      <Flag guid="0" link="Aiol" />
+    </Data>
+	<Data symbol="everything">
+      <Flag guid="0" link="Aiol" />
+    </Data>
+	<Data symbol="few">
+      <Flag guid="0" link="Aial" />
+    </Data>
+	<Data symbol="many">
+      <Flag guid="0" link="Aial" />
+    </Data>
+	<Data symbol="most">
+      <Flag guid="0" link="Aial" />
+    </Data>
+	<Data symbol="much">
+      <Flag guid="0" link="Aial" />
+    </Data>
+	<Data symbol="neither">
+      <Flag guid="0" link="Aial" />
+    </Data>
+	<Data symbol="nobody">
+      <Flag guid="0" link="Aiol" />
+    </Data>
+	<Data symbol="none">
+      <Flag guid="0" link="Aiol" />
+    </Data>
+	<Data symbol="nothing">
+      <Flag guid="0" link="Aia" />
+      <Flag guid="0" link="Aial" />
+    </Data>
+	<Data symbol="one">
+      <Flag guid="0" link="Aia" />      
+    </Data>
+	<Data symbol="other">
+      <Flag guid="0" link="Aia" />      
+    </Data>
+    <Data symbol="several">
+      <Flag guid="0" link="Aial" />
+    </Data>
+    <Data symbol="some">
+      <Flag guid="0" link="Aial" />
+    </Data>
+	<Data symbol="somebody">
+      <Flag guid="0" link="Aio" />
+    </Data>
+	<Data symbol="someone">
+      <Flag guid="0" link="Aio" />
+    </Data>
+	<Data symbol="something">
+      <Flag guid="0" link="Aia" />
+    </Data>
+	<Data symbol="such">
+      <Flag guid="0" link="Aia" />
+      <Flag guid="0" link="Aial" />
+    </Data>
 	<!-- end English indefinite pronouns -->
 	<!-- END PRONOUNS -->
 
@@ -465,7 +562,7 @@ included? -->
 		<Flag guid="2" link="Cpr~*" />
 	</Data>
 	<Data symbol="gone">
-	<Flag guid="2" link="Cpa~*" />
+        <Flag guid="2" link="Cpa~*" />
 	</Data>
 	<Data symbol="went">
 	<Flag guid="2" link="Ca~*" />
@@ -499,7 +596,6 @@ included? -->
 	<Data symbol="could"></Data>
 	<Data symbol="might"></Data>
 	<Data symbol="must"></Data>
-
 
 	<!-- END TENSE SENSTIVE WORDS -->
 
