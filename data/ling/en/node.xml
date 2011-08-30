@@ -20,6 +20,11 @@
       <Flag guid="-1" link="Bz" />
     </Pseudo>
 
+    <!-- These Import elements ease the process of spawning. -->
+
+    <Import uri="verbs.xml" />
+    <Import uri="nouns.xml" />
+
     <!-- START PRONOUNS -->
     <!-- start English personal pronouns -->
     <Data symbol="I">
@@ -128,7 +133,7 @@
       <Flag guid="0" link="Apq3#~" />
       <Flag guid="0" link="Apq3@~" />
     </Data>
-    
+
     <!-- end English personal pronouns -->
 
 	<!-- start English demonstrative pronouns -->
@@ -163,94 +168,94 @@
 
 	<!-- start English relative pronouns -->
 	<Data symbol="what">
-      <Flag guid="0" link="Arc~" />
-      <Flag guid="0" link="Arb~" />
-      <Flag guid="0" link="Arc*" />
-      <Flag guid="0" link="Arb*" />
-      <Flag guid="0" link="Are" />
-    </Data>
-    <!-- @todo What's the difference between who, whose, and whom? -->
+	  <Flag guid="0" link="Arc~" />
+	  <Flag guid="0" link="Arb~" />
+	  <Flag guid="0" link="Arc*" />
+	  <Flag guid="0" link="Arb*" />
+	  <Flag guid="0" link="Are" />
+	</Data>
+	<!-- @todo What's the difference between who, whose, and whom? -->
 	<Data symbol="which"></Data>
-    <Data symbol="who"></Data> <!-- This seems to work only with verbs -->
+	<Data symbol="who"></Data> <!-- This seems to work only with verbs -->
 	<Data symbol="whom"></Data>
 	<Data symbol="whose"></Data>
 	<Data symbol="that"></Data>
 	<!-- end English relative pronouns -->
 
-	<!--
+    <!--
       start English indefinite pronouns
       @note This pronouns share a lot of common properties with the typical
             noun structure.
       @todo This will need a bit of work, but I think the ambigious-ness would
             be remove once we get the ontological references in place.
     -->
-	<Data symbol="all">
+    <Data symbol="all">
       <Flag guid="0" link="Aial" />
     </Data>
-	<Data symbol="another">
+    <Data symbol="another">
       <Flag guid="0" link="Aia" />
     </Data>
-	<Data symbol="any">
+    <Data symbol="any">
       <Flag guid="0" link="Aia" />
     </Data>
-	<Data symbol="anybody">
+    <Data symbol="anybody">
       <Flag guid="0" link="Aio" />
     </Data>
-	<Data symbol="anyone">
+    <Data symbol="anyone">
       <Flag guid="0" link="Aio" />
     </Data>
-	<Data symbol="anything">
+    <Data symbol="anything">
       <Flag guid="0" link="Aia" />
       <Flag guid="0" link="Aial" />
     </Data>
-	<Data symbol="both">
+    <Data symbol="both">
       <Flag guid="0" link="Aial" />
     </Data>
-	<Data symbol="each">
+    <Data symbol="each">
       <Flag guid="0" link="Aia" />
     </Data>
-	<Data symbol="either">
+    <Data symbol="either">
       <Flag guid="0" link="Aia" />
     </Data>
-	<Data symbol="everybody">
+    <Data symbol="everybody">
       <Flag guid="0" link="Aiol" />
     </Data>
-	<Data symbol="everyone">
+    <Data symbol="everyone">
       <Flag guid="0" link="Aiol" />
     </Data>
-	<Data symbol="everything">
+    <Data symbol="everything">
       <Flag guid="0" link="Aiol" />
     </Data>
-	<Data symbol="few">
+    <Data symbol="few">
       <Flag guid="0" link="Aial" />
     </Data>
-	<Data symbol="many">
+    <Data symbol="many">
       <Flag guid="0" link="Aial" />
     </Data>
-	<Data symbol="most">
+    <Data symbol="most">
       <Flag guid="0" link="Aial" />
     </Data>
-	<Data symbol="much">
+    <Data symbol="much">
       <Flag guid="0" link="Aial" />
     </Data>
-	<Data symbol="neither">
+    <Data symbol="neither">
       <Flag guid="0" link="Aial" />
     </Data>
-	<Data symbol="nobody">
+    <Data symbol="nobody">
       <Flag guid="0" link="Aiol" />
     </Data>
-	<Data symbol="none">
+    <Data symbol="none">
       <Flag guid="0" link="Aiol" />
     </Data>
-	<Data symbol="nothing">
+    <Data symbol="nothing">
       <Flag guid="0" link="Aia" />
       <Flag guid="0" link="Aial" />
     </Data>
-	<Data symbol="one">
-      <Flag guid="0" link="Aia" />      
+    <Data symbol="one">
+      <Flag guid="0" link="Aia" />
     </Data>
-	<Data symbol="other">
-      <Flag guid="0" link="Aia" />      
+    <Data symbol="other">
+      <Flag guid="0" link="Aia" />
     </Data>
     <Data symbol="several">
       <Flag guid="0" link="Aial" />
@@ -258,21 +263,21 @@
     <Data symbol="some">
       <Flag guid="0" link="Aial" />
     </Data>
-	<Data symbol="somebody">
+    <Data symbol="somebody">
       <Flag guid="0" link="Aio" />
     </Data>
-	<Data symbol="someone">
+    <Data symbol="someone">
       <Flag guid="0" link="Aio" />
     </Data>
-	<Data symbol="something">
+    <Data symbol="something">
       <Flag guid="0" link="Aia" />
     </Data>
-	<Data symbol="such">
+    <Data symbol="such">
       <Flag guid="0" link="Aia" />
       <Flag guid="0" link="Aial" />
     </Data>
-	<!-- end English indefinite pronouns -->
-	<!-- END PRONOUNS -->
+    <!-- end English indefinite pronouns -->
+    <!-- END PRONOUNS -->
 
 	<Data symbol="aboard">
 		<Flag guid="0" link="F" />
@@ -521,11 +526,11 @@ included? -->
 		<Flag guid="1" link="Ci" />
 	</Data>
 	<Data symbol="being">
-      <Flag guid="1" link="Cg*"  />
-      <Flag guid="1" link="Cpr*" />
-      <Flag guid="1" link="Cg~"  />
-      <Flag guid="1" link="Cpr~" />
-    </Data>
+	  <Flag guid="1" link="Cg*"  />
+	  <Flag guid="1" link="Cpr*" />
+	  <Flag guid="1" link="Cg~"  />
+	  <Flag guid="1" link="Cpr~" />
+	</Data>
 	<Data symbol="been">
 		<Flag guid="1" link="Cpa~*" />
 	</Data>
@@ -562,23 +567,23 @@ included? -->
 		<Flag guid="2" link="Cpr~*" />
 	</Data>
 	<Data symbol="gone">
-        <Flag guid="2" link="Cpa~*" />
+		<Flag guid="2" link="Cpa~*" />
 	</Data>
 	<Data symbol="went">
 	<Flag guid="2" link="Ca~*" />
 	</Data>
 
-	<Data symbol="do">
+    <Data symbol="do">
       <Flag guid="3" link="Ci2~" />
       <Flag guid="3" link="Ci3*" />
     </Data>
-	<Data symbol="did">
+    <Data symbol="did">
       <Flag guid="3" link="Cpa~" />
       <Flag guid="3" link="Cpa*" />
     </Data>
-	<Data symbol="done"></Data>
-	<Data symbol="does"></Data>
-	<Data symbol="doing"></Data>
+    <Data symbol="done"></Data>
+    <Data symbol="does"></Data>
+    <Data symbol="doing"></Data>
 
 	<Data symbol="have"></Data>
 	<Data symbol="having"></Data>

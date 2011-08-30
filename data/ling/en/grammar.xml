@@ -113,8 +113,15 @@ designed for newspaper-like text. We want Wintermute to understand sentence
 fragments and conversation statements. That'll be in the future, I guess. Now
 to the ontology?
 
+[#10] (30 Aug 2011 3:33 AM): Woke up randomly (worried about her being in the ho
+spital). But the declaration of Import elements allow a module-like system to lo
+ad rules from different sources. Soon, when we learn the RDF syntax, we should
+convert this document into something close to it.
+
 -->
 <RuleSet locale="en">
+    <Import uri="verbs.xml" />
+    <Import uri="adjec.xml" />
   <Rule type="A">
     <!-- pronouns -->
     <Rule type="x">
@@ -149,7 +156,7 @@ to the ontology?
     </Rule>
     <Rule type="p">
       <Rule type="x">
-        
+
       </Rule>
     </Rule>
   </Rule>
@@ -180,10 +187,11 @@ to the ontology?
    </Rule>
    <Rule type="raf~">
      <Bind with="Bpz~" />
-     <Bind with="Aeo13~" />
+     <Bind with="Aeox13~" />
    </Rule>
    <Rule type="raf*">
      <Bind with="Bpz*" />
+     <Bind with="Ax*" />
    </Rule>
  </Rule>
 
