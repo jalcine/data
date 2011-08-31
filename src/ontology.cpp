@@ -27,71 +27,62 @@
 #include "wntrdata.hpp"
 #include "unctrl.h"
 #include <QtDebug>
+#include <Soprano/Soprano>
 #include <boost/progress.hpp>
 
 namespace Wintermute {
     namespace Data {
         namespace Ontology {
-            QMap<const QString*, Repository*> Repository::s_repos;
+
             void Configuration::Initialize() {
-                Repository* l_repo = Repository::obtain("COSMO");
+                const Repository* l_repo = Repository::obtainRepository("COSMO");
                 qDebug() << "(data) [Ontology::Configuration] Loaded.";
             }
 
             void Configuration::Deinitialize() {
-                QList<Repository*> l_repos = Repository::s_repos.values ();
-
-                foreach (Repository* l_repo, l_repos)
-                    delete l_repo;
-
                 qDebug() << "(data) [Ontology::Configuration] Unloaded.";
             }
 
-            Repository::Repository( QObject* parent ) : QObject(parent) { }
+            Repository::Repository(const QString &p_str) : m_repo(p_str) { load(); }
 
-            Repository::Repository( const Repository& p_repo ) : m_repoName(p_repo.m_repoName), m_model(p_repo.m_model) { }
+            Repository::Repository(const Repository &p_repo) : m_repo(p_repo.m_repo), m_model(p_repo.m_model) { }
 
-            Repository::Repository( QString p_repoName, QObject* parent ) : m_repoName(p_repoName), QObject(parent) { load(); }
-
-            Repository* Repository::obtain(QString p_repoName){
+            const Repository* Repository::obtainRepository(const QString& p_repoName){
                 Repository* l_repo = new Repository(p_repoName);
-                Repository::s_repos.insert(&p_repoName,l_repo);
+                //Repository::s_repos.insert(&p_repoName,l_repo);
                 return l_repo;
             }
 
             const QString Repository::getPath() const {
                 return QString::fromStdString (Data::Configuration::getDirectory ()) + QString("/")
-                        + QString(WNTRDATA_ONTO_DIR) + QString("/") + m_repoName + QString(".owl");
+                        + QString(WNTRDATA_ONTO_DIR) + QString("/") + m_repo + QString(".owl");
             }
 
-            void Repository::load(const QString p_repoName){
+            void Repository::load(const QString& p_repoName) const {
                 if (!p_repoName.isEmpty ())
-                    m_repoName = p_repoName;
+                    m_repo = p_repoName;
 
-                const QString l_url = getPath();
                 m_model = Soprano::createModel ();
+                const QString l_url = getPath();
                 const Soprano::Parser* l_rdfPrsr = Soprano::PluginManager::instance()->discoverParserForSerialization( Soprano::SerializationRdfXml );
                 Soprano::StatementIterator l_itr = l_rdfPrsr->parseFile( l_url , l_url, Soprano::SerializationRdfXml );
                 QList<Soprano::Statement> l_stats = l_itr.allStatements ();
-                m_model->addStatements (l_itr.allStatements ());
 
-                qDebug() << "(data) [Repository] Loading ontology" << m_repoName << "...";
-                emit loading();
-
-                {
-                    boost::progress_display show_progress( l_stats.length () );
-                    boost::progress_timer timer;
-                    foreach(Soprano::Statement l_st, l_stats){
-                        emit loadingProgress((double) show_progress.count() / (double) l_stats.length () );
-                        ++show_progress;
-                    }
-                }
-
+                m_model->addStatements (l_stats);
                 emit loaded();
-                qDebug() << "(data) [Repository] Loading ontology" << m_repoName << ".";
+                qDebug() << "(data) [Repository] Loaded ontology" << m_repo << "with" << l_stats.size () << "statements.";
             }
 
-            Repository::~Repository() { qDebug() << "repo"; }
+            const Resource* Repository::obtainResource(const QString& p_resource) const {
+                return NULL;
+            }
+
+            const Resource* Repository::obtainResource(const QString& p_repository, const QString& p_resource){
+                Repository* l_repo = new Repository(p_repository);
+                return l_repo->obtainResource(p_resource);
+            }
+
+            Repository::~Repository() { qDebug() << "Destroying repository" << m_repo << "."; }
         }
     }
 }

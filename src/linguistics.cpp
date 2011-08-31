@@ -49,7 +49,9 @@ namespace Wintermute {
                 qDebug() << "(ling) [Config] ## System configured.";
             }
 
-            void Configuration::Deinitialize() {  }
+            void Configuration::Deinitialize() {
+                qDebug() << "(ling) [Config] Shutting down..";
+            }
 
             void Configuration::setLocale ( const string p_lcl ) {
                 if ( p_lcl.empty() )

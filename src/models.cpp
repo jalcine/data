@@ -145,22 +145,23 @@ namespace Wintermute {
                     l_model.loadTo (p_dt);
                 }
 
-                /// @todo Should it create the locale file if it's not defined?
                 void DomStorage::saveFrom (const Data &p_dt){
-                    if (!DomStorage::exists (p_dt))
-                        return;
-
                     QDomDocument l_dom("Data");
+                    l_dom.appendChild (l_dom.createElement ("Data"));
                     QFile* l_file = new QFile(getPath (p_dt));
 
                     if (!l_file->exists ()){
-                        /// @todo Create the file and just leave an empty base node.
+                        l_file->open (QIODevice::WriteOnly | QIODevice::Truncate);
+                        l_file->write ("<!-- Generated -->");
+                        l_file->close ();
                     }
 
-                    l_dom.setContent (l_file);
                     QDomElement l_elem = l_dom.documentElement ();
                     DomSaveModel l_domSvMdl(&l_elem);
                     l_domSvMdl.saveFrom (p_dt);
+                    l_file->open (QIODevice::WriteOnly | QIODevice::Truncate);
+                    l_file->write (l_dom.toByteArray (4));
+                    l_file->close ();
                 }
 
                 const QString DomStorage::type () const { return "Dom"; }
@@ -319,7 +320,8 @@ namespace Wintermute {
                 void DomSaveModel::save()  {
                     if (this->DomBackend::m_ele->isNull()) return;
 
-                    this->DomBackend::m_ele->setAttribute("symbol" , this->Model::m_dt.symbol().toLower ());
+                    this->DomBackend::m_ele->setAttribute ("symbol" , this->Model::m_dt.symbol().toLower ());
+                    this->DomBackend::m_ele->setAttribute ("locale" , this->Model::m_dt.locale ());
 
                     while (this->DomBackend::m_ele->hasChildNodes ())
                         this->DomBackend::m_ele->removeChild (this->DomBackend::m_ele->firstChild ());
@@ -345,7 +347,7 @@ namespace Wintermute {
                 }
 
                 void Cache::write (const Data &p_dt){
-                    Storage* l_fdStr;
+                    Storage* l_fdStr = NULL;
                     foreach (Storage* l_str, Cache::s_stores){
                         if (l_str->exists (p_dt))
                             l_fdStr = l_str;
@@ -356,8 +358,8 @@ namespace Wintermute {
                         l_fdStr->saveFrom (p_dt);
                     else {
                         // save this locally. We consider the DOM storage to be local.
-                        l_fdStr = new DomStorage;
-                        l_fdStr->saveFrom (p_dt);
+                        DomStorage *l_domStr = new DomStorage;
+                        l_domStr->saveFrom (p_dt);
                     }
                 }
 

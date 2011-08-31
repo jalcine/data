@@ -27,7 +27,7 @@
 
 #include <QString>
 #include <QVector>
-#include <Soprano/Soprano>
+#include <Soprano/Model>
 
 using namespace std;
 
@@ -40,10 +40,15 @@ namespace Wintermute {
         namespace Ontology {
             struct Configuration;
             struct Repository;
+            struct Resource;
+            struct Property;
+            struct Statement;
 
             /**
-             * @brief Management class for the ontologies.
-             * This class manages every and anything having to deal with ontologies.
+             * @brief Configuration class for the ontology section.
+             *
+             *
+             *
              * @class Configuration ontology.hpp "include/wntr/data/ontology.hpp"
              */
             class Configuration : public QObject {
@@ -65,80 +70,96 @@ namespace Wintermute {
             };
 
             /**
-             * @brief Represents a collection of @c Knowledge.
-             * @c Repository
+             * @brief Represents an object being described.
+             *
+             * According to the definition of resources in the RDF syntax documentation
+             * <http://www.w3.org/TR/REC-rdf-syntax> it's defined as,
+             * <blockquote>
+             * All things being described by RDF expressions are called resources.
+             * A resource may be an entire Web page; such as the HTML document "http://www.w3.org/Overview.html"
+             * for example. A resource may be a part of a Web page; e.g. a specific HTML or XML element within
+             * the document source. A resource may also be a whole collection of pages; e.g. an entire Web site.
+             * A resource may also be an object that is not directly accessible via the Web; e.g. a printed book.
+             * Resources are always named by URIs plus optional anchor ids. Anything can have a URI; the extensibility
+             * of URIs allows the introduction of identifiers for any entity imaginable.
+             * </blockquote>
+             *
+             * This class provides a means of convience over RDF-XML (mainly SPARQL and RDFQL) so that
+             * properties of resources can be properly queried.
+             *
+             * @class Resource ontology.hpp "include/wntr/data/ontology.hpp"
+             */
+            class Resource : public QObject {
+                public:
+                    /**
+                     * @brief Default constructor.
+                     *
+                     * @fn Resource
+                     * @param p_parent The parent object.
+                     */
+                    explicit Resource( const QObject* = NULL );
+
+                    /**
+                     * @brief Initializating constructor.
+                     *
+                     * Creates a new Resource from its parent Repository and
+                     * its corresponding Node within the ontology.
+                     *
+                     * @fn Resource
+                     * @param p_repo The parent repository.
+                     * @param p_node The Soprano::Node that this Resource represents.
+                     */
+                    Resource( const Repository* , const Soprano::Node& );
+
+                    /**
+                     * @brief Copy constructor.
+                     *
+                     * @fn Resource
+                     * @param p_resource The Resource to be copied.
+                     */
+                    Resource( const Resource& );
+
+                    /**
+                     * @brief Deconstructor.
+                     *
+                     * @fn ~Resource
+                     */
+                    virtual ~Resource();
+
+                private:
+                    const Repository* m_repo;
+                    Soprano::Node m_node;
+
+            };
+
+            /**
+             * @brief Represents an entire ontological store.
+             *
+             * Repostiories represent the entire encompassing set of Resources
+             * in their native format (that being RDF-XML, for now).
+             *
              * @class Repository ontology.hpp "include/wntr/data/ontology.hpp"
              */
             class Repository : public QObject {
-                friend class Configuration;
                 Q_OBJECT
-
                 signals:
-                    /**
-                     * @brief
-                     * @fn loading
-                     */
-                    void loading();
-                    /**
-                     * @brief
-                     * @fn loadingProgress
-                     * @param double
-                     */
-                    void loadingProgress(const double = 0.0);
-                    /**
-                     * @brief
-                     * @fn loaded
-                     */
-                    void loaded();
+                    void loaded() const;
 
                 public:
-                    Repository( const Repository& );
-                    /**
-                     * @brief
-                     * @fn ~Repository
-                     */
+                    explicit Repository(const QObject* = NULL);
+                    Repository(const QString&);
+                    Repository(const Repository&);
                     virtual ~Repository();
-                    /**
-                     * @brief
-                     * @fn load
-                     * @param QString
-                     */
-                    void load(const QString = "");
-                    /**
-                     * @brief
-                     *
-                     * @fn obtain
-                     * @param QString
-                     */
-                    static Repository* obtain(const QString = "");
+                    const Resource* obtainResource(const QString &) const;
 
-                protected:
-                    /**
-                     * @brief
-                     * @fn Repository
-                     */
-                    Repository( QObject* = 0 );
-                    /**
-                     * @brief
-                     * @fn Repository
-                     * @param QString
-                     */
-                    Repository( const QString , QObject* = 0 );
-                    /**
-                     * @brief
-                     * @fn Repository
-                     * @param
-                     */
+                    static const Repository* obtainRepository(const QString&);
+                    static const Resource* obtainResource(const QString&, const QString&);
 
                 private:
-                    /**
-                     * @brief
-                     * @fn getPath
-                     */
+                    void load(const QString& = "") const;
                     const QString getPath() const;
-                    QString m_repoName; /**< Represents the stored name of the ontology. */
-                    Soprano::Model* m_model; /**< Holds the Soprano model that contains every Statement. */
-                    static QMap<const QString*, Repository*> s_repos; /**< Holds a mapping of all of the loaded repositories. */
+                    mutable QString m_repo;
+                    mutable Soprano::Model* m_model;
             };
         }
     }

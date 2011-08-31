@@ -20,7 +20,11 @@
       <Flag guid="-1" link="Bz" />
     </Pseudo>
 
-    <!-- These Import elements ease the process of spawning. -->
+    <!--
+        These Import elements ease the process of spawning.
+
+        @todo Use xincludes instead.
+    -->
 
     <Import uri="verbs.xml" />
     <Import uri="nouns.xml" />
