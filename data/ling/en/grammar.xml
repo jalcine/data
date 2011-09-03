@@ -125,12 +125,8 @@ convert this document into something close to it.
   <Rule type="A">
     <!-- pronouns -->
     <Rule type="x">
-      <Rule type="*">
-        <Bind with="Bcoa*" skipWord="no" />
-      </Rule>
-      <Rule type="~">
-        <Bind with="Bcoaz" skipWord="no" />
-      </Rule>
+        <Bind with="Bcoapz*" hideNext="yes" skipWord="no" typeHas="*" />
+        <Bind with="Bcoapz~" hideNext="yes" skipWord="no" typeHas="~" />
     </Rule>
     <Rule type="r">
       <Rule with="e">
@@ -138,7 +134,7 @@ convert this document into something close to it.
       </Rule>
       <Rule type="b">
         <Bind with="Ap*~123" skipWord="no" />
-        <Bind with="Bcoaz*~" skipWord="no" />
+        <Bind with="Bcoaz*~" hideNext="yes" skipWord="no" />
       </Rule>
       <Rule type="c">
         <Bind with="Craf*~123" skipWord="no" />
@@ -156,28 +152,26 @@ convert this document into something close to it.
     </Rule>
     <Rule type="p">
       <Rule type="x">
-
       </Rule>
     </Rule>
   </Rule>
 
   <Rule type="B">
     <!-- nouns -->
+    <Bind with="Bpz*~,E,Fm+" skipWord="no" hideNext="yes" />
     <Rule type="z">
       <Bind with="Craf123*~" linkAction="reverse" />
-      <Bind with="Bz" hideNext="yes" />
+      <Bind with="Bcoa~*" hideNext="yes" skipWord="no" />
+      <Bind with="Aednopx*~" />
+      <Bind with="E" />
+      <Bind with="Fm+-" skipWord="no"/>
     </Rule>
-    <Rule type="coa*">
+    <Rule type="coa*~">
       <Bind with="Craf3*" linkAction="reverse" />
     </Rule>
     <Rule type="p">
-      <Bind with="Bpz*~" hideNext="yes" />
-      <Rule type="~">
-        <Bind with="Craf3~" linkAction="reverse" />
-      </Rule>
-      <Rule type="*">
-        <Bind with="Craf3*" linkAction="reverse"/>
-      </Rule>
+        <Bind with="Craf3~" linkAction="reverse" typeHas="~" />
+        <Bind with="Craf3*" linkAction="reverse" typeHas="*" />
     </Rule>
   </Rule>
 
@@ -190,7 +184,7 @@ convert this document into something close to it.
      <Bind with="Aeox13~" />
    </Rule>
    <Rule type="raf*">
-     <Bind with="Bpz*" />
+     <Bind with="Bpz*" hideNext="yes" />
      <Bind with="Ax*" />
    </Rule>
  </Rule>
@@ -200,7 +194,13 @@ convert this document into something close to it.
   </Rule>
 
   <Rule type="E">
-    <Rule with="A,B" linkAction="reverse,thisType" />
+    <Rule with="A,Bcoazp*~" skipWord="no" hideNext="yes" linkAction="reverse,thisType" />
     <Rule with="E" />
+  </Rule>
+
+  <Rule type="F">
+    <Rule with="Aednopx*~,Bcoazp*~" linkAction="reverse,thisType" skipWord="no" hideNext="yes" />
+    <Rule with="F+" typeHas="-" />
+    <Rule with="F-" typeHas="+" />
   </Rule>
 </RuleSet>

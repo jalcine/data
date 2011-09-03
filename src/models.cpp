@@ -465,19 +465,31 @@ namespace Wintermute {
 
                 /// @todo This might be the crowning jewel of the linking system.
                 const double Bond::matches(const QString& p_query, const QString& p_regex){
-                    const double l_max = (double) p_query.length () - 1;
-                    double l_cnt = 0.0;
+                    const QStringList l_regexList = p_regex.split (",");
+                    QList<double> l_rslts;
 
-                    if (p_query.at (0) != p_regex.at (0))
-                        return 0.0;
+                    foreach(const QString l_regex, l_regexList){
+                        const double l_max = (double) l_regex.length ();
+                        double l_cnt = 0.0;
 
-                    for (int i = 1; i < p_query.length (); i++){
-                        QChar l_chr = p_query.at (i);
-                        if (p_regex.contains (l_chr,Qt::CaseSensitive))
+                        if (p_query.at (0) == l_regex.at (0)){
                             l_cnt += 1.0;
+                            for (int i = 1; i < p_query.length (); i++){
+                                QChar l_chr = p_query.at (i);
+                                if (p_regex.contains (l_chr,Qt::CaseSensitive))
+                                    l_cnt += 1.0;
+                            }
+                        }
+\
+                        l_rslts.push_back((l_cnt / l_max));
                     }
 
-                    return (l_cnt / l_max);
+                    qSort(l_rslts.begin (),l_rslts.end ());
+
+                    if (!l_rslts.empty ())
+                        return l_rslts.back ();
+                    else
+                        return 0.0;
                 }
 
                 void Bond::operator=(const Bond& p_bnd) { m_props = p_bnd.m_props; }
@@ -581,8 +593,8 @@ namespace Wintermute {
                         p_bndVtr.push_back (l_bnd);
                     }
 
-                    /*if (!p_elem.parentNode ().isNull ())
-                        obtainBonds(p_bndVtr,p_elem.parentNode ().toElement ());*/
+                    if (!p_elem.parentNode ().isNull ())
+                        obtainBonds(p_bndVtr,p_elem.parentNode ().toElement ());
                 }
 
                 const QString DomLoadModel::obtainType(QDomElement p_elem) const {

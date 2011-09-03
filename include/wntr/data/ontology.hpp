@@ -41,8 +41,6 @@ namespace Wintermute {
             struct Configuration;
             struct Repository;
             struct Resource;
-            struct Property;
-            struct Statement;
 
             /**
              * @brief Configuration class for the ontology section.
@@ -126,6 +124,38 @@ namespace Wintermute {
                      */
                     virtual ~Resource();
 
+                    /**
+                     * @brief
+                     *
+                     * @fn object
+                     * @param
+                     */
+                    const Resource* object(const QString& ) const;
+
+                    /**
+                     * @brief
+                     *
+                     * @fn object
+                     * @param
+                     */
+                    const Resource* object(const Resource& ) const;
+
+                    /**
+                     * @brief
+                     *
+                     * @fn setObject
+                     * @param
+                     */
+                    void setObject(const QString& );
+
+                    /**
+                     * @brief
+                     *
+                     * @fn setObject
+                     * @param
+                     */
+                    void setObject(const Resource& );
+
                 private:
                     const Repository* m_repo;
                     Soprano::Node m_node;
@@ -137,6 +167,8 @@ namespace Wintermute {
              *
              * Repostiories represent the entire encompassing set of Resources
              * in their native format (that being RDF-XML, for now).
+             *
+             * @todo Obtain the specified Resource from the internal ontology when requested.
              *
              * @class Repository ontology.hpp "include/wntr/data/ontology.hpp"
              */

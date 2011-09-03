@@ -30,6 +30,8 @@
 #include <Soprano/Soprano>
 #include <boost/progress.hpp>
 
+using namespace Soprano;
+
 namespace Wintermute {
     namespace Data {
         namespace Ontology {
@@ -54,25 +56,26 @@ namespace Wintermute {
             }
 
             const QString Repository::getPath() const {
-                return QString::fromStdString (Data::Configuration::getDirectory ()) + QString("/")
-                        + QString(WNTRDATA_ONTO_DIR) + QString("/") + m_repo + QString(".owl");
+                return QUrl::fromLocalFile (QString::fromStdString (Data::Configuration::getDirectory ()) + QString("/")
+                        + QString(WNTRDATA_ONTO_DIR) + QString("/") + m_repo + QString(".owl")).toString ();
             }
 
             void Repository::load(const QString& p_repoName) const {
+                qDebug() << "(data) [Repository] Loading ontology" << m_repo << "...";
                 if (!p_repoName.isEmpty ())
                     m_repo = p_repoName;
 
                 m_model = Soprano::createModel ();
-                const QString l_url = getPath();
-                const Soprano::Parser* l_rdfPrsr = Soprano::PluginManager::instance()->discoverParserForSerialization( Soprano::SerializationRdfXml );
-                Soprano::StatementIterator l_itr = l_rdfPrsr->parseFile( l_url , l_url, Soprano::SerializationRdfXml );
-                QList<Soprano::Statement> l_stats = l_itr.allStatements ();
-
-                m_model->addStatements (l_stats);
+                const QUrl l_url = getPath();
+                const Parser* l_rdfPrsr = PluginManager::instance()->discoverParserForSerialization( SerializationRdfXml );
+                StatementIterator l_itr = l_rdfPrsr->parseFile( l_url.toLocalFile (), l_url, SerializationRdfXml );
+                m_model->addStatements (l_itr.allStatements ());
+                qDebug() << "(data) [Repository] Loaded ontology" << m_repo << "with" << m_model->listStatements ().allStatements ().size () << "statements.";
                 emit loaded();
-                qDebug() << "(data) [Repository] Loaded ontology" << m_repo << "with" << l_stats.size () << "statements.";
-            }
+                this->obtainResource ("Boy");
+           }
 
+            /// @todo Figure out how to use SPARQL to obtain a resource. I (Jacky A.) am having no luck whatsoever.
             const Resource* Repository::obtainResource(const QString& p_resource) const {
                 return NULL;
             }
