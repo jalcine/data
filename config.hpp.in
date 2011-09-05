@@ -51,7 +51,7 @@ namespace Wintermute {
                  * @fn getDirectory
                  * @return const string
                  */
-                static const string getDirectory() { return WNTRDATA_DATA_DIR; }
+                static const string directory() { return WNTRDATA_DATA_DIR; }
                 /**
                  * @brief Initializes the data services.
                  * @fn Initialize

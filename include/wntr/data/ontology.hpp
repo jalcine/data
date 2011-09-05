@@ -1,6 +1,6 @@
 /**
  * @file ontology.hpp
- * @author Jacky Alcine
+ * @author Wintermute Developers <wintermute-devel@lists.launchpad.net>
  * @date March 29, 2011, 2:25 PM
  * @namespace Wintermute::Data::Ontology
  * @legalese

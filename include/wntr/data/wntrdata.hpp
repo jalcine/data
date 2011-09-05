@@ -1,6 +1,6 @@
 /**
  * @file wntrdata.hpp
- * @author Jacky Alcine <jacky.alcine@thesii.org>
+ * @author Wintermute Developers <wintermute-devel@lists.launchpad.net>
  * @legalese
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public

@@ -191,6 +191,23 @@ namespace Wintermute {
                     }
                 }
 
+                const QString DomStorage::obtainFullSuffix(const QString& p_lcl, const QString& p_sfx) const {
+                    const Data l_dt = Data::createData (QString::null,p_lcl);
+                    const QDomElement l_dom = this->getSpawnDoc (l_dt)->documentElement ();
+                    const QDomNodeList l_domList = l_dom.elementsByTagName ("Mapping").at (0).toElement ().elementsByTagName ("Suffix");
+
+                    for (int i = 0; i < l_domList.count (); i++){
+                        QDomElement l_ele = l_domList.at (i).toElement ();
+
+                        if (l_ele.attribute ("from") == p_sfx)
+                            return l_ele.attribute ("to");
+                        else
+                            continue;
+                    }
+
+                    return "";
+                }
+
                 void DomStorage::spawn(const QDomDocument& p_dom){
                     const QDomElement l_root = p_dom.documentElement ();
                     const QString l_lcl = l_root.attribute ("locale");
@@ -346,6 +363,17 @@ namespace Wintermute {
                     save();
                 }
 
+                const QString Cache::obtainFullSuffix(const QString& p_lcl, const QString& p_sfx){
+                    foreach (Storage* l_str, Cache::s_stores){
+                        const QString l_fl = l_str->obtainFullSuffix(p_lcl,p_sfx);
+                        if (!l_fl.isEmpty ())
+                            return l_fl;
+                        else continue;
+                    }
+
+                    return "";
+                }
+
                 void Cache::write (const Data &p_dt){
                     Storage* l_fdStr = NULL;
                     foreach (Storage* l_str, Cache::s_stores){
@@ -486,7 +514,7 @@ namespace Wintermute {
 
                     qSort(l_rslts.begin (),l_rslts.end ());
 
-                    if (!l_rslts.empty ())
+                    if (!l_rslts.empty () && !p_regex.isEmpty ())
                         return l_rslts.back ();
                     else
                         return 0.0;
@@ -672,7 +700,7 @@ namespace Wintermute {
                 /// @todo We need to figure out a more approriate minimum value.
                 QDomElement DomStorage::findElement (const Chain& p_chn, QDomElement p_elem) const{
                     QDomElement l_elem = findElement(p_chn,p_elem,"");
-                    const double l_minimum = (100 / (double) p_chn.type ().length ()) / 100;
+                    const double l_minimum = (1.0 / (double) p_chn.type ().length ());
 
                     while (l_elem.isNull ()){
                         m_min -= 0.01; // Decrease it by 1%.
@@ -690,19 +718,21 @@ namespace Wintermute {
                     return l_elem;
                 }
 
-                /// @todo Have this method round the results of matching up to the nearest whole number. (0.9 == 1, 1.1 == 2, etc). I can't remember if it's ceil or something else.
-                /// @todo Have this method use a cache to save at least 30 previous rules, to speed the searching process.`
                 QDomElement DomStorage::findElement(const Chain& p_chn, QDomElement p_elem, QString p_prefix) const {
                     if (p_elem.hasAttribute ("type") && p_elem != p_elem.ownerDocument ().documentElement ()){
                         const QString l_data = p_elem.attribute ("type");
                         const QStringList l_lst = l_data.split (",");
 
                         foreach (const QString l_part, l_lst){
-                            p_prefix.append (l_part);
-                            const int l_match = (int) (Bond::matches (p_chn.type (),p_prefix) * 100);
-                            if (l_match >= (int) (m_min * 100))
+                            const QString l_prefix = p_prefix + l_part;
+                            const double l_match = Bond::matches (p_chn.type (),l_prefix);
+                            if (l_match == 1.0){
+                                qDebug() << "findElement: " << p_chn.type () << l_prefix << l_match;
                                 return p_elem;
+                            }
                         }
+
+                        p_prefix.append (l_data);
                     }
 
                     QDomNodeList l_lst = p_elem.elementsByTagName ("Rule");

@@ -16,7 +16,7 @@
  * Boston, MA 02111-1307, USA.
  * @endlegalese
  * @file ontology.cpp
- * @author Jacky Alcine
+ * @author Wintermute Developers <wintermute-devel@lists.launchpad.net>
  * @date March 29, 2011, 2:25 PM
  * @todo Determine a means of using Soprano to interpret RDF/XML (OWL) files into semantic information.
  * @todo Determine how and where UUIDs will be obtained. (Boost::UUID anyone? :])
@@ -37,7 +37,7 @@ namespace Wintermute {
         namespace Ontology {
 
             void Configuration::Initialize() {
-                const Repository* l_repo = Repository::obtainRepository("COSMO");
+                //const Repository* l_repo = Repository::obtainRepository("COSMO");
                 qDebug() << "(data) [Ontology::Configuration] Loaded.";
             }
 
@@ -56,7 +56,7 @@ namespace Wintermute {
             }
 
             const QString Repository::getPath() const {
-                return QUrl::fromLocalFile (QString::fromStdString (Data::Configuration::getDirectory ()) + QString("/")
+                return QUrl::fromLocalFile (QString::fromStdString (Data::Configuration::directory ()) + QString("/")
                         + QString(WNTRDATA_ONTO_DIR) + QString("/") + m_repo + QString(".owl")).toString ();
             }
 
@@ -76,7 +76,7 @@ namespace Wintermute {
            }
 
             /// @todo Figure out how to use SPARQL to obtain a resource. I (Jacky A.) am having no luck whatsoever.
-            const Resource* Repository::obtainResource(const QString& p_resource) const {
+            const Resource* Repository::obtainResource(const QString& p_res) const {
                 return NULL;
             }
 
@@ -85,7 +85,7 @@ namespace Wintermute {
                 return l_repo->obtainResource(p_resource);
             }
 
-            Repository::~Repository() { qDebug() << "Destroying repository" << m_repo << "."; }
+            Repository::~Repository() { qDebug() << "Destroyed repository" << m_repo << "."; }
         }
     }
 }

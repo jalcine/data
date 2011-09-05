@@ -431,6 +431,15 @@ namespace Wintermute {
                          * @param
                          */
                         virtual void loadPseudo(Data&) const = 0;
+
+                        /**
+                         * @brief
+                         *
+                         * @fn obtainFullSuffix
+                         * @param
+                         * @param
+                         */
+                        virtual const QString obtainFullSuffix(const QString&, const QString&) const = 0;
                 };
 
                 /**
@@ -497,6 +506,15 @@ namespace Wintermute {
                          * @fn generate
                          */
                         static void generate();
+
+                        /**
+                         * @brief
+                         *
+                         * @fn obtainFullSuffix
+                         * @param
+                         * @param
+                         */
+                        static const QString obtainFullSuffix(const QString&, const QString&);
                 };
 
                 /**
@@ -711,6 +729,16 @@ namespace Wintermute {
                          * @param
                          */
                         virtual void loadPseudo(Data&) const;
+
+                        /**
+                         * @brief
+                         *
+                         * @fn obtainFullSuffix
+                         * @param
+                         * @param
+                         */
+                        virtual const QString obtainFullSuffix (const QString &, const QString &) const;
+
                         /**
                          * @brief
                          *

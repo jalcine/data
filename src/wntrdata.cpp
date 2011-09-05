@@ -1,5 +1,5 @@
 /**
- * @author Jacky Alcine <jacky.alcine@thesii.org>
+ * @author Wintermute Developers <wintermute-devel@lists.launchpad.net>
  * @legalese
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -28,7 +28,7 @@ using namespace Wintermute::Data::Linguistics;
 namespace Wintermute {
     namespace Data {
         void Configuration::Initialize ( void ) {
-            Wintermute::Data::Linguistics::Configuration::Initialize ( Configuration::getDirectory() + string ( "/" ) + string ( WNTRDATA_LING_DIR ) );
+            Wintermute::Data::Linguistics::Configuration::Initialize ( Configuration::directory() + string ( "/" ) + string ( WNTRDATA_LING_DIR ) );
             Wintermute::Data::Ontology::Configuration::Initialize();
         }
 
