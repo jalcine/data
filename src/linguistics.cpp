@@ -34,10 +34,10 @@ using std::string;
 namespace Wintermute {
     namespace Data {
         namespace Linguistics {
-            string Configuration::_storageDir = string( WNTRDATA_DATA_DIR ) + "/" + string ( WNTRDATA_LING_DIR );
-            string Configuration::_locale = WNTRDATA_DEFAULT_LOCALE;
+            QString Configuration::m_storageDir = QString(WNTRDATA_DATA_DIR) + "/" + QString(WNTRDATA_LING_DIR);
+            QString Configuration::m_lcl = WNTRDATA_DEFAULT_LOCALE;
 
-            void Configuration::Initialize ( const string storageDir, const string locale ) {
+            void Configuration::Initialize ( const QString storageDir, const QString locale ) {
                 Configuration::setDirectory ( storageDir );
                 Configuration::setLocale ( locale );
 
@@ -53,22 +53,22 @@ namespace Wintermute {
                 qDebug() << "(ling) [Config] Shutting down..";
             }
 
-            void Configuration::setLocale ( const string p_lcl ) {
-                if ( p_lcl.empty() )
+            void Configuration::setLocale ( const QString p_lcl ) {
+                if ( p_lcl.isEmpty() )
                     return;
 
-                Configuration::_locale = p_lcl;
-                qDebug() << "(ling) [Config] ## Default locale:" << p_lcl.c_str ();
+                Configuration::m_lcl = p_lcl;
+                qDebug() << "(ling) [Config] ## Default locale:" << p_lcl;
             }
 
-            void Configuration::setDirectory ( const string p_configDir ) {
-                if ( p_configDir.empty() )
+            void Configuration::setDirectory ( const QString p_configDir ) {
+                if ( p_configDir.isEmpty() )
                     return;
 
-                QDir* d = new QDir(p_configDir.c_str ());
+                QDir* d = new QDir(p_configDir);
                 if (d->exists ()){
-                    Configuration::_storageDir = d->absolutePath().toStdString ();
-                    qDebug() << "(ling) [Config] ## Root dir:" << p_configDir.c_str ();
+                    Configuration::m_storageDir = d->absolutePath();
+                    qDebug() << "(ling) [Config] ## Root dir:" << p_configDir;
                 }
             }
         } // namespaces

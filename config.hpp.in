@@ -33,6 +33,7 @@
 #define WNTRDATA_DEFAULT_LOCALE "@WNTRDATA_LOCALE@"
 
 #include <string>
+#include <QObject>
 
 using namespace std;
 
@@ -44,14 +45,31 @@ namespace Wintermute {
          * @brief Manages the data location representing WntrData.
          * @class Configuration config.hpp "config.hpp"
          */
-        class Configuration {
+        class Configuration : public QObject {
+            Q_OBJECT
+            Q_DISABLE_COPY(Configuration)
+
+            private:
+                static Configuration* s_config;
+                Configuration() { }
+
             public:
                 /**
                  * @brief Obtains the directory that of which the data files are stored.
                  * @fn getDirectory
                  * @return const string
                  */
-                static const string directory() { return WNTRDATA_DATA_DIR; }
+                static const QString directory() { return WNTRDATA_DATA_DIR; }
+
+                /**
+                 * @brief
+                 *
+                 * @fn instance
+                 * @return const Configuration *
+                 */
+                static const Configuration* instance() { return s_config; }
+
+            public slots:
                 /**
                  * @brief Initializes the data services.
                  * @fn Initialize

@@ -123,8 +123,7 @@ namespace Wintermute {
                 DomStorage::DomStorage() { }
 
                 const QString DomStorage::getPath(const Data& p_dt){
-                    return QString::fromStdString (Configuration::directory ()) + QString("/")
-                           + p_dt.locale() + QString("/node/") + p_dt.id () + QString(".node");
+                    return Configuration::directory () + QString("/") + p_dt.locale() + QString("/node/") + p_dt.id () + QString(".node");
                 }
 
                 const bool DomStorage::exists (const Data &p_dt) const {
@@ -167,7 +166,7 @@ namespace Wintermute {
                 const QString DomStorage::type () const { return "Dom"; }
 
                 void DomStorage::generate() {
-                    QDir d(QString::fromStdString (Configuration::directory ()));
+                    QDir d(Configuration::directory ());
                     d.setFilter (QDir::Dirs | QDir::NoDotAndDotDot);
                     QStringList l_lst = d.entryList ();
 
@@ -252,7 +251,7 @@ namespace Wintermute {
                 }
 
                 QDomDocument* DomStorage::getSpawnDoc(const Data& p_dt) const {
-                    QDir d(QString::fromStdString (Configuration::directory ()));
+                    QDir d(Configuration::directory ());
                     const QString l_pth = d.absolutePath () + "/" + p_dt.locale () + "/node.xml";
                     QDomDocument* l_spawnDom = new QDomDocument("Storage");
                     QFile* l_file = new QFile(l_pth);
@@ -667,7 +666,7 @@ namespace Wintermute {
                 DomStorage::DomStorage(const Storage &p_str) : Storage(p_str) { }
 
                 const QString DomStorage::getPath(const Chain& p_chn){
-                    return QString::fromStdString (Configuration::directory ()) + "/" + p_chn.locale () + "/grammar.xml";
+                    return Configuration::directory () + "/" + p_chn.locale () + "/grammar.xml";
                 }
 
                 QDomDocument* DomStorage::loadDom(const Chain& p_chn) {

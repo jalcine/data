@@ -40,11 +40,5 @@
 #include "linguistics.hpp"
 #include "models.hpp"
 
-namespace Wintermute {
-    namespace Data {
-
-    }
-}
-
 #endif /* __WNTRDATA_HPP__ */
 // kate: indent-mode cstyle; space-indent on; indent-width 4;

@@ -27,8 +27,10 @@ using namespace Wintermute::Data::Linguistics;
 
 namespace Wintermute {
     namespace Data {
+        Configuration* Configuration::s_config = new Configuration;
+
         void Configuration::Initialize ( void ) {
-            Wintermute::Data::Linguistics::Configuration::Initialize ( Configuration::directory() + string ( "/" ) + string ( WNTRDATA_LING_DIR ) );
+            Wintermute::Data::Linguistics::Configuration::Initialize ( Configuration::directory() + QString ( "/" ) + QString ( WNTRDATA_LING_DIR ) );
             Wintermute::Data::Ontology::Configuration::Initialize();
         }
 
@@ -38,7 +40,7 @@ namespace Wintermute {
         }
 
         BOOST_PYTHON_MODULE ( wntrdata ) {
-            class_<Configuration> ( "Configuration",no_init )
+            class_<Configuration, boost::noncopyable> ( "Configuration",no_init )
             .def ( "Initialize", Configuration::Initialize )
             .def ( "Deinitialize", Configuration::Deinitialize );
 

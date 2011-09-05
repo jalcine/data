@@ -41,8 +41,8 @@ namespace Wintermute {
              */
             class Configuration {
                 private:
-                    static string _storageDir; /**< Holds the location of the linguistic info. */
-                    static string _locale; /**< Holds the current locale in use. */
+                    static QString m_storageDir; /**< Holds the location of the linguistic info. */
+                    static QString m_lcl; /**< Holds the current locale in use. */
 
                 public:
                     /**
@@ -50,14 +50,14 @@ namespace Wintermute {
                      * Sets the default locale to be used as the standard locale.
                      * @param locale The locale to set.
                      */
-                    static void setLocale ( const string );
+                    static void setLocale ( const QString );
 
                     /**
                      * @brief Changes root directory.
                      * Sets the root directory to find data for linguistics from.
                      * @param root The root directory.
                      */
-                    static void setDirectory ( const string );
+                    static void setDirectory ( const QString );
 
                     /**
                      * @brief Gets current locale used.
@@ -65,7 +65,7 @@ namespace Wintermute {
                      * @fn getLocale
                      * @return string String with the current locale.
                      */
-                    static const inline string locale() { return _locale; }
+                    static const inline QString locale() { return m_lcl; }
 
                     /**
                      * @brief Gets linguistics directory.
@@ -73,7 +73,7 @@ namespace Wintermute {
                      * @fn getDirectory
                      * @return string
                      */
-                    static const inline string directory() { return _storageDir; }
+                    static const inline QString directory() { return m_storageDir; }
                     /**
                      * @brief Initialization.
                      * Initializes the system by running prerequisite code.
@@ -81,7 +81,7 @@ namespace Wintermute {
                      * @param storageDir The directory where storage data are located.
                      * @param locale The locale that should be initially loaded.
                      */
-                    static void Initialize ( const string = _storageDir, const string = locale ());
+                    static void Initialize ( const QString = m_storageDir, const QString = m_lcl );
 
                     /**
                      * @brief Deinitialization.

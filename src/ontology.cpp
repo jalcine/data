@@ -56,7 +56,7 @@ namespace Wintermute {
             }
 
             const QString Repository::getPath() const {
-                return QUrl::fromLocalFile (QString::fromStdString (Data::Configuration::directory ()) + QString("/")
+                return QUrl::fromLocalFile (Data::Configuration::directory () + QString("/")
                         + QString(WNTRDATA_ONTO_DIR) + QString("/") + m_repo + QString(".owl")).toString ();
             }
 
