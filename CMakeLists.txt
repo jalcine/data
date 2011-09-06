@@ -63,10 +63,10 @@ set(WNTRDATA_DATA_INSTALL_DIR share/wintermute CACHE PATH "The directory where W
 set(WNTRDATA_LING_DIR "ling" CACHE PATH "The name of the folder that contains the linguistics information. There should be no trailing or leading slashes.")
 set(WNTRDATA_ONTO_DIR "onto" CACHE PATH "The name of the folder that contains the ontology information. There should be no trailing or leading slashes.")
 
-set(WNTRDATA_INCLUDE_INSTALL_DIR "include/wntr/data")
+set(WNTRDATA_INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include/wntr/data")
 
 set(WNTRDATA_INCLUDE_DIRS "${WNTRDATA_INCLUDE_INSTALL_DIR}"
-    ${PYTHON_INCLUDE_DIR}
+    ${PYTHON_INCLUDE_DIRS}
     ${QT_INCLUDE_DIRS}
     ${Soprano_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS})
@@ -129,3 +129,7 @@ install(DIRECTORY "data/${WNTRDATA_LING_DIR}"
 
 install(DIRECTORY "data/${WNTRDATA_ONTO_DIR}"
     DESTINATION "${WNTRDATA_DATA_INSTALL_DIR}")
+
+install(FILES "${PROJECT_BINARY_DIR}/config.hpp"
+    DESTINATION "${WNTRDATA_INCLUDE_INSTALL_DIR}"
+    COMPONENT dev)

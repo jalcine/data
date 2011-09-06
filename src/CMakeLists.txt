@@ -27,3 +27,6 @@ install(TARGETS wntrdata
 install(EXPORT WntrDataLibraryDepends
     DESTINATION share/cmake/WntrData)
 
+install(FILES ${WNTRDATA_MOC_FILES}
+    DESTINATION ${WNTRDATA_INCLUDE_INSTALL_DIR}
+    COMPONENT dev)
