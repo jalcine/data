@@ -16,6 +16,18 @@ include_directories(${PROJECT_BINARY_DIR})
 list(APPEND CMAKE_MODULE_PATH cmake/Modules)
 
 #
+# Doxygen stuff
+#
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+    configure_file(Doxyfile.in Doxyfile)
+    add_custom_target(doxydoc
+        ${DOXYGEN_EXECUTABLE} Doxyfile
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Generating API documentation using Doxygen.")
+endif()
+
+#
 # Dependency packages
 #
 find_package(Boost 1.42 COMPONENTS

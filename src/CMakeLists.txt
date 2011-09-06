@@ -1,5 +1,4 @@
 project(WntrDataLib)
-
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Source files
