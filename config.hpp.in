@@ -30,7 +30,7 @@
 #define WNTRDATA_DATA_DIR "@WNTRDATA_DATA_DIR@"
 #define WNTRDATA_LING_DIR "@WNTRDATA_LING_DIR@"
 #define WNTRDATA_ONTO_DIR "@WNTRDATA_ONTO_DIR@"
-#define WNTRDATA_DEFAULT_LOCALE "@WNTRDATA_LOCALE@"
+#define WNTRDATA_DEFAULT_LOCALE "@WINTER_DEFAULT_LOCALE@"
 
 #include <string>
 #include <QObject>
@@ -45,13 +45,15 @@ namespace Wintermute {
          * @brief Manages the data location representing WntrData.
          * @class Configuration config.hpp "config.hpp"
          */
-        class Configuration : public QObject {
+        class System : public QObject {
+            friend class SystemAdaptor;
             Q_OBJECT
-            Q_DISABLE_COPY(Configuration)
+            Q_DISABLE_COPY(System)
 
             private:
-                static Configuration* s_config;
-                Configuration() { }
+                static System* s_config;
+                QString m_dir;
+                System();
 
             public:
                 /**
@@ -59,7 +61,15 @@ namespace Wintermute {
                  * @fn getDirectory
                  * @return const string
                  */
-                static const QString directory() { return WNTRDATA_DATA_DIR; }
+                static const QString directory();
+
+                /**
+                 * @brief
+                 *
+                 * @fn setDirectory
+                 * @param
+                 */
+                static void setDirectory(const QString&);
 
                 /**
                  * @brief
@@ -67,19 +77,23 @@ namespace Wintermute {
                  * @fn instance
                  * @return const Configuration *
                  */
-                static const Configuration* instance() { return s_config; }
+                static System* instance();
+
+            signals:
+                void started();
+                void stopped();
 
             public slots:
                 /**
                  * @brief Initializes the data services.
                  * @fn Initialize
                  */
-                static void Initialize();
+                static void stop();
                 /**
                  * @brief Deinitializes the data services.
                  * @fn Deinitialize
                  */
-                static void Deinitialize();
+                static void start();
         };
     }
 }

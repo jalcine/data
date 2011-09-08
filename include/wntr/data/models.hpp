@@ -31,6 +31,8 @@
 #include <QtDebug>
 #include <QMultiHash>
 #include <QStringList>
+#include <QMetaType>
+#include <QtDBus/QDBusMetaType>
 #include <QtXml/QDomDocument>
 #include "linguistics.hpp"
 
@@ -40,6 +42,8 @@ using std::map;
 
 namespace Wintermute {
     namespace Data {
+        struct NodeAdaptor;
+        struct RuleAdaptor;
         namespace Linguistics {
             namespace Lexical {
                 struct Data;
@@ -48,14 +52,16 @@ namespace Wintermute {
                 struct SaveModel;
                 struct LoadModel;
                 struct Storage;
+                struct Backend;
                 struct Cache;
 
-                /**
-                 * @brief
-                 *
-                 * @typedef DataMap
-                 */
-                typedef QMultiHash<const QString, const QString> DataFlagMap;
+
+                struct DomLoadModel;
+                struct DomSaveModel;
+                struct DomStorage;
+                struct DomBackend;
+
+                typedef QMultiMap<QString, QString> FlagMapping;
 
                 /**
                  * @brief
@@ -63,17 +69,20 @@ namespace Wintermute {
                  * @class Data models.hpp "include/wntr/data/models.hpp"
                  */
                 class Data : public QObject {
+                    friend QDBusArgument& operator<< (QDBusArgument&, const Data&);
+                    friend const QDBusArgument& operator>> (const QDBusArgument&, Data&);
+
                     Q_OBJECT
                     Q_PROPERTY(QString Locale READ locale)
                     Q_PROPERTY(QString Symbol READ symbol WRITE setSymbol)
                     Q_PROPERTY(QString ID READ id)
-                    Q_PROPERTY(DataFlagMap Flags READ flags WRITE setFlags)
+                    Q_PROPERTY(FlagMapping Flags READ flags WRITE setFlags)
 
                     private:
                         QString m_id;
                         QString m_lcl;
                         QString m_sym;
-                        DataFlagMap m_flg;
+                        FlagMapping m_flg;
 
                     protected:
                         /**
@@ -85,7 +94,7 @@ namespace Wintermute {
                          * @param string
                          * @param DataFlagMap
                          */
-                        Data(const QString , const QString , const QString = "" , const DataFlagMap = DataFlagMap());
+                        Data(const QString , const QString , const QString = "" , const FlagMapping = FlagMapping());
 
                     public:
                         /**
@@ -144,7 +153,7 @@ namespace Wintermute {
                          *
                          * @fn flags
                          */
-                        const DataFlagMap flags() const;
+                        const FlagMapping flags() const;
                         /**
                          * @brief
                          *
@@ -158,7 +167,7 @@ namespace Wintermute {
                          * @fn setFlags
                          * @param
                          */
-                        void setFlags( const DataFlagMap& );
+                        void setFlags( const FlagMapping& );
                         /**
                          * @brief
                          *
@@ -174,7 +183,7 @@ namespace Wintermute {
                          * @param string
                          * @param DataFlagMap
                          */
-                        static Data createData(const QString, const QString, const QString = "", const DataFlagMap = DataFlagMap());
+                        static Data createData(const QString, const QString, const QString = "", const FlagMapping = FlagMapping());
                         /**
                          * @brief
                          *
@@ -182,6 +191,20 @@ namespace Wintermute {
                          * @param string
                          */
                         static const QString idFromString(const QString);
+
+                        QDBusArgument& operator<< (QDBusArgument &p_arg) {
+                            p_arg.beginStructure();
+                            p_arg << m_id << m_lcl << m_sym << m_flg;
+                            p_arg.endStructure();
+                            return p_arg;
+                        }
+
+                        const QDBusArgument& operator>> (const QDBusArgument &p_arg) {
+                            p_arg.beginStructure();
+                            p_arg >> m_id >> m_lcl >> m_sym >> m_flg;
+                            p_arg.endStructure();
+                            return p_arg;
+                        }
 
                         static const Data Null; /**< Represents an empty set of data. */
                 };
@@ -364,12 +387,16 @@ namespace Wintermute {
                         void loaded() const;
                 };
 
+                class Backend {
+
+                };
+
                 /**
                  * @brief
                  * @todo Attempt to drop the Boost dependency here and find another means of implementing inherited interfaces to this class.
                  * @class Storage models.hpp "include/wntr/data/models.hpp"
                  */
-                class Storage {
+                class Storage : public virtual Backend {
                     public:
                         /**
                          * @brief
@@ -377,6 +404,20 @@ namespace Wintermute {
                          * @fn GenericStorage
                          */
                         Storage();
+                        /**
+                         * @brief
+                         *
+                         * @fn Storage
+                         * @param
+                         */
+                        Storage(const Storage&);
+                        /**
+                         * @brief
+                         *
+                         * @fn Storage
+                         * @param
+                         */
+                        Storage(const Backend&);
                         /**
                          * @brief
                          *
@@ -449,7 +490,8 @@ namespace Wintermute {
                  */
                 class Cache {
                     friend class Storage;
-                    friend class Wintermute::Data::Linguistics::Configuration;
+                    friend class Wintermute::Data::NodeAdaptor;
+                    friend class Wintermute::Data::Linguistics::System;
                     typedef QList<Storage*> StorageList;
 
                     private:
@@ -461,7 +503,27 @@ namespace Wintermute {
                          * @fn addStorage
                          * @param
                          */
-                        static void addStorage(Storage*);
+                        static Storage* addStorage(Storage*);
+                        /**
+                         * @brief
+                         *
+                         * @fn clearStorage
+                         */
+                        static void clearStorage();
+                        /**
+                         * @brief
+                         *
+                         * @fn hasStorage
+                         * @param
+                         */
+                        static const bool hasStorage(const QString&);
+                        /**
+                         * @brief
+                         *
+                         * @fn storage
+                         * @param
+                         */
+                        static Storage* storage(const QString&);
 
                     public:
                         ~Cache();
@@ -521,7 +583,7 @@ namespace Wintermute {
                  * @brief
                  * @class DomBackend models.hpp "include/wntr/data/models.hpp"
                  */
-                class DomBackend {
+                class DomBackend : public Backend {
                     public:
                         /**
                          * @brief
@@ -747,32 +809,36 @@ namespace Wintermute {
                          */
                         QDomDocument* getSpawnDoc(const Data&) const;
                 };
+
             }
 
             namespace Rules {
                 struct Bond;
                 struct Chain;
+
                 struct Model;
                 struct LoadModel;
                 struct SaveModel;
                 struct Storage;
+                struct Backend;
                 struct Cache;
+
+                struct DomLoadModel;
+                struct DomSaveModel;
+                struct DomStorage;
+                struct DomBackend;
 
                 /**
                  * @brief Represents a key-value list of strings.
                  * @typedef StringMap
-                 * @bug Qt's container classes force us to use pointers instead of values,
-                 *      unlike the typical STL library. I want to use Qt for memory management,
-                 *      but that feature messes things up. This'll use the std::map until we
-                 *      find a work-around. (Apply the bug number here when reported).
                  */
-                typedef map<const QString, QString> StringMap;
+                typedef QMap<QString, QString> StringMap;
 
                 /**
                  * @brief Represents a list of Bonds.
                  * @typedef BondVector
                  */
-                typedef QList<Bond*> BondList;
+                typedef QList<Bond> BondList;
 
                 /**
                  * @brief Represents the syntactical data and rules needed to form a syntactic link.
@@ -793,6 +859,8 @@ namespace Wintermute {
                     Q_OBJECT
                     Q_PROPERTY(QString With READ with WRITE setWith)
                     Q_PROPERTY(StringMap Attributes READ attributes WRITE setAttributes)
+                    friend QDBusArgument& operator<< (QDBusArgument& , const Bond& );
+                    friend const QDBusArgument& operator>> (const QDBusArgument& , Bond& );
 
                     public:
                         /**
@@ -821,7 +889,7 @@ namespace Wintermute {
                          * @fn operator ==
                          * @param
                          */
-                        bool operator==(const Bond&) const;
+                        const bool operator==(const Bond&) const;
                         /**
                          * @brief
                          *
@@ -895,6 +963,8 @@ namespace Wintermute {
                  * @class Chain models.hpp "include/wntr/data/models.hpp"
                  */
                 class Chain : public QObject {
+                    friend QDBusArgument& operator<< (QDBusArgument&, const Chain&);
+                    friend const QDBusArgument& operator>> (const QDBusArgument&, Chain&);
                     Q_OBJECT
                     Q_PROPERTY(BondList Bonds READ bonds WRITE setBonds)
                     Q_PROPERTY(QString Type READ type WRITE setType)
@@ -973,12 +1043,12 @@ namespace Wintermute {
                          * @param
                          */
                         Bond operator[](const int&) const;
-
-                    private:
+                private:
                         BondList m_bndVtr; /**< Holds the bonds */
                         QString m_lcl;
                         QString m_typ;
                 };
+
 
                 /**
                  * @brief
@@ -1129,11 +1199,15 @@ namespace Wintermute {
                         virtual ~LoadModel() = 0;
                 };
 
+                class Backend {
+
+                };
+
                 /**
                  * @brief
                  * @class Storage models.hpp "include/wntr/data/models.hpp"
                  */
-                class Storage {
+                class Storage : public virtual Backend {
                     public:
                         /**
                          * @brief
@@ -1146,16 +1220,23 @@ namespace Wintermute {
                          *
                          * @fn Storage
                          * @param
-                         * @param
                          */
-                        Storage(const QString&, const QString&);
+                        Storage(const Storage&);
                         /**
                          * @brief
                          *
                          * @fn Storage
                          * @param
                          */
-                        Storage(const Storage&);
+                        Storage(const Backend&);
+                        /**
+                         * @brief
+                         *
+                         * @fn Storage
+                         * @param
+                         * @param
+                         */
+                        Storage(const QString&, const QString&);
                         /**
                          * @brief
                          *
@@ -1212,6 +1293,7 @@ namespace Wintermute {
                         QString m_flg;
                         QString m_lcl;
                 };
+
 
                 /**
                  * @brief
@@ -1473,19 +1555,39 @@ namespace Wintermute {
                      * @typedef StorageList
                      */
                     typedef QList<Storage*> StorageList;
-                    friend class Wintermute::Data::Linguistics::Configuration;
+                    friend class Wintermute::Data::RuleAdaptor;
+                    friend class Wintermute::Data::Linguistics::System;
 
                     private:
-                        static StorageList s_stores; /**< Holds the storage. */
                         Cache();
-                        virtual ~Cache();
+                        static StorageList s_stores; /**< Holds the storage. */
                         /**
                          * @brief
                          *
                          * @fn addStorage
                          * @param
                          */
-                        static void addStorage(Storage* );
+                        static Storage* addStorage(Storage* );
+                        /**
+                         * @brief
+                         *
+                         * @fn storage
+                         * @param
+                         */
+                        static Storage* storage(const QString&);
+                        /**
+                         * @brief
+                         *
+                         * @fn hasStorage
+                         * @param
+                         */
+                        static const bool hasStorage(const QString&);
+                        /**
+                         * @brief
+                         *
+                         * @fn clearStorage
+                         */
+                        static void clearStorage();
 
                     public:
                         /**
@@ -1515,7 +1617,9 @@ namespace Wintermute {
     }
 }
 
-
+Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Lexical::Data)
+Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Rules::Bond)
+Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Rules::Chain)
 
 #endif /* MODELS_HPP */
 // kate: indent-mode cstyle; space-indent on; indent-width 4;

@@ -34,41 +34,46 @@ using std::string;
 namespace Wintermute {
     namespace Data {
         namespace Linguistics {
-            QString Configuration::m_storageDir = QString(WNTRDATA_DATA_DIR) + "/" + QString(WNTRDATA_LING_DIR);
-            QString Configuration::m_lcl = WNTRDATA_DEFAULT_LOCALE;
+            QString System::m_storageDir = QString(WNTRDATA_DATA_DIR) + "/" + QString(WNTRDATA_LING_DIR);
+            QString System::m_lcl = WNTRDATA_DEFAULT_LOCALE;
 
-            void Configuration::Initialize ( const QString storageDir, const QString locale ) {
-                Configuration::setDirectory ( storageDir );
-                Configuration::setLocale ( locale );
+            void System::load ( const QString storageDir, const QString locale ) {
+                qDebug() << "(data) [System] # ling # System loading...";
+
+                System::setDirectory ( storageDir );
+                System::setLocale ( locale );
 
                 Lexical::Cache::addStorage ((new Lexical::DomStorage));
                 Rules::Cache::addStorage ((new Rules::DomStorage));
 
                 Lexical::Cache::generate();
 
-                qDebug() << "(ling) [Config] ## System configured.";
+                qDebug() << "(data) [System] # ling # System loaded.";
             }
 
-            void Configuration::Deinitialize() {
-                qDebug() << "(ling) [Config] Shutting down..";
+            void System::unload() {
+                qDebug() << "(ling) [System] System unloading...";
+                Lexical::Cache::clearStorage();
+                Rules::Cache::clearStorage();
+                qDebug() << "(data) [System] # ling # System unloaded.";
             }
 
-            void Configuration::setLocale ( const QString p_lcl ) {
+            void System::setLocale ( const QString p_lcl ) {
                 if ( p_lcl.isEmpty() )
                     return;
 
-                Configuration::m_lcl = p_lcl;
-                qDebug() << "(ling) [Config] ## Default locale:" << p_lcl;
+                System::m_lcl = p_lcl;
+                qDebug() << "(data) [System] # ling # Default locale:" << p_lcl;
             }
 
-            void Configuration::setDirectory ( const QString p_configDir ) {
+            void System::setDirectory ( const QString p_configDir ) {
                 if ( p_configDir.isEmpty() )
                     return;
 
                 QDir* d = new QDir(p_configDir);
                 if (d->exists ()){
-                    Configuration::m_storageDir = d->absolutePath();
-                    qDebug() << "(ling) [Config] ## Root dir:" << p_configDir;
+                    System::m_storageDir = d->absolutePath();
+                    qDebug() << "(data) [System] # ling # Root dir:" << p_configDir;
                 }
             }
         } // namespaces

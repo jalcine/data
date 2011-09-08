@@ -1,6 +1,6 @@
 /**
  * @file models.hpp
-Wintermute Developers <wintermute-devel@lists.launchpad.net>
+ * @author Wintermute Developers <wintermute-devel@lists.launchpad.net>
  * @date Fri, 13 May 21:54:16
  *
  * @legalese
@@ -27,6 +27,7 @@ Wintermute Developers <wintermute-devel@lists.launchpad.net>
 #include <QFile>
 #include <QtDebug>
 #include <QMetaType>
+#include <QDBusMetaType>
 #include <algorithm>
 #include <boost/progress.hpp>
 
@@ -44,10 +45,10 @@ namespace Wintermute {
                 Data::Data(const Data &p_dt) : m_id(p_dt.m_id),
                     m_lcl(p_dt.m_lcl), m_sym(p_dt.m_sym), m_flg(p_dt.m_flg) { }
 
-                Data::Data(QString p_id, QString p_lcl, QString p_sym, DataFlagMap p_flg) : m_id(p_id),
+                Data::Data(QString p_id, QString p_lcl, QString p_sym, FlagMapping p_flg) : m_id(p_id),
                     m_lcl(p_lcl), m_sym(p_sym), m_flg(p_flg) { }
 
-                const DataFlagMap Data::flags () const { return m_flg; }
+                const FlagMapping Data::flags () const { return m_flg; }
 
                 const QString Data::symbol () const { return m_sym; }
 
@@ -57,7 +58,7 @@ namespace Wintermute {
 
                 void Data::setSymbol(const QString& l_sym) { m_sym = l_sym; m_id = Data::idFromString (m_sym); }
 
-                void Data::setFlags(const DataFlagMap& l_flg) {
+                void Data::setFlags(const FlagMapping& l_flg) {
                     m_flg = l_flg;
                     Q_ASSERT(m_flg == l_flg);
                 }
@@ -76,7 +77,7 @@ namespace Wintermute {
 
                 const bool Data::isEmpty () const { return Data::Null == *this; }
 
-                Data Data::createData (const QString p_id, const QString p_lcl, const QString p_sym, const DataFlagMap p_flg) {
+                Data Data::createData (const QString p_id, const QString p_lcl, const QString p_sym, const FlagMapping p_flg) {
                     return Data(p_id,p_lcl,p_sym,p_flg);
                 }
 
@@ -123,7 +124,7 @@ namespace Wintermute {
                 DomStorage::DomStorage() { }
 
                 const QString DomStorage::getPath(const Data& p_dt){
-                    return Configuration::directory () + QString("/") + p_dt.locale() + QString("/node/") + p_dt.id () + QString(".node");
+                    return System::directory () + QString("/") + p_dt.locale() + QString("/node/") + p_dt.id () + QString(".node");
                 }
 
                 const bool DomStorage::exists (const Data &p_dt) const {
@@ -166,7 +167,7 @@ namespace Wintermute {
                 const QString DomStorage::type () const { return "Dom"; }
 
                 void DomStorage::generate() {
-                    QDir d(Configuration::directory ());
+                    QDir d(System::directory ());
                     d.setFilter (QDir::Dirs | QDir::NoDotAndDotDot);
                     QStringList l_lst = d.entryList ();
 
@@ -251,7 +252,7 @@ namespace Wintermute {
                 }
 
                 QDomDocument* DomStorage::getSpawnDoc(const Data& p_dt) const {
-                    QDir d(Configuration::directory ());
+                    QDir d(System::directory ());
                     const QString l_pth = d.absolutePath () + "/" + p_dt.locale () + "/node.xml";
                     QDomDocument* l_spawnDom = new QDomDocument("Storage");
                     QFile* l_file = new QFile(l_pth);
@@ -312,7 +313,7 @@ namespace Wintermute {
                         return false;
                     }
 
-                    DataFlagMap l_mp;
+                    FlagMapping l_mp;
                     QDomNodeList l_ndlst = this->DomBackend::m_ele->elementsByTagName ("Flag");
 
                     for (int i = 0; i < l_ndlst.count (); i++){
@@ -344,7 +345,7 @@ namespace Wintermute {
 
                     QDomDocument l_dom = this->DomBackend::m_ele->ownerDocument ();
 
-                    for(DataFlagMap::ConstIterator itr = this->Model::m_dt.flags ().begin ();
+                    for(FlagMapping::ConstIterator itr = this->Model::m_dt.flags ().begin ();
                         itr != this->Model::m_dt.flags ().end (); itr++) {
                         QDomElement l_ele = l_dom.createElement ("Flag");
                         l_ele.setAttribute ("guid",itr.key ());
@@ -431,8 +432,36 @@ namespace Wintermute {
                     return false;
                 }
 
-                void Cache::addStorage(Storage* l_str){
-                    s_stores.push_back(l_str);
+                Storage* Cache::addStorage(Storage* l_str){
+                    if (!hasStorage(l_str->type ()))
+                        s_stores << l_str;
+
+                    return l_str;
+                }
+
+                void Cache::clearStorage(){
+                    foreach(Storage* l_str, s_stores)
+                        delete l_str;
+
+                    s_stores.clear ();
+                }
+
+                const bool Cache::hasStorage(const QString& p_strName){
+                    foreach (Storage* l_str, s_stores){
+                        if (l_str->type () == p_strName)
+                            return true;
+                    }
+
+                    return false;
+                }
+
+                Storage* Cache::storage(const QString& p_strName){
+                    foreach (Storage* l_str, s_stores){
+                        if (l_str->type () == p_strName)
+                            return l_str;
+                    }
+
+                    return NULL;
                 }
 
                 void Cache::generate() {
@@ -446,6 +475,20 @@ namespace Wintermute {
                     qDebug() << "(data) [Cache] Dumped.";
                 }
 
+                const QDBusArgument& operator>> (const QDBusArgument &p_arg, Data& p_dt) {
+                    p_arg.beginStructure();
+                    p_arg >> p_dt.m_lcl >> p_dt.m_id >> p_dt.m_flg >> p_dt.m_sym;
+                    p_arg.endStructure();
+                    return p_arg;
+                }
+
+                QDBusArgument& operator<< (QDBusArgument &p_arg, const Data& p_dt) {
+                    p_arg.beginStructure();
+                    p_arg << p_dt.m_lcl << p_dt.m_id << p_dt.m_flg << p_dt.m_sym;
+                    p_arg.endStructure();
+                    return p_arg;
+                }
+
             } /** end namespace Lexical */
 
             namespace Rules {
@@ -456,22 +499,15 @@ namespace Wintermute {
                 Bond::Bond(const Bond &p_bnd) : m_props(p_bnd.m_props) { }
 
 				void Bond::setWith(QString& p_value) {
-			const QString l_with = "with";
-					setAttribute(l_with,p_value);
+					setAttribute("with",p_value);
 				}
 
                 void Bond::setAttribute(const QString& p_attr, QString& p_val) {
-                    if (m_props.find (p_attr) != m_props.end ())
-                        m_props.at (p_attr) = p_val;
-                    else
-                        m_props.insert (StringMap::value_type(p_attr,p_val));
+                    m_props.insert (p_attr,p_val);
                 }
 
                 const QString Bond::attribute(const QString& p_attr) const {
-                    if (hasAttribute(p_attr))
-                        return m_props.at (p_attr);
-                    else
-                        return QString::null;
+                    return m_props.value(p_attr);
                 }
 
                 void Bond::setAttributes(const StringMap& p_props) {
@@ -479,11 +515,11 @@ namespace Wintermute {
                 }
 
                 const bool Bond::hasAttribute(const QString& p_attr) const {
-                    return !(m_props.find (p_attr) == m_props.end ());
+                    return m_props.contains(p_attr);
                 }
 
                 const QString Bond::with() const {
-                    return m_props.at ("with");
+                    return m_props.value ("with");
                 }
 
                 const StringMap Bond::attributes() const {
@@ -520,6 +556,8 @@ namespace Wintermute {
                 }
 
                 void Bond::operator=(const Bond& p_bnd) { m_props = p_bnd.m_props; }
+
+                const bool Bond::operator == (const Bond& p_bnd) const { return m_props == p_bnd.m_props; }
 
                 Bond::~Bond () { }
 
@@ -617,7 +655,7 @@ namespace Wintermute {
                             l_bnd->setAttribute (l_nm,l_vl);
                         }
 
-                        p_bndVtr.push_back (l_bnd);
+                        p_bndVtr << *l_bnd;
                     }
 
                     if (!p_elem.parentNode ().isNull ())
@@ -666,7 +704,7 @@ namespace Wintermute {
                 DomStorage::DomStorage(const Storage &p_str) : Storage(p_str) { }
 
                 const QString DomStorage::getPath(const Chain& p_chn){
-                    return Configuration::directory () + "/" + p_chn.locale () + "/grammar.xml";
+                    return System::directory () + "/" + p_chn.locale () + "/grammar.xml";
                 }
 
                 QDomDocument* DomStorage::loadDom(const Chain& p_chn) {
@@ -817,16 +855,67 @@ namespace Wintermute {
                     return false;
                 }
 
-                void Cache::addStorage (Storage *p_str){
-                    s_stores.push_back (p_str);
+                Storage* Cache::addStorage (Storage *p_str){
+                    if (!hasStorage(p_str->type ()))
+                        s_stores << p_str;
+                    return p_str;
                 }
-            }
-        } /** end namespace Rules */
+
+                void Cache::clearStorage(){
+                    foreach (Storage* l_str, s_stores)
+                        delete l_str;
+
+                    s_stores.clear ();
+                }
+
+
+                const bool Cache::hasStorage(const QString& p_strName){
+                    foreach (Storage* l_str, s_stores){
+                        if (l_str->type () == p_strName)
+                            return true;
+                    }
+
+                    return false;
+                }
+
+                Storage* Cache::storage(const QString& p_strName){
+                    foreach (Storage* l_str, s_stores){
+                        if (l_str->type () == p_strName)
+                            return l_str;
+                    }
+
+                    return NULL;
+                }
+                QDBusArgument& operator<< (QDBusArgument &p_arg, const Bond& p_bnd) {
+                    p_arg.beginStructure();
+                    p_arg << p_bnd.m_props;
+                    p_arg.endStructure();
+                    return p_arg;
+                }
+
+                const QDBusArgument& operator>> (const QDBusArgument &p_arg, Bond& p_bnd) {
+                    p_arg.beginStructure();
+                    p_arg >> p_bnd.m_props;
+                    p_arg.endStructure();
+                    return p_arg;
+                }
+
+                QDBusArgument& operator<< (QDBusArgument &p_arg, const Chain& p_chn) {
+                    p_arg.beginStructure();
+                    p_arg << p_chn.m_lcl << p_chn.m_typ << p_chn.m_bndVtr;
+                    p_arg.endStructure();
+                    return p_arg;
+                }
+
+                const QDBusArgument& operator>> (const QDBusArgument &p_arg, Chain& p_chn) {
+                    p_arg.beginStructure();
+                    p_arg >> p_chn.m_lcl >> p_chn.m_typ >> p_chn.m_bndVtr;
+                    p_arg.endStructure();
+                    return p_arg;
+                }
+            } /** end namespace Rules */
+        }
     }
 }
 
-Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Lexical::Model)
-Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Lexical::Data)
-Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Rules::Model)
-Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Rules::Bond)
 // kate: indent-mode cstyle; space-indent on; indent-width 4;

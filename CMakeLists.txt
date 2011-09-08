@@ -3,9 +3,10 @@ cmake_minimum_required(VERSION 2.8)
 
 set(MOC_CODE )
 set(WNTRDATA_MAJOR_VERSION 0)
-set(WNTRDATA_MINOR_VERSION 01)
+set(WNTRDATA_MINOR_VERSION 0)
+set(WNTRDATA_MICRO_VERSION 1)
 set(WNTRDATA_VERSION
-    ${WNTRDATA_MAJOR_VERSION}.${WNTRDATA_MINOR_VERSION})
+    ${WNTRDATA_MAJOR_VERSION}.${WNTRDATA_MINOR_VERSION}${WNTRDATA_MICRO_VERSION})
 
 include(WinterDefaults)
 include(WinterLibsDependencies)
@@ -20,14 +21,12 @@ list(APPEND CMAKE_MODULE_PATH "cmake/Modules")
 # Dependency packages
 #
 find_package(Boost 1.40 COMPONENTS
-    signals
     python
     REQUIRED)
-
 find_package(PythonLibs REQUIRED)
-
 find_package(Qt4 4.4.3 COMPONENTS
     QtCore
+    QtDBus
     QtXml
     REQUIRED)
 
@@ -44,7 +43,6 @@ pkg_search_module(Soprano REQUIRED soprano)
 set(VS_KEYWORD Qt4VSv1.0)
 set(VS_SCC_PROJECTNAME "Wintermute Database")
 set(PROJECT_LABEL "Wintermute Database")
-set(WNTRDATA_LOCALE "en" CACHE STRING "The standard locale to use in Wintermute.")
 set(WNTRDATA_LIB_DIR "${WINTER_LIB_INSTALL_DIR}")
 set(WNTRDATA_DATA_DIR "${WINTER_DATA_INSTALL_DIR}" CACHE PATH "The directory where Wintermute's data files will be installed.")
 set(WNTRDATA_LING_DIR "ling" CACHE PATH "The name of the folder that contains the linguistics information. There should be no trailing or leading slashes.")
@@ -80,6 +78,7 @@ endforeach()
 include_directories(
     "${PROJECT_SOURCE_DIR}/include/wntr/data"
     "${PROJECT_SOURCE_DIR}/include/wntr"
+    "${PROJECT_SOURCE_DIR}/include"
     ${WNTRDATA_INCLUDE_DIRS})
 
 #

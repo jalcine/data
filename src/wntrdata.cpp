@@ -21,38 +21,44 @@
 #include <boost/python.hpp>
 #include "config.hpp"
 #include "wntrdata.hpp"
+#include <QtDebug>
 
 using namespace boost::python;
 using namespace Wintermute::Data::Linguistics;
 
 namespace Wintermute {
     namespace Data {
-        Configuration* Configuration::s_config = new Configuration;
+        System* System::s_config = NULL;
 
-        void Configuration::Initialize ( void ) {
-            Wintermute::Data::Linguistics::Configuration::Initialize ( Configuration::directory() + QString ( "/" ) + QString ( WNTRDATA_LING_DIR ) );
-            Wintermute::Data::Ontology::Configuration::Initialize();
+        System::System() : m_dir(WNTRDATA_DATA_DIR) {
         }
 
-        void Configuration::Deinitialize ( void ) {
-            Wintermute::Data::Linguistics::Configuration::Deinitialize();
-            Wintermute::Data::Ontology::Configuration::Deinitialize();
+        void System::start ( ) {
+            Wintermute::Data::Linguistics::System::load ( System::directory() + QString ( "/" ) + QString ( WNTRDATA_LING_DIR ) );
+            Wintermute::Data::Ontology::System::load();
+            emit s_config->started();
+        }
+
+        void System::stop ( ) {
+            Wintermute::Data::Ontology::System::unload();
+            Wintermute::Data::Linguistics::System::unload();
+            emit s_config->stopped();
+        }
+
+        const QString System::directory () { return s_config->m_dir; }
+
+        void System::setDirectory(const QString& p_dir) {
+            stop();
+            s_config->m_dir = p_dir;
+            start();
+        }
+
+        System* System::instance () {
+            if (!s_config) s_config = new System;
+            return s_config;
         }
 
         BOOST_PYTHON_MODULE ( wntrdata ) {
-            class_<Configuration, boost::noncopyable> ( "Configuration",no_init )
-            .def ( "Initialize", Configuration::Initialize )
-            .def ( "Deinitialize", Configuration::Deinitialize );
-
-            //class_<Model, boost::noncopyable>("Model",no_init);
-
-            /*class_<SaveModel, boost::noncopyable, bases<Model> >("SaveModel",no_init)
-                    .def("save",&SaveModel::save)
-            ;
-
-            class_<LoadModel, boost::noncopyable, bases<Model> >("LoadModel",no_init)
-                    .def("load",&LoadModel::load)
-            ;*/
         }
     }
 }

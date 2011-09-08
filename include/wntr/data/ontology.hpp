@@ -38,7 +38,7 @@ using std::string;
 namespace Wintermute {
     namespace Data {
         namespace Ontology {
-            struct Configuration;
+            struct System;
             struct Repository;
             struct Resource;
 
@@ -49,7 +49,7 @@ namespace Wintermute {
              *
              * @class Configuration ontology.hpp "include/wntr/data/ontology.hpp"
              */
-            class Configuration : public QObject {
+            class System : public QObject {
                 Q_OBJECT
 
                 public:
@@ -58,13 +58,13 @@ namespace Wintermute {
                      * Runs all of the necessary initialziation code to get the ontology system on its toes.
                      * @fn Initialize
                      */
-                    Q_INVOKABLE static void Initialize();
+                    Q_INVOKABLE static void load();
                     /**
                      * @brief Deinitializes the ontology system/
                      * Runs all of the necessary deinitialization code to have the ontology system be safely shut down.
                      * @fn Deinitialize
                      */
-                    Q_INVOKABLE static void Deinitialize();
+                    Q_INVOKABLE static void unload();
             };
 
             /**

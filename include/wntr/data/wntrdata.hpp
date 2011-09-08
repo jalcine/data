@@ -35,10 +35,11 @@
 #ifndef __WNTRDATA_HPP__
 #define __WNTRDATA_HPP__
 
-#include "config.hpp"
-#include "ontology.hpp"
-#include "linguistics.hpp"
-#include "models.hpp"
+#include <wntr/data/config.hpp>
+#include <wntr/data/ontology.hpp>
+#include <wntr/data/linguistics.hpp>
+#include <wntr/data/models.hpp>
+#include <wntr/data/adaptors.hpp>
 
 #endif /* __WNTRDATA_HPP__ */
 // kate: indent-mode cstyle; space-indent on; indent-width 4;

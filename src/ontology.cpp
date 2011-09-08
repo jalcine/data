@@ -36,13 +36,13 @@ namespace Wintermute {
     namespace Data {
         namespace Ontology {
 
-            void Configuration::Initialize() {
+            void System::load() {
                 //const Repository* l_repo = Repository::obtainRepository("COSMO");
-                qDebug() << "(data) [Ontology::Configuration] Loaded.";
+                qDebug() << "(data) [System] # ontology # Loaded.";
             }
 
-            void Configuration::Deinitialize() {
-                qDebug() << "(data) [Ontology::Configuration] Unloaded.";
+            void System::unload() {
+                qDebug() << "(data) [System] # ontology # Unloaded.";
             }
 
             Repository::Repository(const QString &p_str) : m_repo(p_str) { load(); }
@@ -56,7 +56,7 @@ namespace Wintermute {
             }
 
             const QString Repository::getPath() const {
-                return QUrl::fromLocalFile (Data::Configuration::directory () + QString("/")
+                return QUrl::fromLocalFile (Data::System::directory () + QString("/")
                         + QString(WNTRDATA_ONTO_DIR) + QString("/") + m_repo + QString(".owl")).toString ();
             }
 
