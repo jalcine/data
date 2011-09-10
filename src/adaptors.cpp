@@ -21,8 +21,8 @@
  * Boston, MA  02110-1301  USA
  */
 
-#include "wntr/data/adaptors.hpp"
-#include <wntrdata.hpp>
+#include "adaptors.hpp"
+#include "wntrdata.hpp"
 #include <QDBusConnection>
 
 namespace Wintermute {
