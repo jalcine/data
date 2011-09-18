@@ -31,6 +31,22 @@
  * that introduce new sources of words aside from importing new syntactic information
  * for the fact the syntactic system still needs a bit more work before it becomes as
  * decently mature as the lexical system.
+ *
+ * @section N01 Obtaining Information
+ * WntrData holds all of the lexical, syntactical, and ontological data for Wintermute.
+ * Thus, the means of information obtaining (at least for lexical and syntactic) information
+ * are similar, whereas ontological information resembles a vaguely knit representation of
+ * of that shown by typical SPARQL interpretators and parsers.
+ * @subsection N011 Lexical Information
+ * Lexical information is stored by using the Models system designed by Adrian Borucki <gentoolx@gmail.com>.
+ * The syntactical information is also stored accordingly.
+ * @see N012
+ * @subsubsection N0111 Loading
+ * Obtaining lexical information is done by creating a Data object and specifying the ID
+ * and locale of the Data object. The symbol value is filled as well as the flags from the
+ * loading
+ * @endsection
+ * @endsection
  */
 #ifndef __WNTRDATA_HPP__
 #define __WNTRDATA_HPP__

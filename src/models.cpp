@@ -77,13 +77,15 @@ namespace Wintermute {
 
                 const bool Data::isEmpty () const { return Data::Null == *this; }
 
-                Data Data::createData (const QString p_id, const QString p_lcl, const QString p_sym, const FlagMapping p_flg) {
-                    return Data(p_id,p_lcl,p_sym,p_flg);
-                }
-
                 const QString Data::idFromString (const QString p_sym) { return QString::fromStdString (md5(p_sym.toLower ().toStdString ())); }
 
                 Data::~Data () { }
+
+                QDebug operator<<(QDebug dbg, const Data* p_nd) {
+                    dbg.space ();
+                    dbg << p_nd->m_id << p_nd->m_lcl << p_nd->m_sym << p_nd->m_sym;
+                    return dbg.space ();
+                }
 
                 Model::Model() { }
 
@@ -192,7 +194,7 @@ namespace Wintermute {
                 }
 
                 const QString DomStorage::obtainFullSuffix(const QString& p_lcl, const QString& p_sfx) const {
-                    const Data l_dt = Data::createData (QString::null,p_lcl);
+                    const Data l_dt(QString::null,p_lcl);
                     const QDomElement l_dom = this->getSpawnDoc (l_dt)->documentElement ();
                     const QDomNodeList l_domList = l_dom.elementsByTagName ("Mapping").at (0).toElement ().elementsByTagName ("Suffix");
 
@@ -223,12 +225,10 @@ namespace Wintermute {
                             continue;
                         }
 
-                        Data l_dt;
-
                         DomLoadModel l_ldM(&l_ele);
                         QDomDocument l_newDom("Data");
                         const Data* l_bsDt = l_ldM.load();
-                        l_dt = Data::createData (l_bsDt->id (),l_lcl,l_bsDt->symbol (),l_bsDt->flags ());
+                        Data l_dt(l_bsDt->id (),l_lcl,l_bsDt->symbol (),l_bsDt->flags ());
 
                         QDomElement l_root = l_newDom.createElement ("Data");
                         l_root.setAttribute ("locale",l_lcl);

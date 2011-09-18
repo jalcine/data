@@ -61,17 +61,31 @@ namespace Wintermute {
             //emit nodeBackendRegistered (l_str->type ());
         }
 
-        void NodeAdaptor::write (const Lexical::Data &p_data, const QDBusMessage& p_msg) { Lexical::Cache::write (p_data); }
+        void NodeAdaptor::write (const Lexical::Data &p_data, const QDBusMessage& p_msg) {
+            Lexical::Cache::write (p_data);
+        }
 
-        void NodeAdaptor::generate (const QDBusMessage& p_msg) { Lexical::Cache::generate (); }
+        void NodeAdaptor::generate (const QDBusMessage& p_msg) {
+            Lexical::Cache::generate ();
+        }
 
-        void NodeAdaptor::read (const QDBusMessage& p_msg, Lexical::Data &p_data) const { Lexical::Cache::read (p_data); }
+        void NodeAdaptor::read (const QDBusMessage& p_msg, Lexical::Data &p_data) const {
+            Lexical::Cache::read (p_data);
+        }
 
-        void NodeAdaptor::pseudo (const QDBusMessage& p_msg, Lexical::Data &p_data) const { Lexical::Cache::pseudo (p_data); }
+        void NodeAdaptor::pseudo (const QDBusMessage& p_msg, Lexical::Data &p_data) const {
+            Lexical::Cache::pseudo (p_data);
+        }
 
-        const bool NodeAdaptor::exists(const Lexical::Data &p_data, const QDBusMessage& p_msg) const { return Lexical::Cache::exists (p_data); }
+        const bool NodeAdaptor::exists(const QDBusArgument &p_data, const QDBusMessage& p_msg) const {
+            const bool l_rslt = Lexical::Cache::exists (p_data.asVariant ().value<Lexical::Data>());
+            QDBusConnection::sessionBus().send (p_msg.createReply (l_rslt));
+        }
 
-        const bool NodeAdaptor::isPseudo (const Lexical::Data &p_data, const QDBusMessage& p_msg) const { return Lexical::Cache::isPseudo (p_data); }
+        const bool NodeAdaptor::isPseudo (const Lexical::Data &p_data, const QDBusMessage& p_msg) const {
+            const bool l_rslt = Lexical::Cache::isPseudo (p_data);
+            QDBusConnection::sessionBus().send (p_msg.createReply (l_rslt));
+        }
 
         void NodeAdaptor::quit(const QDBusMessage& p_msg) const {
             p_msg.createErrorReply (QDBusError::AccessDenied,"Cannot stop the Lexical::Node service.");
@@ -79,12 +93,17 @@ namespace Wintermute {
 
         RuleAdaptor::RuleAdaptor() : Adaptor(System::instance()) { }
 
-        void RuleAdaptor::read (const QDBusMessage& p_msg, Rules::Chain &p_chn) const { Rules::Cache::read (p_chn); }
+        void RuleAdaptor::read (const QDBusMessage& p_msg, Rules::Chain &p_chn) const {
+            Rules::Cache::read (p_chn);
+        }
 
-        void RuleAdaptor::write (const Rules::Chain &p_chn, const QDBusMessage& p_msg) { Rules::Cache::write (p_chn); }
+        void RuleAdaptor::write (const Rules::Chain &p_chn, const QDBusMessage& p_msg) {
+            Rules::Cache::write (p_chn);
+        }
 
         const bool RuleAdaptor::exists (const QString &p_1, const QString &p_2, const QDBusMessage& p_msg) const {
-            return Rules::Cache::exists (p_1,p_2);
+            const bool l_rslt = Rules::Cache::exists (p_1,p_2);
+            QDBusConnection::sessionBus().send (p_msg.createReply (l_rslt));
         }
 
         void RuleAdaptor::registerBackend (const QDBusMessage& p_msg, Rules::Backend &p_bcknd){

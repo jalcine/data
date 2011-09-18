@@ -28,7 +28,7 @@
 
 #include <map>
 #include <QHash>
-#include <QtDebug>
+#include <QDebug>
 #include <QMultiHash>
 #include <QStringList>
 #include <QMetaType>
@@ -61,16 +61,36 @@ namespace Wintermute {
                 struct DomStorage;
                 struct DomBackend;
 
+                /**
+                 * @brief A collection of flags.
+                 *
+                 * This typedef encapsulates a QMultiMap that holds a one-to-many
+                 * mapping of values. This flag collection is used by the parser
+                 * to hold the vital ontological value up to the lexicosyntactical
+                 * binding ID.
+                 *
+                 * @typedef FlagMapping
+                 */
                 typedef QMultiMap<QString, QString> FlagMapping;
 
                 /**
-                 * @brief
-                 * @note This class can be considered this a POD of Wintermute; as it is used extensively.
+                 * @brief The lexical POD format of linguistics parsing.
+                 *
+                 * The Data object represents the internal workings of the lexical
+                 * bindings. Data objects hold information about the locale of the
+                 * potential parent node, the ID of the node, the symbol and the
+                 * flags of the node. All of this information can be used to assist
+                 * interoperability in moving it from a literal symbol ("you") to
+                 * its internal, workable type ("Aeon1#~" [en]).
+                 *
+                 * @note This class can be considered this a POD (<b>p</b>lain <b>o</b>l' <b>data format) of Wintermute.
                  * @class Data models.hpp "include/wntr/data/models.hpp"
+                 * @see FlagMapping
                  */
                 class Data : public QObject {
                     friend QDBusArgument& operator<< (QDBusArgument&, const Data&);
                     friend const QDBusArgument& operator>> (const QDBusArgument&, Data&);
+                    friend QDebug operator<<(QDebug dbg, const Data*);
 
                     Q_OBJECT
                     Q_PROPERTY(QString Locale READ locale)
@@ -84,122 +104,113 @@ namespace Wintermute {
                         QString m_sym;
                         FlagMapping m_flg;
 
-                    protected:
-                        /**
-                         * @brief
-                         *
-                         * @fn Data
-                         * @param string
-                         * @param string
-                         * @param string
-                         * @param DataFlagMap
-                         */
-                        Data(const QString , const QString , const QString = "" , const FlagMapping = FlagMapping());
-
                     public:
                         /**
-                         * @brief
-                         *
+                         * @brief Default constructor.
+                         * @fn Data
+                         * @param string The ID of the Data.
+                         * @param string The locale of the Data.
+                         * @param string The symbol of the Data.
+                         * @param DataFlagMap The flags of the Data.
+                         */
+                        explicit Data(const QString , const QString , const QString = "" , const FlagMapping = FlagMapping());
+
+                        /**
+                         * @brief Null constructor.
                          * @fn Data
                          */
                         Data();
+
                         /**
-                         * @brief
-                         *
+                         * @brief Copy constructor.
                          * @fn Data
-                         * @param
+                         * @param Data The Data to be copied.
                          */
                         Data(const Data&);
+
                         /**
-                         * @brief
-                         *
-                         * @fn operator ==
-                         * @param
+                         * @brief Equality operator.
+                         * @fn operator==
+                         * @param The Data to be equated against.
                          */
                         bool operator==(const Data&) const;
+
                         /**
-                         * @brief
-                         *
-                         * @fn operator =
-                         * @param
+                         * @brief Assignment operator.
+                         * @fn operator=
+                         * @param The Data to be copied.
                          */
                         void operator=(const Data&);
+
                         /**
-                         * @brief
-                         *
+                         * @brief Deconstructor.
                          * @fn ~Data
                          */
                         virtual ~Data();
+
                         /**
-                         * @brief
-                         *
+                         * @brief Returns the ID of the node.
                          * @fn id
                          */
                         const QString id() const;
+
                         /**
-                         * @brief
-                         *
+                         * @brief Returns the locale of the Data.
                          * @fn locale
                          */
                         const QString locale() const;
+
                         /**
-                         * @brief
-                         *
+                         * @brief Returns the symbol of the Data.
                          * @fn symbol
                          */
                         const QString symbol() const;
+
                         /**
-                         * @brief
-                         *
+                         * @brief Returns the flags of the Data.
                          * @fn flags
                          */
                         const FlagMapping flags() const;
+
                         /**
-                         * @brief
-                         *
+                         * @brief Changes the symbol of the Data to p_dt.
                          * @fn setSymbol
-                         * @param
+                         * @param p_dt The symbol for the Data to hold now.
+                         * @note When the symbol is changed, the ID is changed as well. This
+                         *       is why there's no setID() method. The ID value is actually a
+                         *       MD5 hash of a lower-case representation of the symbol string.
+                         * @see idFromString(const QString)
                          */
                         void setSymbol( const QString& );
+
                         /**
-                         * @brief
-                         *
+                         * @brief Sets the flags of the Data.
                          * @fn setFlags
-                         * @param
+                         * @param p_flg The flags for the Data to hold now.
                          */
                         void setFlags( const FlagMapping& );
+
                         /**
-                         * @brief
-                         *
+                         * @brief Determines if this Data is equivalent to a null Data object.
                          * @fn isEmpty
                          */
                         const bool isEmpty() const;
+
                         /**
-                         * @brief
-                         *
-                         * @fn createData
-                         * @param string
-                         * @param string
-                         * @param string
-                         * @param DataFlagMap
-                         */
-                        static Data createData(const QString, const QString, const QString = "", const FlagMapping = FlagMapping());
-                        /**
-                         * @brief
-                         *
+                         * @brief Obtains the ID from a said QString.
                          * @fn idFromString
-                         * @param string
+                         * @param QString The text to be transformed into its proper ID.
                          */
                         static const QString idFromString(const QString);
 
-                        QDBusArgument& operator<< (QDBusArgument &p_arg) {
+                        QDBusArgument &operator<< (QDBusArgument &p_arg) {
                             p_arg.beginStructure();
                             p_arg << m_id << m_lcl << m_sym << m_flg;
                             p_arg.endStructure();
                             return p_arg;
                         }
 
-                        const QDBusArgument& operator>> (const QDBusArgument &p_arg) {
+                        const QDBusArgument &operator>> (const QDBusArgument &p_arg) {
                             p_arg.beginStructure();
                             p_arg >> m_id >> m_lcl >> m_sym >> m_flg;
                             p_arg.endStructure();
@@ -210,8 +221,15 @@ namespace Wintermute {
                 };
 
                 /**
-                 * @brief
+                 * @brief The most basic model for data obtaining for lexical information
+                 * storage.
                  *
+                 * The Model class provides the most simplest means of loading and
+                 * saving lexical information for Wintermute. This class merely serves
+                 * as a base of the more defined classes (LoadModel and SaveModel, typically
+                 * used instead of this) for storage purposes.
+                 *
+                 * @see LoadModel, SaveModel
                  * @class Model models.hpp "include/wntr/data/models.hpp"
                  */
                 class Model : public QObject {
@@ -219,117 +237,137 @@ namespace Wintermute {
                     Q_PROPERTY(Data data READ data WRITE setData)
 
                     protected:
-                        mutable Data m_dt; /**< TODO */
+                        mutable Data m_dt; /**< The variable holding the internal Data. */
 
                     public:
                         /**
-                         * @brief
+                         * @brief Default constructor.
                          * @fn ~Model
                          */
                         virtual ~Model();
+
                         /**
                          * @brief Null constructor.
                          * @fn Model
                          */
                         Model();
+
                         /**
                          * @brief Constructor, using lexical data.
                          * @fn Model
-                         * @param info The data to fill itself with.
+                         * @param p_info The data to fill itself with.
                          */
                         Model ( Data& );
+
                         /**
-                         * @brief
+                         * @brief Copy constructor.
                          * @fn Model
-                         * @param
+                         * @param p_mdl The Model to be copied.
                          */
                         Model ( const Model& );
 
                         /**
-                         * @brief
+                         * @brief Obtains the data stored in this Model.
                          * @fn getLexicalMap
+                         * @return Data
                          */
                         const Data& data();
 
                         /**
-                         * @brief
-                         *
+                         * @brief Changes the internal Data to p_dt.
                          * @fn setData
-                         * @param
+                         * @param p_dt The Data to be used, or typically Data::Null.
                          */
                         void setData(const Data& = Data::Null );
                 };
 
                 /**
-                 * @brief
+                 * @brief Represents a model for saving data to the lexical information
+                 * storage.
                  *
+                 * The SaveModel class is typically dervived for the simplest of
+                 * saving information to whatever it's dervied source of lexical
+                 * information may be. Typically, you'd use this class if you
+                 * don't know where your information is being saved to; but the
+                 * way that the system is built; you'll never need to programatically
+                 * use this base.
+                 *
+                 * @see DomSaveModel
                  * @class SaveModel models.hpp "include/wntr/data/models.hpp"
                  */
                 class SaveModel : public Model {
                     Q_OBJECT
                     protected:
                         /**
-                         * @brief
-                         *
+                         * @brief Default constructor.
                          * @fn SaveModel
                          */
                         SaveModel();
 
                         /**
-                         * @brief
-                         *
+                         * @brief Constructor.
                          * @fn SaveModel
-                         * @param p_lxin
+                         * @param p_lxin The Data to be saved.
                          */
                         SaveModel ( Data& );
 
                         /**
-                         * @brief
-                         *
+                         * @brief Base copy constructor.
                          * @fn SaveModel
-                         * @param p_mod
+                         * @param p_mod The Model to be copied.
                          */
                         SaveModel ( const Model& );
 
                         /**
-                         * @brief
-                         *
+                         * @brief Copy constructor.
                          * @fn SaveModel
-                         * @param p_smod
+                         * @param p_smod The SaveModel to be copied.
                          */
                         SaveModel ( const SaveModel& );
+
                         /**
-                         * @brief
-                         *
+                         * @brief Deconstructor.
                          * @fn ~SaveModel
                          */
                         ~SaveModel();
 
                     public:
                         /**
-                         * @brief
+                         * @brief Saves the data in this SaveModel to the specified
+                         *        lexical information storage.
                          * @fn save
                          */
                         virtual void save() = 0;
+
                         /**
-                         * @brief
-                         *
+                         * @brief Saves p_dt to the specified lexical information
+                         *        storage.
                          * @fn saveFrom
-                         * @param
+                         * @param p_dt The Data to be saved.
                          */
                         virtual void saveFrom(const Data& ) = 0;
 
                     signals:
+
                         /**
-                         * @brief
-                         *
+                         * @brief Emitted when a save operation has been completed
+                         *        successfully. Typically emitted if the operation
+                         *        is asynchronous.
                          * @fn saved
                          */
                         void saved();
                 };
 
                 /**
-                 * @brief
+                 * @brief Represents a model for saving data to the lexical information
+                 * storage.
+                 *
+                 * The LoadModel class is typically dervived for the simplest of
+                 * loading information to whatever it's dervied source of lexical
+                 * information may be. Typically, you'd use this class if you
+                 * don't know where your information is being loaded from; but the
+                 * way that the system is built; you'll never need to programatically
+                 * use this base.
                  *
                  * @class LoadModel models.hpp "include/wntr/data/models.hpp"
                  */
@@ -338,26 +376,27 @@ namespace Wintermute {
 
                     protected:
                         /**
-                         * @brief
+                         * @brief Null constructor.
                          * @fn LoadModel
                          */
                         LoadModel();
 
                         /**
-                         * @brief
+                         * @brief Copy constructor.
                          * @fn LoadModel
-                         * @param loadModel
+                         * @param p_mdl The LoadModel to be copied.
                          */
                         LoadModel ( const LoadModel& );
 
                         /**
-                         * @brief
+                         * @brief Base copy constructor.
                          * @fn LoadModel
-                         * @param model
+                         * @param p_mdl The Model to be copied.
                          */
                         LoadModel ( const Model& );
+
                         /**
-                         * @brief
+                         * @brief Deconstructor.
                          * @fn ~LoadModel
                          */
                         ~LoadModel();
@@ -365,35 +404,42 @@ namespace Wintermute {
                     public:
 
                         /**
-                         * @brief
-                         *
+                         * @brief Loads the Data from its specified lexical
+                         *        information storage.
                          * @fn load
+                         * @return The Data obtained from disk, or Data::Null.
                          */
                         virtual const Data* load( ) const = 0;
+
                         /**
-                         * @brief
-                         *
+                         * @brief Loads the lexical information storage to p_dt.
                          * @fn loadTo
-                         * @param
+                         * @param p_dt The Data to load the information to.
                          */
                         virtual bool loadTo(Data& ) const = 0;
 
                     signals:
                         /**
-                         * @brief
-                         *
+                         * @brief Emitted when the load operation behind this
+                                  LoadModel has completed. Typically, this is used
+                                  for asynchronous operations.
                          * @fn loaded
                          */
                         void loaded() const;
                 };
 
-                class Backend {
-
-                };
+                /**
+                 * @brief Represents the infrastructual backend of all storage classes.
+                 * @class Backend models.hpp "src/models.hpp"
+                 */
+                class Backend { };
 
                 /**
-                 * @brief
-                 * @todo Attempt to drop the Boost dependency here and find another means of implementing inherited interfaces to this class.
+                 * @brief Represents the foundational front-end means of loading
+                 *        and saving lexical information from any storage.
+                 *
+                 * The Storage class is the <b>recommended</b> class to use for
+                 *
                  * @class Storage models.hpp "include/wntr/data/models.hpp"
                  */
                 class Storage : public virtual Backend {
