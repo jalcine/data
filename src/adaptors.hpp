@@ -1,7 +1,7 @@
 /**
  * @file    adaptors.hpp
  * @author  Wintermute Developers <wintermute-devel@lists.launchpad.net>
- * @created 9/6/2011
+ *  
  *
  *
  *
@@ -67,12 +67,12 @@ namespace Wintermute {
                 void nodeCreated(const QString&);
 
             public slots:
-               Q_NOREPLY void registerBackend(const Lexical::Backend&, const QDBusMessage&);
+                Q_NOREPLY void registerBackend(const QDBusMessage&);
                 Q_NOREPLY void generate(const QDBusMessage&);
                 void pseudo(const QDBusMessage&, Lexical::Data&) const;
                 void read(const QDBusMessage&, Lexical::Data& ) const;
                 void write(const Lexical::Data&, const QDBusMessage&);
-                const bool exists(const QDBusArgument& ,const QDBusMessage&) const;
+                const bool exists(const QDBusMessage&, const Lexical::Data& ) const;
                 const bool isPseudo(const Lexical::Data& ,const QDBusMessage&) const;
                 virtual void quit(const QDBusMessage&) const;
         };
@@ -89,7 +89,7 @@ namespace Wintermute {
                 void ruleCreated(const QString&);
 
             public slots:
-                void registerBackend(const QDBusMessage&, Rules::Backend&);
+                Q_NOREPLY void registerBackend(const QDBusMessage&, Rules::Backend&);
                 void read(const QDBusMessage&, Rules::Chain&) const;
                 void write(const Rules::Chain&, const QDBusMessage&);
                 const bool exists(const QString&, const QString&,const QDBusMessage&) const;

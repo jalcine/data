@@ -47,7 +47,7 @@ namespace Wintermute {
              *
              *
              *
-             * @class Configuration ontology.hpp "include/wntr/data/ontology.hpp"
+             * @class Configuration ontology.hpp "src/ontology.hpp"
              */
             class System : public QObject {
                 Q_OBJECT
@@ -85,7 +85,7 @@ namespace Wintermute {
              * This class provides a means of convience over RDF-XML (mainly SPARQL and RDFQL) so that
              * properties of resources can be properly queried.
              *
-             * @class Resource ontology.hpp "include/wntr/data/ontology.hpp"
+             * @class Resource ontology.hpp "src/ontology.hpp"
              */
             class Resource : public QObject {
                 public:
@@ -156,6 +156,13 @@ namespace Wintermute {
                      */
                     void setObject(const Resource& );
 
+                    /**
+                     * @brief
+                     *
+                     * @fn countConcepts
+                     */
+                    static const int countConcepts();
+
                 private:
                     const Repository* m_repo;
                     Soprano::Node m_node;
@@ -170,7 +177,7 @@ namespace Wintermute {
              *
              * @todo Obtain the specified Resource from the internal ontology when requested.
              *
-             * @class Repository ontology.hpp "include/wntr/data/ontology.hpp"
+             * @class Repository ontology.hpp "src/ontology.hpp"
              */
             class Repository : public QObject {
                 Q_OBJECT
@@ -186,6 +193,7 @@ namespace Wintermute {
 
                     static const Repository* obtainRepository(const QString&);
                     static const Resource* obtainResource(const QString&, const QString&);
+                    static const int countOntologies();
 
                 private:
                     void load(const QString& = "") const;

@@ -27,76 +27,10 @@
 
 /* #undef DEBUG */
 
-#define WNTRDATA_DATA_DIR "/share/wintermute"
+#define WNTRDATA_DATA_DIR "/usr/share/wintermute"
 #define WNTRDATA_LING_DIR "ling"
 #define WNTRDATA_ONTO_DIR "onto"
-#define WNTRDATA_DEFAULT_LOCALE ""
-
-#include <string>
-#include <QObject>
-
-using namespace std;
-
-using std::string;
-
-namespace Wintermute {
-    namespace Data {
-        /**
-         * @brief Manages the data location representing WntrData.
-         * @class Configuration config.hpp "config.hpp"
-         */
-        class System : public QObject {
-            friend class SystemAdaptor;
-            Q_OBJECT
-            Q_DISABLE_COPY(System)
-
-            private:
-                static System* s_config;
-                QString m_dir;
-                System();
-
-            public:
-                /**
-                 * @brief Obtains the directory that of which the data files are stored.
-                 * @fn getDirectory
-                 * @return const string
-                 */
-                static const QString directory();
-
-                /**
-                 * @brief
-                 *
-                 * @fn setDirectory
-                 * @param
-                 */
-                static void setDirectory(const QString&);
-
-                /**
-                 * @brief
-                 *
-                 * @fn instance
-                 * @return const Configuration *
-                 */
-                static System* instance();
-
-            signals:
-                void started();
-                void stopped();
-
-            public slots:
-                /**
-                 * @brief Initializes the data services.
-                 * @fn Initialize
-                 */
-                static void stop();
-                /**
-                 * @brief Deinitializes the data services.
-                 * @fn Deinitialize
-                 */
-                static void start();
-        };
-    }
-}
+#define WNTRDATA_DEFAULT_LOCALE "en"
 
 #endif // __WNTRDATA_CONFIG_HPP__
 

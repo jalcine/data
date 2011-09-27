@@ -41,8 +41,8 @@ namespace Wintermute {
              */
             class System {
                 private:
-                    static QString m_storageDir; /**< Holds the location of the linguistic info. */
-                    static QString m_lcl; /**< Holds the current locale in use. */
+                    static QString s_storageDir; /**< Holds the location of the linguistic info. */
+                    static QString s_lcl; /**< Holds the current locale in use. */
 
                 public:
                     /**
@@ -65,7 +65,14 @@ namespace Wintermute {
                      * @fn getLocale
                      * @return string String with the current locale.
                      */
-                    static const inline QString locale() { return m_lcl; }
+                    static const inline QString locale() { return s_lcl; }
+
+                    /**
+                     * @brief
+                     *
+                     * @fn locales
+                     */
+                    static const QStringList locales();
 
                     /**
                      * @brief Gets linguistics directory.
@@ -73,8 +80,8 @@ namespace Wintermute {
                      * @fn getDirectory
                      * @return string
                      */
-                    static const inline QString directory() { return m_storageDir; }
-                    static void load ( const QString = m_storageDir, const QString = m_lcl );
+                    static const inline QString directory() { return s_storageDir; }
+                    static void load ( const QString = s_storageDir, const QString = s_lcl );
                     static void unload();
             };
         } // namespaces

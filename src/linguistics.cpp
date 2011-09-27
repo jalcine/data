@@ -20,6 +20,7 @@
  */
 
 #include <map>
+#include <algorithm>
 #include <string>
 #include <QDir>
 #include "config.hpp"
@@ -34,11 +35,12 @@ using std::string;
 namespace Wintermute {
     namespace Data {
         namespace Linguistics {
-            QString System::m_storageDir = QString(WNTRDATA_DATA_DIR) + "/" + QString(WNTRDATA_LING_DIR);
-            QString System::m_lcl = WNTRDATA_DEFAULT_LOCALE;
+            QString System::s_storageDir = QString(WNTRDATA_DATA_DIR) + "/" + QString(WNTRDATA_LING_DIR);
+            QString System::s_lcl = QString(WNTRDATA_DEFAULT_LOCALE);
 
             void System::load ( const QString storageDir, const QString locale ) {
                 qDebug() << "(data) [System] # ling # System loading...";
+                qDebug() << storageDir << locale;
 
                 System::setDirectory ( storageDir );
                 System::setLocale ( locale );
@@ -62,7 +64,7 @@ namespace Wintermute {
                 if ( p_lcl.isEmpty() )
                     return;
 
-                System::m_lcl = p_lcl;
+                System::s_lcl = p_lcl;
                 qDebug() << "(data) [System] # ling # Default locale:" << p_lcl;
             }
 
@@ -72,11 +74,19 @@ namespace Wintermute {
 
                 QDir* d = new QDir(p_configDir);
                 if (d->exists ()){
-                    System::m_storageDir = d->absolutePath();
+                    System::s_storageDir = d->absolutePath();
                     qDebug() << "(data) [System] # ling # Root dir:" << p_configDir;
                 }
             }
+
+            const QStringList System::locales() {
+                QDir l_dir(System::directory ());
+                const QString l_path = l_dir.absolutePath ();
+                l_dir.setFilter (QDir::Dirs | QDir::NoDotAndDotDot);
+                QStringList l_locale = l_dir.entryList ();
+                unique(l_locale.begin (),l_locale.end ());
+                return l_locale;
+            }
         } // namespaces
     }
-}
-// kate: indent-mode cstyle; space-indent on; indent-width 4;
+}// kate: indent-mode cstyle; space-indent on; indent-width 4;

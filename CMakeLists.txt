@@ -27,7 +27,7 @@ find_package(Qt4 4.4.3 COMPONENTS
 include("${QT_USE_FILE}")
 
 find_package(PkgConfig REQUIRED)
-pkg_search_module(Soprano REQUIRED soprano)
+pkg_search_module(SOPRANO REQUIRED soprano)
 ## update: The above should be removed and have the FindSoprano.cmake used instead at (http://websvn.kde.org/%2Acheckout%2A/trunk/KDE/kdelibs/cmake/modules/FindSoprano.cmake)
 enable_doxygen()
 
@@ -42,12 +42,12 @@ set(WNTRDATA_INCLUDE_DIR "${WINTER_INCLUDE_INSTALL_DIR}/data")
 set(WNTRDATA_INCLUDE_DIRS "${WNTRDATA_INCLUDE_DIR}"
     ${PYTHON_INCLUDE_DIR}
     ${QT_INCLUDE_DIR}
-    ${Soprano_INCLUDE_DIR}
+    ${SOPRANO_INCLUDE_DIR}
     ${Boost_INCLUDE_DIRS})
 set(WNTRDATA_CMAKE_DIR "${CMAKE_INSTALL_PREFIX}/share/cmake/WntrData")
 set(WNTRDATA_LIBRARIES "${PYTHON_LIBRARIES}"
     ${QT_LIBRARIES}
-    ${Soprano_LIBRARIES}
+    ${SOPRANO_LIBRARIES}
     ${Boost_LIBRARIES})
 
 include_directories(${WNTRDATA_INCLUDE_DIRS})

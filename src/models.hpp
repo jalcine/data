@@ -84,18 +84,18 @@ namespace Wintermute {
                  * its internal, workable type ("Aeon1#~" [en]).
                  *
                  * @note This class can be considered this a POD (<b>p</b>lain <b>o</b>l' <b>data format) of Wintermute.
-                 * @class Data models.hpp "include/wntr/data/models.hpp"
+                 * @class Data models.hpp "src/models.hpp"
                  * @see FlagMapping
                  */
                 class Data : public QObject {
                     friend QDBusArgument& operator<< (QDBusArgument&, const Data&);
                     friend const QDBusArgument& operator>> (const QDBusArgument&, Data&);
-                    friend QDebug operator<<(QDebug dbg, const Data*);
+                    friend QDebug operator<<(QDebug dbg, const Data&);
 
                     Q_OBJECT
-                    Q_PROPERTY(QString Locale READ locale)
+                    Q_PROPERTY(QString Locale READ locale WRITE setLocale)
                     Q_PROPERTY(QString Symbol READ symbol WRITE setSymbol)
-                    Q_PROPERTY(QString ID READ id)
+                    Q_PROPERTY(QString ID READ id WRITE setID)
                     Q_PROPERTY(FlagMapping Flags READ flags WRITE setFlags)
 
                     private:
@@ -190,11 +190,14 @@ namespace Wintermute {
                          */
                         void setFlags( const FlagMapping& );
 
+                        void setLocale(const QString&);
+                        void setID(const QString&);
+
                         /**
                          * @brief Determines if this Data is equivalent to a null Data object.
-                         * @fn isEmpty
+                         * @fn isNull
                          */
-                        const bool isEmpty() const;
+                        const bool isNull() const;
 
                         /**
                          * @brief Obtains the ID from a said QString.
@@ -230,7 +233,7 @@ namespace Wintermute {
                  * used instead of this) for storage purposes.
                  *
                  * @see LoadModel, SaveModel
-                 * @class Model models.hpp "include/wntr/data/models.hpp"
+                 * @class Model models.hpp "src/models.hpp"
                  */
                 class Model : public QObject {
                     Q_OBJECT
@@ -293,7 +296,7 @@ namespace Wintermute {
                  * use this base.
                  *
                  * @see DomSaveModel
-                 * @class SaveModel models.hpp "include/wntr/data/models.hpp"
+                 * @class SaveModel models.hpp "src/models.hpp"
                  */
                 class SaveModel : public Model {
                     Q_OBJECT
@@ -369,7 +372,7 @@ namespace Wintermute {
                  * way that the system is built; you'll never need to programatically
                  * use this base.
                  *
-                 * @class LoadModel models.hpp "include/wntr/data/models.hpp"
+                 * @class LoadModel models.hpp "src/models.hpp"
                  */
                 class LoadModel : public Model {
                     Q_OBJECT
@@ -440,7 +443,7 @@ namespace Wintermute {
                  *
                  * The Storage class is the <b>recommended</b> class to use for
                  *
-                 * @class Storage models.hpp "include/wntr/data/models.hpp"
+                 * @class Storage models.hpp "src/models.hpp"
                  */
                 class Storage : public virtual Backend {
                     public:
@@ -532,7 +535,7 @@ namespace Wintermute {
                 /**
                  * @brief
                  *
-                 * @class Cache models.hpp "include/wntr/data/models.hpp"
+                 * @class Cache models.hpp "src/models.hpp"
                  */
                 class Cache {
                     friend class Storage;
@@ -618,6 +621,28 @@ namespace Wintermute {
                         /**
                          * @brief
                          *
+                         * @fn countFlags
+                         */
+                        static const int countFlags();
+
+                        /**
+                         * @brief
+                         *
+                         * @fn countSymbols
+                         */
+                        static const int countSymbols();
+
+                        /**
+                         * @brief
+                         *
+                         * @fn allNodes
+                         * @param
+                         */
+                        static const QStringList allNodes(const QString& = Wintermute::Data::Linguistics::System::locale ());
+
+                        /**
+                         * @brief
+                         *
                          * @fn obtainFullSuffix
                          * @param
                          * @param
@@ -627,7 +652,7 @@ namespace Wintermute {
 
                 /**
                  * @brief
-                 * @class DomBackend models.hpp "include/wntr/data/models.hpp"
+                 * @class DomBackend models.hpp "src/models.hpp"
                  */
                 class DomBackend : public Backend {
                     public:
@@ -652,7 +677,7 @@ namespace Wintermute {
                 /**
                  * @brief
                  *
-                 * @class DomLoadModel models.hpp "include/wntr/data/models.hpp"
+                 * @class DomLoadModel models.hpp "src/models.hpp"
                  */
                 class DomLoadModel : public LoadModel, public DomBackend {
                     public:
@@ -702,7 +727,7 @@ namespace Wintermute {
                 /**
                  * @brief
                  *
-                 * @class DomSaveModel models.hpp "include/wntr/data/models.hpp"
+                 * @class DomSaveModel models.hpp "src/models.hpp"
                  */
                 class DomSaveModel : public SaveModel, public DomBackend {
                     public:
@@ -751,7 +776,7 @@ namespace Wintermute {
                 /**
                  * @brief
                  *
-                 * @class DomStorage models.hpp "include/wntr/data/models.hpp"
+                 * @class DomStorage models.hpp "src/models.hpp"
                  */
                 class DomStorage : public Storage {
                     private:
@@ -762,6 +787,14 @@ namespace Wintermute {
                          * @param
                          */
                         static const QString getPath(const Data&);
+
+                        /**
+                         * @brief
+                         *
+                         * @fn spawnDoc
+                         * @param
+                         */
+                        static QDomDocument* getSpawnDoc(const Data&);
                         /**
                          * @brief
                          *
@@ -850,10 +883,16 @@ namespace Wintermute {
                         /**
                          * @brief
                          *
-                         * @fn spawnDoc
-                         * @param
+                         * @fn countFlags
                          */
-                        QDomDocument* getSpawnDoc(const Data&) const;
+                        static const int countFlags();
+
+                        /**
+                         * @brief
+                         *
+                         * @fn countSymbols
+                         */
+                        static const int countSymbols();
                 };
 
             }
@@ -899,7 +938,7 @@ namespace Wintermute {
                  *
                  * @see Binding
                  * @see Cache
-                 * @class Bond models.hpp "include/wntr/data/models.hpp"
+                 * @class Bond models.hpp "src/models.hpp"
                  */
                 class Bond : public QObject {
                     Q_OBJECT
@@ -1006,7 +1045,7 @@ namespace Wintermute {
                 /**
                  * @brief
                  *
-                 * @class Chain models.hpp "include/wntr/data/models.hpp"
+                 * @class Chain models.hpp "src/models.hpp"
                  */
                 class Chain : public QObject {
                     friend QDBusArgument& operator<< (QDBusArgument&, const Chain&);
@@ -1098,7 +1137,7 @@ namespace Wintermute {
 
                 /**
                  * @brief
-                 * @class Model models.hpp "include/wntr/data/models.hpp"
+                 * @class Model models.hpp "src/models.hpp"
                  * @todo This should provide the practical methods of obtaining Bindings.
                  */
                 class Model : public QObject {
@@ -1152,7 +1191,7 @@ namespace Wintermute {
 
                 /**
                  * @brief
-                 * @class SaveModel models.hpp "include/wntr/data/models.hpp"
+                 * @class SaveModel models.hpp "src/models.hpp"
                  */
                 class SaveModel : public Model {
                     Q_OBJECT
@@ -1199,7 +1238,7 @@ namespace Wintermute {
 
                 /**
                  * @brief
-                 * @class LoadModel models.hpp "include/wntr/data/models.hpp"
+                 * @class LoadModel models.hpp "src/models.hpp"
                  */
                 class LoadModel : public Model {
                     Q_OBJECT
@@ -1251,7 +1290,7 @@ namespace Wintermute {
 
                 /**
                  * @brief
-                 * @class Storage models.hpp "include/wntr/data/models.hpp"
+                 * @class Storage models.hpp "src/models.hpp"
                  */
                 class Storage : public virtual Backend {
                     public:
@@ -1344,7 +1383,7 @@ namespace Wintermute {
                 /**
                  * @brief
                  *
-                 * @class DomBackend models.hpp "include/wntr/data/models.hpp"
+                 * @class DomBackend models.hpp "src/models.hpp"
                  */
                 class DomBackend {
                     public:
@@ -1382,7 +1421,7 @@ namespace Wintermute {
                 /**
                  * @brief
                  *
-                 * @class DomLoadModel models.hpp "include/wntr/data/models.hpp"
+                 * @class DomLoadModel models.hpp "src/models.hpp"
                  */
                 class DomLoadModel : public LoadModel, public DomBackend {
                     Q_OBJECT
@@ -1447,7 +1486,7 @@ namespace Wintermute {
                 /**
                  * @brief
                  *
-                 * @class DomSaveModel models.hpp "include/wntr/data/models.hpp"
+                 * @class DomSaveModel models.hpp "src/models.hpp"
                  */
                 class DomSaveModel : public SaveModel, public DomBackend {
                     Q_OBJECT
@@ -1497,7 +1536,7 @@ namespace Wintermute {
                 /**
                  * @brief
                  *
-                 * @class DomStorage models.hpp "include/wntr/data/models.hpp"
+                 * @class DomStorage models.hpp "src/models.hpp"
                  */
                 class DomStorage : public Storage {
                     public:
@@ -1592,7 +1631,7 @@ namespace Wintermute {
                 /**
                  * @brief
                  *
-                 * @class Cache models.hpp "include/wntr/data/models.hpp"
+                 * @class Cache models.hpp "src/models.hpp"
                  */
                 class Cache {
                     /**

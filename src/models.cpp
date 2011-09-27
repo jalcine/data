@@ -58,6 +58,10 @@ namespace Wintermute {
 
                 void Data::setSymbol(const QString& l_sym) { m_sym = l_sym; m_id = Data::idFromString (m_sym); }
 
+                void Data::setLocale(const QString& l_lcl) { m_lcl = l_lcl; }
+
+                void Data::setID (const QString &l_id) { m_id = l_id; }
+
                 void Data::setFlags(const FlagMapping& l_flg) {
                     m_flg = l_flg;
                     Q_ASSERT(m_flg == l_flg);
@@ -75,15 +79,16 @@ namespace Wintermute {
                     m_id = p_otherDt.m_id;
                 }
 
-                const bool Data::isEmpty () const { return Data::Null == *this; }
+                const bool Data::isNull () const { return Data::Null == *this; }
 
                 const QString Data::idFromString (const QString p_sym) { return QString::fromStdString (md5(p_sym.toLower ().toStdString ())); }
 
                 Data::~Data () { }
 
-                QDebug operator<<(QDebug dbg, const Data* p_nd) {
+                QDebug operator<<(QDebug dbg, const Data& p_nd) {
                     dbg.space ();
-                    dbg << p_nd->m_id << p_nd->m_lcl << p_nd->m_sym << p_nd->m_sym;
+                    dbg << "(Lexical::Data) ID:"<< p_nd.m_id << ", Locale:"<< p_nd.m_lcl
+                        << ", Symbol:"<< p_nd.m_sym << ", Flags:"<< p_nd.m_flg;
                     return dbg.space ();
                 }
 
@@ -251,13 +256,13 @@ namespace Wintermute {
                     cout << endl << endl;
                 }
 
-                QDomDocument* DomStorage::getSpawnDoc(const Data& p_dt) const {
-                    QDir d(System::directory ());
-                    const QString l_pth = d.absolutePath () + "/" + p_dt.locale () + "/node.xml";
+                QDomDocument* DomStorage::getSpawnDoc(const Data& p_dt) {
+                    QDir l_dir(System::directory ());
+                    const QString l_pth = l_dir.absolutePath () + "/" + p_dt.locale () + "/node.xml";
                     QDomDocument* l_spawnDom = new QDomDocument("Storage");
                     QFile* l_file = new QFile(l_pth);
 
-                    if (!l_file->exists ()){
+                    if (!l_file->exists () || !l_dir.exists ()){
                         qWarning() << "(data) [DomStorage] Can't find node cache for" << p_dt.locale ();
                         return NULL;
                     }
@@ -292,6 +297,37 @@ namespace Wintermute {
                     p_dt.setSymbol (l_sym); // The loading process probably overwrote the symbol.
                 }
 
+                const int DomStorage::countFlags() {
+                    const QStringList l_locales = System::locales();
+                    int l_cnt = 0;
+
+                    foreach (const QString l_locale, l_locales){
+                        qDebug() << l_locale;
+                        Data l_dt(QString::null,l_locale);
+                        const QStringList l_nodeIDs = Cache::allNodes(l_locale);
+                        foreach (const QString l_nodeID, l_nodeIDs){
+                            l_dt.setID(l_nodeID);
+                            Cache::read (l_dt);
+                            l_cnt += l_dt.flags ().count ();
+                        }
+                    }
+
+                    return l_cnt;
+                }
+
+                const int DomStorage::countSymbols() {
+                    const QStringList l_locales = System::locales();
+                    int l_cnt = 0;
+
+                    foreach (const QString l_locale, l_locales){
+                        qDebug() << l_locale;
+                        const QStringList l_nodeIDs = Cache::allNodes(l_locale);
+                        l_cnt += l_nodeIDs.count ();
+                    }
+
+                    return l_cnt;
+                }
+
                 DomStorage::~DomStorage() { }
 
                 DomLoadModel::DomLoadModel(QDomElement* p_ele) : DomBackend(p_ele) { }
@@ -309,20 +345,18 @@ namespace Wintermute {
 
                 bool DomLoadModel::loadTo (Data &p_dt) const {
                     if (this->DomBackend::m_ele == NULL || this->DomBackend::m_ele->isNull ()){
-                        qWarning() << "(data) [DomLoadModel] Backend's empty.";
+                        qCritical () << "(data) [DomLoadModel] Backend's empty.";
                         return false;
                     }
 
                     FlagMapping l_mp;
                     QDomNodeList l_ndlst = this->DomBackend::m_ele->elementsByTagName ("Flag");
 
-                    for (int i = 0; i < l_ndlst.count (); i++){
-                        QDomElement l_elem = l_ndlst.at (i).toElement ();
-                        l_mp.insert (l_elem.attribute ("guid"),l_elem.attribute ("link"));
-                    }
-
-                    if (l_mp.isEmpty () || l_ndlst.isEmpty ()){
-                        //qWarning() << "(data) [DomLoadModel] No flags loaded for" << p_dt.symbol ();
+                    if (!(l_mp.isEmpty () || l_ndlst.isEmpty ())) {
+                        for (int i = 0; i < l_ndlst.count (); i++){
+                            QDomElement l_elem = l_ndlst.at (i).toElement ();
+                            l_mp.insert (l_elem.attribute ("guid"),l_elem.attribute ("link"));
+                        }
                     }
 
                     p_dt.setSymbol(this->DomBackend::m_ele->attribute ("symbol").toLower());
@@ -389,6 +423,16 @@ namespace Wintermute {
                         DomStorage *l_domStr = new DomStorage;
                         l_domStr->saveFrom (p_dt);
                     }
+                }
+
+                // Note that Wintermute considers its local data to be stored to disk.
+                // Currently, DomStorage represents the local nodes.
+                const int Cache::countFlags(){
+                    return DomStorage::countFlags();
+                }
+
+                const int Cache::countSymbols(){
+                    return DomStorage::countSymbols();
                 }
 
                 const bool Cache::exists(const Data& p_dt) {
@@ -464,15 +508,22 @@ namespace Wintermute {
                     return NULL;
                 }
 
+                const QStringList Cache::allNodes(const QString& p_lcl){
+                    QDir l_dir(Wintermute::Data::Linguistics::System::directory () + "/" + p_lcl + "/node");
+                    l_dir.setFilter (QDir::Files);
+                    l_dir.setNameFilters (QString("*.node").split(","));
+                    return l_dir.entryList ().replaceInStrings (".node","");
+                }
+
                 void Cache::generate() {
-                    qDebug() << "(data) [Cache] Dumping..";
+                    qDebug() << "(data) [Cache] Dumping all data storages...";
 
                     foreach (Storage* l_str, Cache::s_stores){
                         qDebug() << "(data) [Cache] Dumping" << l_str->type ();
                         l_str->generate();
                     }
 
-                    qDebug() << "(data) [Cache] Dumped.";
+                    qDebug() << "(data) [Cache] Dumped data.";
                 }
 
                 const QDBusArgument& operator>> (const QDBusArgument &p_arg, Data& p_dt) {
@@ -519,14 +570,14 @@ namespace Wintermute {
                 }
 
                 const QString Bond::with() const {
-                    return m_props.value ("with");
+                    return attribute("with");
                 }
 
                 const StringMap Bond::attributes() const {
                     return m_props;
                 }
 
-                /// @todo This might be the crowning jewel of the linking system.
+                /// @note This might be the crowning jewel of the linking system.
                 const double Bond::matches(const QString& p_query, const QString& p_regex){
                     const QStringList l_regexList = p_regex.split (",");
                     QList<double> l_rslts;
@@ -549,8 +600,8 @@ namespace Wintermute {
 
                     qSort(l_rslts.begin (),l_rslts.end ());
 
-                    if (!l_rslts.empty () && !p_regex.isEmpty ())
-                        return l_rslts.back ();
+                    if (!l_rslts.isEmpty () && !p_regex.isEmpty ())
+                        return l_rslts.last ();
                     else
                         return 0.0;
                 }
@@ -764,7 +815,7 @@ namespace Wintermute {
                             const QString l_prefix = p_prefix + l_part;
                             const double l_match = Bond::matches (p_chn.type (),l_prefix);
                             if (l_match == 1.0){
-                                qDebug() << "findElement: " << p_chn.type () << l_prefix << l_match;
+                                qDebug() << "(data) [DomStorage] findElement: " << p_chn.type () << l_prefix << l_match;
                                 return p_elem;
                             }
                         }
@@ -886,6 +937,7 @@ namespace Wintermute {
 
                     return NULL;
                 }
+
                 QDBusArgument& operator<< (QDBusArgument &p_arg, const Bond& p_bnd) {
                     p_arg.beginStructure();
                     p_arg << p_bnd.m_props;
@@ -917,5 +969,4 @@ namespace Wintermute {
         }
     }
 }
-
 // kate: indent-mode cstyle; space-indent on; indent-width 4;

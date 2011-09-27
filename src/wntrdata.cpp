@@ -18,20 +18,14 @@
  * @endlegalese
  */
 
-#include <boost/python.hpp>
-#include "config.hpp"
-#include "wntrdata.hpp"
 #include <QtDebug>
-
-using namespace boost::python;
-using namespace Wintermute::Data::Linguistics;
+#include "wntrdata.hpp"
 
 namespace Wintermute {
     namespace Data {
         System* System::s_config = NULL;
 
-        System::System() : m_dir(WNTRDATA_DATA_DIR) {
-        }
+        System::System() : m_dir(WNTRDATA_DATA_DIR) { }
 
         void System::start ( ) {
             Wintermute::Data::Linguistics::System::load ( System::directory() + QString ( "/" ) + QString ( WNTRDATA_LING_DIR ) );
@@ -56,9 +50,6 @@ namespace Wintermute {
         System* System::instance () {
             if (!s_config) s_config = new System;
             return s_config;
-        }
-
-        BOOST_PYTHON_MODULE ( wntrdata ) {
         }
     }
 }

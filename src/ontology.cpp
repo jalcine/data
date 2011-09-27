@@ -45,6 +45,8 @@ namespace Wintermute {
                 qDebug() << "(data) [System] # ontology # Unloaded.";
             }
 
+            const int Resource::countConcepts () { return 0; }
+
             Repository::Repository(const QString &p_str) : m_repo(p_str) { load(); }
 
             Repository::Repository(const Repository &p_repo) : m_repo(p_repo.m_repo), m_model(p_repo.m_model) { }
@@ -54,6 +56,8 @@ namespace Wintermute {
                 //Repository::s_repos.insert(&p_repoName,l_repo);
                 return l_repo;
             }
+
+            const int Repository::countOntologies () { return 0; }
 
             const QString Repository::getPath() const {
                 return QUrl::fromLocalFile (Data::System::directory () + QString("/")

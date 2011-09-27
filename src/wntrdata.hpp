@@ -57,5 +57,74 @@
 #include "models.hpp"
 #include "adaptors.hpp"
 
+namespace Wintermute {
+    namespace Data {
+        /**
+         * @brief Manages the data location representing WntrData.
+         * @class Configuration config.hpp "config.hpp"
+         */
+        class System : public QObject {
+            friend class SystemAdaptor;
+            Q_OBJECT
+            Q_DISABLE_COPY(System)
+
+            private:
+                static System* s_config;
+                QString m_dir;
+                System();
+
+            public:
+                /**
+                 * @brief Obtains the directory that of which the data files are stored.
+                 * @fn getDirectory
+                 * @return const QString
+                 */
+                static const QString directory();
+
+                /**
+                 * @brief Changes the working directory.
+                 * @fn setDirectory
+                 * @param const QString
+                 */
+                static void setDirectory(const QString&);
+
+                /**
+                 * @brief Obtains an instance of the data system object.
+                 * @fn instance
+                 * @return const Configuration
+                 */
+                static System* instance();
+
+            signals:
+                /**
+                 * @brief
+                 *
+                 * @fn started
+                 */
+                void started();
+
+                /**
+                 * @brief
+                 *
+                 * @fn stopped
+                 */
+                void stopped();
+
+            public slots:
+                /**
+                 * @brief Initializes the data services.
+                 * @fn Initialize
+                 */
+                static void stop();
+
+                /**
+                 * @brief Deinitializes the data services.
+                 * @fn Deinitialize
+                 */
+                static void start();
+        };
+    }
+}
+
 #endif /* __WNTRDATA_HPP__ */
 // kate: indent-mode cstyle; space-indent on; indent-width 4;

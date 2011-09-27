@@ -1,7 +1,7 @@
 /**
  * @file    adaptors.cpp
  * @author  Wintermute Developers <wintermute-devel@lists.launchpad.net>
- * @created 9/6/2011
+ *  
  *
  *
  *
@@ -56,7 +56,7 @@ namespace Wintermute {
 
         NodeAdaptor::NodeAdaptor() : Adaptor(System::instance()) { }
 
-        void NodeAdaptor::registerBackend (const Lexical::Backend &p_bcknd, const QDBusMessage& p_msg) {
+        void NodeAdaptor::registerBackend (const QDBusMessage& p_msg) {
             //const Lexical::Storage* l_str = Lexical::Cache::addStorage (*p_bcknd);
             //emit nodeBackendRegistered (l_str->type ());
         }
@@ -77,8 +77,13 @@ namespace Wintermute {
             Lexical::Cache::pseudo (p_data);
         }
 
-        const bool NodeAdaptor::exists(const QDBusArgument &p_data, const QDBusMessage& p_msg) const {
-            const bool l_rslt = Lexical::Cache::exists (p_data.asVariant ().value<Lexical::Data>());
+        //const bool NodeAdaptor::exists(const QDBusArgument &p_data, const QDBusMessage& p_msg) const {
+        const bool NodeAdaptor::exists(const QDBusMessage& p_msg, const Lexical::Data& p_dt) const {
+            const QDBusArgument l_argDt = p_msg.arguments().at(0).value<QDBusArgument>();
+            Lexical::Data l_dt;
+            l_argDt >> l_dt;
+            qDebug() << l_dt;
+            const bool l_rslt = Lexical::Cache::exists (l_dt);
             QDBusConnection::sessionBus().send (p_msg.createReply (l_rslt));
         }
 
