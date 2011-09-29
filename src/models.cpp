@@ -419,9 +419,9 @@ namespace Wintermute {
                     if (l_fdStr)
                         l_fdStr->saveFrom (p_dt);
                     else {
-                        // save this locally. We consider the DOM storage to be local.
                         DomStorage *l_domStr = new DomStorage;
                         l_domStr->saveFrom (p_dt);
+                        delete l_domStr;
                     }
                 }
 
@@ -707,6 +707,7 @@ namespace Wintermute {
                         }
 
                         p_bndVtr << *l_bnd;
+                        delete l_bnd;
                     }
 
                     if (!p_elem.parentNode ().isNull ())

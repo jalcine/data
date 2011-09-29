@@ -1,7 +1,7 @@
 /**
  * @file    adaptors.cpp
  * @author  Wintermute Developers <wintermute-devel@lists.launchpad.net>
- *  
+ *
  *
  *
  *
