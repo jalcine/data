@@ -82,8 +82,8 @@ configure_file("${PROJECT_SOURCE_DIR}/cmake/WntrDataConfigVersion.cmake.in"
 configure_file("${PROJECT_SOURCE_DIR}/config.hpp.in"
     "${PROJECT_SOURCE_DIR}/src/config.hpp" @ONLY)
 
-configure_file("${PROJECT_SOURCE_DIR}/wntrdata.pc.in"
-    "${PROJECT_BINARY_DIR}/InstallFiles/wntrdata.pc" @ONLY)
+configure_file("${PROJECT_SOURCE_DIR}/spec.in"
+    "${PROJECT_BINARY_DIR}/InstallFiles/wntrdata.spec" @ONLY)
 
 configure_file("${PROJECT_SOURCE_DIR}/spec.in"
     "${PROJECT_BINARY_DIR}/InstallFiles/wntrdata.spec" @ONLY)
@@ -112,8 +112,8 @@ install(FILES ${CMAKE_MODULES}
 install(FILES "${PROJECT_BINARY_DIR}/InstallFiles/wntrdata.pc"
     DESTINATION "${WINTER_LIB_INSTALL_DIR}/pkgconfig/")
 
-install(FILES "${PROJECT_BINARY_DIR}/InstallFiles/wntrdata.pc"
-    DESTINATION "${WINTER_PLUGINSPEC_INSTALL_DIR}/wntrdata.pc")
+install(FILES "${PROJECT_BINARY_DIR}/InstallFiles/wntrdata.spec"
+    DESTINATION "${WINTER_PLUGINSPEC_INSTALL_DIR}/wntrdata.spec")
 
 install(DIRECTORY "data/${WNTRDATA_LING_DIR}" "data/${WNTRDATA_ONTO_DIR}"
     DESTINATION "${WINTER_DATA_INSTALL_DIR}")
