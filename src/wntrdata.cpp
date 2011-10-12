@@ -51,6 +51,28 @@ namespace Wintermute {
             if (!s_config) s_config = new System;
             return s_config;
         }
+
+        void Plugin::initialize () const {
+            Data::Linguistics::System::setLocale ( Core::arguments ()->value ("locale").toString () );
+ 
+            connect(Wintermute::Core::instance (),SIGNAL(started()),Wintermute::Data::System::instance (),SLOT(start()));
+            connect(Wintermute::Core::instance (),SIGNAL(stopped()),Wintermute::Data::System::instance (),SLOT(stop()));
+ 
+            Data::SystemAdaptor* l_adpt = new Data::SystemAdaptor;
+            Data::NodeAdaptor* l_adpt2 = new Data::NodeAdaptor;
+            Data::RuleAdaptor* l_adpt3 = new Data::RuleAdaptor;
+ 
+            Wintermute::IPC::System::registerObject ("/System" , l_adpt);
+            Wintermute::IPC::System::registerObject ("/Nodes"  , l_adpt2);
+            Wintermute::IPC::System::registerObject ("/Rules"  , l_adpt3);
+        }
+
+        void Plugin::deinitialize () const {
+        }
+
+        QObject* Plugin::instance () const { return System::instance(); }
     }
 }
+
+Q_EXPORT_PLUGIN2(WntrData, Wintermute::Data::Plugin)
 // kate: indent-mode cstyle; space-indent on; indent-width 4;

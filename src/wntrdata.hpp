@@ -56,9 +56,16 @@
 #include "linguistics.hpp"
 #include "models.hpp"
 #include "adaptors.hpp"
+#include <wntr/plugins.hpp>
+#include <QtPlugin>
+
+using Wintermute::Plugins::AbstractPlugin;
 
 namespace Wintermute {
     namespace Data {
+        struct Plugin;
+        struct System;
+
         /**
          * @brief Manages the data location representing WntrData.
          * @class Configuration config.hpp "config.hpp"
@@ -122,6 +129,18 @@ namespace Wintermute {
                  * @fn Deinitialize
                  */
                 static void start();
+        };
+
+       class Plugin : public AbstractPlugin {
+            Q_OBJECT
+            public:
+                Plugin() : AbstractPlugin() { }
+                ~Plugin() { }
+                Plugin(Plugin const &k) : AbstractPlugin(k) { }
+
+                virtual void initialize() const;
+                virtual void deinitialize() const;
+                virtual QObject* instance() const;
         };
     }
 }
