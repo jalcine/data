@@ -1,23 +1,23 @@
 project(WntrData)
 cmake_minimum_required(VERSION 2.8)
 
+set(WINTERMUTE_IS_PLUGIN ON)
 set(WNTRDATA_MAJOR_VERSION 0)
 set(WNTRDATA_MINOR_VERSION 0)
 set(WNTRDATA_MICRO_VERSION 1)
+set(WNTRDATA_UUID "a9b6b020-f4f2-11e0-be50-0800200c9a66")
 set(WNTRDATA_VERSION
     ${WNTRDATA_MAJOR_VERSION}.${WNTRDATA_MINOR_VERSION}${WNTRDATA_MICRO_VERSION})
-
-include(WintermuteMacros)
-include(WintermuteDefaults)
 
 ## Custom modules
 list(APPEND CMAKE_MODULE_PATH "cmake/Modules")
 
 ## Packages
-find_package(Boost 1.40 COMPONENTS
+find_package(Wintermute 0.01 REQUIRED)
+find_package(PythonLibs 2.7 REQUIRED)
+find_package(Boost 1.42 COMPONENTS
     python
     REQUIRED)
-find_package(PythonLibs REQUIRED)
 find_package(Qt4 4.4.3 COMPONENTS
     QtCore
     QtDBus
@@ -25,6 +25,8 @@ find_package(Qt4 4.4.3 COMPONENTS
     REQUIRED)
 
 include("${QT_USE_FILE}")
+include(WintermuteMacros)
+include(WintermuteDefaults)
 
 find_package(PkgConfig REQUIRED)
 pkg_search_module(SOPRANO REQUIRED soprano)
@@ -38,9 +40,10 @@ set(PROJECT_LABEL "Wintermute Database")
 set(WNTRDATA_DATA_DIR "${WINTER_DATA_INSTALL_DIR}" CACHE PATH "The directory where Wintermute's data files will be installed.")
 set(WNTRDATA_LING_DIR "ling" CACHE PATH "The name of the folder that contains the linguistics information. There should be no trailing or leading slashes.")
 set(WNTRDATA_ONTO_DIR "onto" CACHE PATH "The name of the folder that contains the ontology information. There should be no trailing or leading slashes.")
-set(WNTRDATA_INCLUDE_DIR "${WINTER_INCLUDE_INSTALL_DIR}/data")
+set(WNTRDATA_INCLUDE_DIR "${WINTER_PLUGIN_INCLUDE_INSTALL_DIR}/data")
 set(WNTRDATA_INCLUDE_DIRS "${WNTRDATA_INCLUDE_DIR}"
     ${PYTHON_INCLUDE_DIR}
+    ${WINTERMUTE_INCLUDE_DIRS}
     ${QT_INCLUDE_DIR}
     ${SOPRANO_INCLUDE_DIR}
     ${Boost_INCLUDE_DIRS})
@@ -82,6 +85,9 @@ configure_file("${PROJECT_SOURCE_DIR}/config.hpp.in"
 configure_file("${PROJECT_SOURCE_DIR}/wntrdata.pc.in"
     "${PROJECT_BINARY_DIR}/InstallFiles/wntrdata.pc" @ONLY)
 
+configure_file("${PROJECT_SOURCE_DIR}/spec.in"
+    "${PROJECT_BINARY_DIR}/InstallFiles/wntrdata.spec" @ONLY)
+
 ## Installs
 install(TARGETS wntrdata
     EXPORT WntrDataLibraryDepends
@@ -105,6 +111,9 @@ install(FILES ${CMAKE_MODULES}
 
 install(FILES "${PROJECT_BINARY_DIR}/InstallFiles/wntrdata.pc"
     DESTINATION "${WINTER_LIB_INSTALL_DIR}/pkgconfig/")
+
+install(FILES "${PROJECT_BINARY_DIR}/InstallFiles/wntrdata.pc"
+    DESTINATION "${WINTER_PLUGINSPEC_INSTALL_DIR}/wntrdata.pc")
 
 install(DIRECTORY "data/${WNTRDATA_LING_DIR}" "data/${WNTRDATA_ONTO_DIR}"
     DESTINATION "${WINTER_DATA_INSTALL_DIR}")
