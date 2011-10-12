@@ -1,5 +1,5 @@
 /**
- * @author Jacky Alcine <jacky.alcine@thesii.org>
+ * @author Wintermute Developers <wintermute-devel@lists.launchpad.net>
  * @legalese
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -18,40 +18,64 @@
  * @endlegalese
  */
 
-#include <boost/python.hpp>
-#include "config.hpp"
-#include "wntrdata.hpp"
+#include <QtDebug>
+#include <wntr/core.hpp>
+#include <wntr/ipc.hpp>
 
-using namespace boost::python;
-using namespace Wintermute::Data::Linguistics;
+#include "wntrdata.hpp"
 
 namespace Wintermute {
     namespace Data {
-        void Configuration::Initialize ( void ) {
-            Wintermute::Data::Linguistics::Configuration::Initialize ( Configuration::getDirectory() + string ( "/" ) + string ( WNTRDATA_LING_DIR ) );
-            Wintermute::Data::Ontology::Configuration::Initialize();
+        System* System::s_config = NULL;
+
+        System::System() : m_dir(WNTRDATA_DATA_DIR) { }
+
+        void System::start ( ) {
+            Wintermute::Data::Linguistics::System::load ( System::directory() + QString ( "/" ) + QString ( WNTRDATA_LING_DIR ) );
+            Wintermute::Data::Ontology::System::load();
+            emit s_config->started();
         }
 
-        void Configuration::Deinitialize ( void ) {
-            Wintermute::Data::Linguistics::Configuration::Deinitialize();
-            Wintermute::Data::Ontology::Configuration::Deinitialize();
+        void System::stop ( ) {
+            Wintermute::Data::Ontology::System::unload();
+            Wintermute::Data::Linguistics::System::unload();
+            emit s_config->stopped();
         }
 
-        BOOST_PYTHON_MODULE ( wntrdata ) {
-            class_<Configuration> ( "Configuration",no_init )
-            .def ( "Initialize", Configuration::Initialize )
-            .def ( "Deinitialize", Configuration::Deinitialize );
+        const QString System::directory () { return s_config->m_dir; }
 
-            //class_<Model, boost::noncopyable>("Model",no_init);
-
-            /*class_<SaveModel, boost::noncopyable, bases<Model> >("SaveModel",no_init)
-                    .def("save",&SaveModel::save)
-            ;
-
-            class_<LoadModel, boost::noncopyable, bases<Model> >("LoadModel",no_init)
-                    .def("load",&LoadModel::load)
-            ;*/
+        void System::setDirectory(const QString& p_dir) {
+            stop();
+            s_config->m_dir = p_dir;
+            start();
         }
+
+        System* System::instance () {
+            if (!s_config) s_config = new System;
+            return s_config;
+        }
+
+        void Plugin::initialize () const {
+            Data::Linguistics::System::setLocale ( Core::arguments ()->value ("locale").toString () );
+ 
+            connect(Wintermute::Core::instance (),SIGNAL(started()),Wintermute::Data::System::instance (),SLOT(start()));
+            connect(Wintermute::Core::instance (),SIGNAL(stopped()),Wintermute::Data::System::instance (),SLOT(stop()));
+ 
+            Data::SystemAdaptor* l_adpt = new Data::SystemAdaptor;
+            Data::NodeAdaptor* l_adpt2 = new Data::NodeAdaptor;
+            Data::RuleAdaptor* l_adpt3 = new Data::RuleAdaptor;
+ 
+            Wintermute::IPC::System::registerObject ("/System" , l_adpt);
+            Wintermute::IPC::System::registerObject ("/Nodes"  , l_adpt2);
+            Wintermute::IPC::System::registerObject ("/Rules"  , l_adpt3);
+        }
+
+        void Plugin::deinitialize () const {
+        }
+
+        QObject* Plugin::instance () const { return System::instance(); }
     }
 }
+
+Q_EXPORT_PLUGIN2(WntrData, Wintermute::Data::Plugin)
 // kate: indent-mode cstyle; space-indent on; indent-width 4;

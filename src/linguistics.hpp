@@ -32,17 +32,17 @@ using std::string;
 namespace Wintermute {
     namespace Data {
         namespace Linguistics {
-            struct Configuration;
+            struct System;
 
             /**
              * @brief An abstract static class representing the current configuration of the linguistics data.
              * All configuration variables and their access methods specific for linguistic part of WntrData
              * are defined here.
              */
-            class Configuration {
+            class System {
                 private:
-                    static string _storageDir; /**< Holds the location of the linguistic info. */
-                    static string _locale; /**< Holds the current locale in use. */
+                    static QString s_storageDir; /**< Holds the location of the linguistic info. */
+                    static QString s_lcl; /**< Holds the current locale in use. */
 
                 public:
                     /**
@@ -50,14 +50,14 @@ namespace Wintermute {
                      * Sets the default locale to be used as the standard locale.
                      * @param locale The locale to set.
                      */
-                    static void setLocale ( const string );
+                    static void setLocale ( const QString );
 
                     /**
                      * @brief Changes root directory.
                      * Sets the root directory to find data for linguistics from.
                      * @param root The root directory.
                      */
-                    static void setDirectory ( const string );
+                    static void setDirectory ( const QString );
 
                     /**
                      * @brief Gets current locale used.
@@ -65,7 +65,14 @@ namespace Wintermute {
                      * @fn getLocale
                      * @return string String with the current locale.
                      */
-                    static const inline string locale() { return _locale; }
+                    static const inline QString locale() { return s_lcl; }
+
+                    /**
+                     * @brief
+                     *
+                     * @fn locales
+                     */
+                    static const QStringList locales();
 
                     /**
                      * @brief Gets linguistics directory.
@@ -73,22 +80,9 @@ namespace Wintermute {
                      * @fn getDirectory
                      * @return string
                      */
-                    static const inline string directory() { return _storageDir; }
-                    /**
-                     * @brief Initialization.
-                     * Initializes the system by running prerequisite code.
-                     * @fn Initialize
-                     * @param storageDir The directory where storage data are located.
-                     * @param locale The locale that should be initially loaded.
-                     */
-                    static void Initialize ( const string = _storageDir, const string = locale ());
-
-                    /**
-                     * @brief Deinitialization.
-                     * Deinitializes the system by freeing up resources used by the system.
-                     * @fn Deinitialize
-                     */
-                    static void Deinitialize();
+                    static const inline QString directory() { return s_storageDir; }
+                    static void load ( const QString = s_storageDir, const QString = s_lcl );
+                    static void unload();
             };
         } // namespaces
     }

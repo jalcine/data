@@ -16,7 +16,7 @@
  * Boston, MA 02111-1307, USA.
  * @endlegalese
  * @file ontology.cpp
- * @author Jacky Alcine
+ * @author Wintermute Developers <wintermute-devel@lists.launchpad.net>
  * @date March 29, 2011, 2:25 PM
  * @todo Determine a means of using Soprano to interpret RDF/XML (OWL) files into semantic information.
  * @todo Determine how and where UUIDs will be obtained. (Boost::UUID anyone? :])
@@ -30,18 +30,22 @@
 #include <Soprano/Soprano>
 #include <boost/progress.hpp>
 
+using namespace Soprano;
+
 namespace Wintermute {
     namespace Data {
         namespace Ontology {
 
-            void Configuration::Initialize() {
-                const Repository* l_repo = Repository::obtainRepository("COSMO");
-                qDebug() << "(data) [Ontology::Configuration] Loaded.";
+            void System::load() {
+                //const Repository* l_repo = Repository::obtainRepository("COSMO");
+                qDebug() << "(data) [System] # ontology # Loaded.";
             }
 
-            void Configuration::Deinitialize() {
-                qDebug() << "(data) [Ontology::Configuration] Unloaded.";
+            void System::unload() {
+                qDebug() << "(data) [System] # ontology # Unloaded.";
             }
+
+            const int Resource::countConcepts () { return 0; }
 
             Repository::Repository(const QString &p_str) : m_repo(p_str) { load(); }
 
@@ -53,27 +57,30 @@ namespace Wintermute {
                 return l_repo;
             }
 
+            const int Repository::countOntologies () { return 0; }
+
             const QString Repository::getPath() const {
-                return QString::fromStdString (Data::Configuration::getDirectory ()) + QString("/")
-                        + QString(WNTRDATA_ONTO_DIR) + QString("/") + m_repo + QString(".owl");
+                return QUrl::fromLocalFile (Data::System::directory () + QString("/")
+                        + QString(WNTRDATA_ONTO_DIR) + QString("/") + m_repo + QString(".owl")).toString ();
             }
 
             void Repository::load(const QString& p_repoName) const {
+                qDebug() << "(data) [Repository] Loading ontology" << m_repo << "...";
                 if (!p_repoName.isEmpty ())
                     m_repo = p_repoName;
 
                 m_model = Soprano::createModel ();
-                const QString l_url = getPath();
-                const Soprano::Parser* l_rdfPrsr = Soprano::PluginManager::instance()->discoverParserForSerialization( Soprano::SerializationRdfXml );
-                Soprano::StatementIterator l_itr = l_rdfPrsr->parseFile( l_url , l_url, Soprano::SerializationRdfXml );
-                QList<Soprano::Statement> l_stats = l_itr.allStatements ();
-
-                m_model->addStatements (l_stats);
+                const QUrl l_url = getPath();
+                const Parser* l_rdfPrsr = PluginManager::instance()->discoverParserForSerialization( SerializationRdfXml );
+                StatementIterator l_itr = l_rdfPrsr->parseFile( l_url.toLocalFile (), l_url, SerializationRdfXml );
+                m_model->addStatements (l_itr.allStatements ());
+                qDebug() << "(data) [Repository] Loaded ontology" << m_repo << "with" << m_model->listStatements ().allStatements ().size () << "statements.";
                 emit loaded();
-                qDebug() << "(data) [Repository] Loaded ontology" << m_repo << "with" << l_stats.size () << "statements.";
-            }
+                this->obtainResource ("Boy");
+           }
 
-            const Resource* Repository::obtainResource(const QString& p_resource) const {
+            /// @todo Figure out how to use SPARQL to obtain a resource. I (Jacky A.) am having no luck whatsoever.
+            const Resource* Repository::obtainResource(const QString& p_res) const {
                 return NULL;
             }
 
@@ -82,7 +89,7 @@ namespace Wintermute {
                 return l_repo->obtainResource(p_resource);
             }
 
-            Repository::~Repository() { qDebug() << "Destroying repository" << m_repo << "."; }
+            Repository::~Repository() { qDebug() << "Destroyed repository" << m_repo << "."; }
         }
     }
 }

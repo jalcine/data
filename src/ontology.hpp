@@ -1,6 +1,6 @@
 /**
  * @file ontology.hpp
- * @author Jacky Alcine
+ * @author Wintermute Developers <wintermute-devel@lists.launchpad.net>
  * @date March 29, 2011, 2:25 PM
  * @namespace Wintermute::Data::Ontology
  * @legalese
@@ -38,20 +38,18 @@ using std::string;
 namespace Wintermute {
     namespace Data {
         namespace Ontology {
-            struct Configuration;
+            struct System;
             struct Repository;
             struct Resource;
-            struct Property;
-            struct Statement;
 
             /**
              * @brief Configuration class for the ontology section.
              *
              *
              *
-             * @class Configuration ontology.hpp "include/wntr/data/ontology.hpp"
+             * @class Configuration ontology.hpp "src/ontology.hpp"
              */
-            class Configuration : public QObject {
+            class System : public QObject {
                 Q_OBJECT
 
                 public:
@@ -60,13 +58,13 @@ namespace Wintermute {
                      * Runs all of the necessary initialziation code to get the ontology system on its toes.
                      * @fn Initialize
                      */
-                    Q_INVOKABLE static void Initialize();
+                    Q_INVOKABLE static void load();
                     /**
                      * @brief Deinitializes the ontology system/
                      * Runs all of the necessary deinitialization code to have the ontology system be safely shut down.
                      * @fn Deinitialize
                      */
-                    Q_INVOKABLE static void Deinitialize();
+                    Q_INVOKABLE static void unload();
             };
 
             /**
@@ -87,7 +85,7 @@ namespace Wintermute {
              * This class provides a means of convience over RDF-XML (mainly SPARQL and RDFQL) so that
              * properties of resources can be properly queried.
              *
-             * @class Resource ontology.hpp "include/wntr/data/ontology.hpp"
+             * @class Resource ontology.hpp "src/ontology.hpp"
              */
             class Resource : public QObject {
                 public:
@@ -126,6 +124,45 @@ namespace Wintermute {
                      */
                     virtual ~Resource();
 
+                    /**
+                     * @brief
+                     *
+                     * @fn object
+                     * @param
+                     */
+                    const Resource* object(const QString& ) const;
+
+                    /**
+                     * @brief
+                     *
+                     * @fn object
+                     * @param
+                     */
+                    const Resource* object(const Resource& ) const;
+
+                    /**
+                     * @brief
+                     *
+                     * @fn setObject
+                     * @param
+                     */
+                    void setObject(const QString& );
+
+                    /**
+                     * @brief
+                     *
+                     * @fn setObject
+                     * @param
+                     */
+                    void setObject(const Resource& );
+
+                    /**
+                     * @brief
+                     *
+                     * @fn countConcepts
+                     */
+                    static const int countConcepts();
+
                 private:
                     const Repository* m_repo;
                     Soprano::Node m_node;
@@ -138,7 +175,9 @@ namespace Wintermute {
              * Repostiories represent the entire encompassing set of Resources
              * in their native format (that being RDF-XML, for now).
              *
-             * @class Repository ontology.hpp "include/wntr/data/ontology.hpp"
+             * @todo Obtain the specified Resource from the internal ontology when requested.
+             *
+             * @class Repository ontology.hpp "src/ontology.hpp"
              */
             class Repository : public QObject {
                 Q_OBJECT
@@ -154,6 +193,7 @@ namespace Wintermute {
 
                     static const Repository* obtainRepository(const QString&);
                     static const Resource* obtainResource(const QString&, const QString&);
+                    static const int countOntologies();
 
                 private:
                     void load(const QString& = "") const;

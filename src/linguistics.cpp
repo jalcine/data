@@ -20,6 +20,7 @@
  */
 
 #include <map>
+#include <algorithm>
 #include <string>
 #include <QDir>
 #include "config.hpp"
@@ -34,44 +35,58 @@ using std::string;
 namespace Wintermute {
     namespace Data {
         namespace Linguistics {
-            string Configuration::_storageDir = string( WNTRDATA_DATA_DIR ) + "/" + string ( WNTRDATA_LING_DIR );
-            string Configuration::_locale = WNTRDATA_DEFAULT_LOCALE;
+            QString System::s_storageDir = QString(WNTRDATA_DATA_DIR) + "/" + QString(WNTRDATA_LING_DIR);
+            QString System::s_lcl = QString(WNTRDATA_DEFAULT_LOCALE);
 
-            void Configuration::Initialize ( const string storageDir, const string locale ) {
-                Configuration::setDirectory ( storageDir );
-                Configuration::setLocale ( locale );
+            void System::load ( const QString storageDir, const QString locale ) {
+                qDebug() << "(data) [System] # ling # System loading...";
+                qDebug() << storageDir << locale;
+
+                System::setDirectory ( storageDir );
+                System::setLocale ( locale );
 
                 Lexical::Cache::addStorage ((new Lexical::DomStorage));
                 Rules::Cache::addStorage ((new Rules::DomStorage));
 
                 Lexical::Cache::generate();
 
-                qDebug() << "(ling) [Config] ## System configured.";
+                qDebug() << "(data) [System] # ling # System loaded.";
             }
 
-            void Configuration::Deinitialize() {
-                qDebug() << "(ling) [Config] Shutting down..";
+            void System::unload() {
+                qDebug() << "(ling) [System] System unloading...";
+                Lexical::Cache::clearStorage();
+                Rules::Cache::clearStorage();
+                qDebug() << "(data) [System] # ling # System unloaded.";
             }
 
-            void Configuration::setLocale ( const string p_lcl ) {
-                if ( p_lcl.empty() )
+            void System::setLocale ( const QString p_lcl ) {
+                if ( p_lcl.isEmpty() )
                     return;
 
-                Configuration::_locale = p_lcl;
-                qDebug() << "(ling) [Config] ## Default locale:" << p_lcl.c_str ();
+                System::s_lcl = p_lcl;
+                qDebug() << "(data) [System] # ling # Default locale:" << p_lcl;
             }
 
-            void Configuration::setDirectory ( const string p_configDir ) {
-                if ( p_configDir.empty() )
+            void System::setDirectory ( const QString p_configDir ) {
+                if ( p_configDir.isEmpty() )
                     return;
 
-                QDir* d = new QDir(p_configDir.c_str ());
+                QDir* d = new QDir(p_configDir);
                 if (d->exists ()){
-                    Configuration::_storageDir = d->absolutePath().toStdString ();
-                    qDebug() << "(ling) [Config] ## Root dir:" << p_configDir.c_str ();
+                    System::s_storageDir = d->absolutePath();
+                    qDebug() << "(data) [System] # ling # Root dir:" << p_configDir;
                 }
+            }
+
+            const QStringList System::locales() {
+                QDir l_dir(System::directory ());
+                const QString l_path = l_dir.absolutePath ();
+                l_dir.setFilter (QDir::Dirs | QDir::NoDotAndDotDot);
+                QStringList l_locale = l_dir.entryList ();
+                unique(l_locale.begin (),l_locale.end ());
+                return l_locale;
             }
         } // namespaces
     }
-}
-// kate: indent-mode cstyle; space-indent on; indent-width 4;
+}// kate: indent-mode cstyle; space-indent on; indent-width 4;

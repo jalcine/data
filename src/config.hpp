@@ -25,12 +25,12 @@
 #ifndef __WNTRDATA_CONFIG_HPP__
 #define __WNTRDATA_CONFIG_HPP__
 
-#cmakedefine DEBUG
+/* #undef DEBUG */
 
-#define WNTRDATA_DATA_DIR "@WNTRDATA_DATA_DIR@"
-#define WNTRDATA_LING_DIR "@WNTRDATA_LING_DIR@"
-#define WNTRDATA_ONTO_DIR "@WNTRDATA_ONTO_DIR@"
-#define WNTRDATA_DEFAULT_LOCALE "@WINTER_DEFAULT_LOCALE@"
+#define WNTRDATA_DATA_DIR "/usr/share/wintermute"
+#define WNTRDATA_LING_DIR "ling"
+#define WNTRDATA_ONTO_DIR "onto"
+#define WNTRDATA_DEFAULT_LOCALE "en"
 
 #endif // __WNTRDATA_CONFIG_HPP__
 

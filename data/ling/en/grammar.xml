@@ -125,73 +125,80 @@ convert this document into something close to it.
   <Rule type="A">
     <!-- pronouns -->
     <Rule type="x">
-      <Rule type="*">
-        <Bind with="Bcoa*" skipWord="no" />
-      </Rule>
-      <Rule type="~">
-        <Bind with="Bcoaz" skipWord="no" />
-      </Rule>
+        <Bind with="Bcoapz" has="*" hideNext="yes" skipWord="no" typeHas="*" />
+        <Bind with="Bcoapz" has="~" hideNext="yes" skipWord="no" typeHas="~" />
     </Rule>
     <Rule type="r">
       <Rule with="e">
         <Bind with="E" skipWord="no" />
       </Rule>
       <Rule type="b">
-        <Bind with="Ap*~123" skipWord="no" />
-        <Bind with="Bcoaz*~" skipWord="no" />
+        <Bind with="Ap" has="123*~" skipWord="no" />
+        <Bind with="Bcoaz" has="*~" hideNext="yes" skipWord="no" />
       </Rule>
       <Rule type="c">
-        <Bind with="Craf*~123" skipWord="no" />
+        <Bind with="Craf" has="123*~" skipWord="no" />
       </Rule>
     </Rule>
     <Rule type="e,d">
       <Rule type="n,o,p">
         <Rule type="*">
-          <Bind with="Craf*" linkAction="reverse" />
+            <Bind with="Craf" has="1*" linkAction="reverse" typeHas="1*" />
+            <Bind with="Craf" has="2*" linkAction="reverse" typeHas="2*" />
+            <Bind with="Craf" has="3*" linkAction="reverse" typeHas="3*" />
         </Rule>
         <Rule type="~">
-          <Bind with="Craf~" linkAction="reverse" />
+            <Bind with="Craf" has="1~" linkAction="reverse" typeHas="1~" />
+            <Bind with="Craf" has="2~" linkAction="reverse" typeHas="2~" />
+            <Bind with="Craf" has="3~" linkAction="reverse" typeHas="3~" />
         </Rule>
       </Rule>
     </Rule>
     <Rule type="p">
       <Rule type="x">
-
       </Rule>
     </Rule>
   </Rule>
 
   <Rule type="B">
     <!-- nouns -->
+    <Bind with="Bpz*~,E,Fm+" skipWord="no" hideNext="yes" />
+    <Rule type="coa*~">
+        <Bind with="Craf" hasAll="3~" linkAction="reverse" typeHas="~" />
+        <Bind with="Craf" hasAll="3*" skipWord="no" linkAction="reverse" typeHas="*" />
+    </Rule>
+    <Rule type="p*~">
+        <Bind with="Craf" hasAll="23~" linkAction="reverse" typeHas="p~" />
+        <Bind with="Craf" hasAll="23*" skipWord="no" linkAction="reverse" typeHas="p*" />
+    </Rule>
     <Rule type="z">
-      <Bind with="Craf123*~" linkAction="reverse" />
-      <Bind with="Bz" hideNext="yes" />
-    </Rule>
-    <Rule type="coa*">
-      <Bind with="Craf3*" linkAction="reverse" />
-    </Rule>
-    <Rule type="p">
-      <Bind with="Bpz*~" hideNext="yes" />
-      <Rule type="~">
-        <Bind with="Craf3~" linkAction="reverse" />
-      </Rule>
-      <Rule type="*">
-        <Bind with="Craf3*" linkAction="reverse"/>
-      </Rule>
+      <Bind with="Craf" has="123*~" skipWord="no" linkAction="reverse" typeHas="z*~" />
+      <Bind with="Bcoa" has="*~" hideNext="yes" skipWord="no" />
+      <Bind with="Aednopx" has="*~" />
+      <Bind with="E" />
+      <Bind with="Fm+-" skipWord="no"/>
     </Rule>
   </Rule>
 
   <Rule type="C">
-   <Rule type="*">
-     <Bind with="B*" />"
-   </Rule>
-   <Rule type="raf~">
-     <Bind with="Bpz~" />
-     <Bind with="Aeox13~" />
-   </Rule>
-   <Rule type="raf*">
-     <Bind with="Bpz*" />
-     <Bind with="Ax*" />
+   <Rule type="raf">
+      <Bind with="Bz*~" typeHas="*~" />
+      <Rule type="*">
+         <Bind with="Bz"    hasAll="*"  typeHas="*" />
+         <Bind with="Bpcoa" hasAll="3*" typeHas="3*" />
+         <Bind with="Ax"    hasAll="*"  typeHas="*" />
+         <Bind with="Aeon"  hasAll="1*" typeHas="1*" />
+         <Bind with="Aeon"  hasAll="2*" typeHas="2*" />
+         <Bind with="Aeon"  hasAll="3*" typeHas="3*" />
+      </Rule>
+      <Rule type="~">
+         <Bind with="Bz"    hasAll="~"  typeHas="~" />
+         <Bind with="Bpcoa" hasAll="3~" typeHas="3~" />
+         <Bind with="Ax"    hasAll="~"  typeHas="~" />
+         <Bind with="Aeon"  hasAll="1~" typeHas="1~" />
+         <Bind with="Aeon"  hasAll="2~" typeHas="2~" />
+         <Bind with="Aeon"  hasAll="3~" typeHas="3~" />
+      </Rule>
    </Rule>
  </Rule>
 
@@ -200,7 +207,13 @@ convert this document into something close to it.
   </Rule>
 
   <Rule type="E">
-    <Rule with="A,B" linkAction="reverse,thisType" />
+    <Rule with="A,Bcoazp*~" skipWord="no" hideNext="yes" linkAction="reverse,thisType" />
     <Rule with="E" />
+  </Rule>
+
+  <Rule type="F">
+    <Rule with="Aednopx*~,Bcoazp*~" linkAction="reverse,thisType" skipWord="no" hideNext="yes" />
+    <Rule with="F+" typeHas="-" />
+    <Rule with="F-" typeHas="+" />
   </Rule>
 </RuleSet>

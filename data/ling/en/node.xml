@@ -14,20 +14,25 @@
           subject. For example, ${COSMO}#PersonalPronoun WITH rdf:ID="I" would be
           linked to Storage/Data:Symbol="I", but not with that kind of syntax. The
           syntax has yet to be devised, once I get a grasp of RDFQL and SPARQL.
+
+    @todo Find a way to fix words after suffixes like "'t" have been used on words like
+          won't (contraction expansion?)
 -->
 <Storage locale="en">
     <Pseudo symbol="-">
-      <Flag guid="-1" link="Bz" />
+      <Flag guid="-1" link="Bz*~" />
     </Pseudo>
 
-    <!--
-        These Import elements ease the process of spawning.
-
-        @todo Use xincludes instead.
-    -->
-
-    <Import uri="verbs.xml" />
-    <Import uri="nouns.xml" />
+    <Mapping>
+        <Suffix from="'m" to="am" />
+        <!--
+            @warning This is going to cause a problem with posessions, like Bobby's.
+                     We might need to use Token objects all the way through.
+        -->
+        <Suffix from="'s" to="is" />
+        <Suffix from="'re" to="are" />
+        <Suffix from="'ll" to="will" />
+    </Mapping>
 
     <!-- START PRONOUNS -->
     <!-- start English personal pronouns -->
@@ -48,8 +53,8 @@
     </Data>
     <Data symbol="you">
         <Flag guid="0" link="Aen2~" />
-        <Flag guid="0" link="Aen2*" />
         <Flag guid="0" link="Aeo2~" />
+        <Flag guid="0" link="Aen2*" />
         <Flag guid="0" link="Aeo2*" />
     </Data>
     <Data symbol="your">
@@ -595,7 +600,7 @@ included? -->
 	<Data symbol="had"></Data>
 	<!-- END VERBS -->
 
-	<!-- TENSE SENSTIVE WORDS -->
+	<!-- begin auxillary verbs -->
 	<Data symbol="will"></Data>
 	<Data symbol="can"></Data>
 	<Data symbol="may"></Data>
@@ -606,7 +611,7 @@ included? -->
 	<Data symbol="might"></Data>
 	<Data symbol="must"></Data>
 
-	<!-- END TENSE SENSTIVE WORDS -->
+	<!-- end auxillary verbs -->
 
 	<!-- START ADJECTIVES -->
 	<Data symbol="best">
@@ -617,15 +622,15 @@ included? -->
 	</Data>
 	<!-- END ADJECTIVES -->
 
-	<!-- START NOUNS -->
+	<!-- START PROPER NOUNS -->
 	<Data symbol="wintermute">
-		<Flag guid="10" link="Bp~" />
+		<Flag guid="10" link="Bp3~" />
 	</Data>
 	<Data symbol="jacky">
-		<Flag guid="11" link="Bp~" />
+		<Flag guid="11" link="Bp3~" />
 	</Data>
 	<Data symbol="alcine">
-		<Flag guid="11" link="Bp~" />
+		<Flag guid="11" link="Bp3~" />
 	</Data>
 	<!-- END NOUNS -->
 </Storage>
