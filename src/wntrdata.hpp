@@ -1,6 +1,6 @@
 /**
  * @file wntrdata.hpp
- * @author Jacky Alcine <jacky.alcine@thesii.org>
+ * @author Wintermute Developers <wintermute-devel@lists.launchpad.net>
  * @legalese
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -31,6 +31,22 @@
  * that introduce new sources of words aside from importing new syntactic information
  * for the fact the syntactic system still needs a bit more work before it becomes as
  * decently mature as the lexical system.
+ *
+ * @section N01 Obtaining Information
+ * WntrData holds all of the lexical, syntactical, and ontological data for Wintermute.
+ * Thus, the means of information obtaining (at least for lexical and syntactic) information
+ * are similar, whereas ontological information resembles a vaguely knit representation of
+ * of that shown by typical SPARQL interpretators and parsers.
+ * @subsection N011 Lexical Information
+ * Lexical information is stored by using the Models system designed by Adrian Borucki <gentoolx@gmail.com>.
+ * The syntactical information is also stored accordingly.
+ * @see N012
+ * @subsubsection N0111 Loading
+ * Obtaining lexical information is done by creating a Data object and specifying the ID
+ * and locale of the Data object. The symbol value is filled as well as the flags from the
+ * loading
+ * @endsection
+ * @endsection
  */
 #ifndef __WNTRDATA_HPP__
 #define __WNTRDATA_HPP__
@@ -39,10 +55,93 @@
 #include "ontology.hpp"
 #include "linguistics.hpp"
 #include "models.hpp"
+#include "adaptors.hpp"
+#include <wntr/plugins.hpp>
+#include <QtPlugin>
+
+using Wintermute::Plugins::AbstractPlugin;
 
 namespace Wintermute {
     namespace Data {
+        struct Plugin;
+        struct System;
 
+        /**
+         * @brief Manages the data location representing WntrData.
+         * @class Configuration config.hpp "config.hpp"
+         */
+        class System : public QObject {
+            friend class SystemAdaptor;
+            Q_OBJECT
+            Q_DISABLE_COPY(System)
+
+            private:
+                static System* s_config;
+                QString m_dir;
+                System();
+
+            public:
+                /**
+                 * @brief Obtains the directory that of which the data files are stored.
+                 * @fn getDirectory
+                 * @return const QString
+                 */
+                static const QString directory();
+
+                /**
+                 * @brief Changes the working directory.
+                 * @fn setDirectory
+                 * @param const QString
+                 */
+                static void setDirectory(const QString&);
+
+                /**
+                 * @brief Obtains an instance of the data system object.
+                 * @fn instance
+                 * @return const Configuration
+                 */
+                static System* instance();
+
+            signals:
+                /**
+                 * @brief
+                 *
+                 * @fn started
+                 */
+                void started();
+
+                /**
+                 * @brief
+                 *
+                 * @fn stopped
+                 */
+                void stopped();
+
+            public slots:
+                /**
+                 * @brief Initializes the data services.
+                 * @fn Initialize
+                 */
+                static void stop();
+
+                /**
+                 * @brief Deinitializes the data services.
+                 * @fn Deinitialize
+                 */
+                static void start();
+        };
+
+       class Plugin : public AbstractPlugin {
+            Q_OBJECT
+            public:
+                Plugin() : AbstractPlugin() { }
+                ~Plugin() { }
+                Plugin(Plugin const &k) : AbstractPlugin(k) { }
+
+                virtual void initialize() const;
+                virtual void deinitialize() const;
+                virtual QObject* instance() const;
+        };
     }
 }
 
