@@ -27,7 +27,7 @@
 
 /* #undef DEBUG */
 
-#define WNTRDATA_DATA_DIR "/usr/local/share/wintermute"
+#define WNTRDATA_DATA_DIR "/usr/share/wintermute"
 #define WNTRDATA_LING_DIR "ling"
 #define WNTRDATA_ONTO_DIR "onto"
 #define WNTRDATA_DEFAULT_LOCALE "en"
