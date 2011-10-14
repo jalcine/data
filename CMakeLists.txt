@@ -22,6 +22,7 @@ find_package(Qt4 4.4.3 COMPONENTS
     QtCore
     QtDBus
     QtXml
+    QtGui
     REQUIRED)
 
 include("${QT_USE_FILE}")
