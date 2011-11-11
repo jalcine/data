@@ -19,6 +19,9 @@
  */
 
 #include <QtDebug>
+#include <QtPlugin>
+#include <wntr/core.hpp>
+#include <wntr/ipc.hpp>
 #include "wntrdata.hpp"
 
 namespace Wintermute {
@@ -54,14 +57,14 @@ namespace Wintermute {
 
         void Plugin::initialize () const {
             Data::Linguistics::System::setLocale ( Core::arguments ()->value ("locale").toString () );
- 
+
             connect(Wintermute::Core::instance (),SIGNAL(started()),Wintermute::Data::System::instance (),SLOT(start()));
             connect(Wintermute::Core::instance (),SIGNAL(stopped()),Wintermute::Data::System::instance (),SLOT(stop()));
- 
+
             Data::SystemAdaptor* l_adpt = new Data::SystemAdaptor;
             Data::NodeAdaptor* l_adpt2 = new Data::NodeAdaptor;
             Data::RuleAdaptor* l_adpt3 = new Data::RuleAdaptor;
- 
+
             Wintermute::IPC::System::registerObject ("/System" , l_adpt);
             Wintermute::IPC::System::registerObject ("/Nodes"  , l_adpt2);
             Wintermute::IPC::System::registerObject ("/Rules"  , l_adpt3);

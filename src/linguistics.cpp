@@ -19,31 +19,27 @@
  * @endlegalese
  */
 
-#include <map>
 #include <algorithm>
-#include <string>
 #include <QDir>
 #include "config.hpp"
 #include "models.hpp"
 #include "linguistics.hpp"
 
-using namespace std;
 using namespace Wintermute::Data;
-
-using std::string;
+using std::unique;
 
 namespace Wintermute {
     namespace Data {
         namespace Linguistics {
-            QString System::s_storageDir = QString(WNTRDATA_DATA_DIR) + "/" + QString(WNTRDATA_LING_DIR);
+            QString System::s_dir = QString(WNTRDATA_DATA_DIR) + "/" + QString(WNTRDATA_LING_DIR);
             QString System::s_lcl = QString(WNTRDATA_DEFAULT_LOCALE);
 
-            void System::load ( const QString storageDir, const QString locale ) {
+            void System::load ( const QString p_dir, const QString p_lcl ) {
                 qDebug() << "(data) [System] # ling # System loading...";
-                qDebug() << storageDir << locale;
+                qDebug() << p_dir << p_lcl;
 
-                System::setDirectory ( storageDir );
-                System::setLocale ( locale );
+                System::setDirectory ( p_dir );
+                System::setLocale ( p_lcl );
 
                 Lexical::Cache::addStorage ((new Lexical::DomStorage));
                 Rules::Cache::addStorage ((new Rules::DomStorage));
@@ -68,14 +64,14 @@ namespace Wintermute {
                 qDebug() << "(data) [System] # ling # Default locale:" << p_lcl;
             }
 
-            void System::setDirectory ( const QString p_configDir ) {
-                if ( p_configDir.isEmpty() )
+            void System::setDirectory ( const QString p_dir ) {
+                if ( p_dir.isEmpty() )
                     return;
 
-                QDir* d = new QDir(p_configDir);
+                QDir* d = new QDir(p_dir);
                 if (d->exists ()){
-                    System::s_storageDir = d->absolutePath();
-                    qDebug() << "(data) [System] # ling # Root dir:" << p_configDir;
+                    System::s_dir = d->absolutePath();
+                    qDebug() << "(data) [System] # ling # Root dir:" << p_dir;
                 }
             }
 
@@ -89,4 +85,5 @@ namespace Wintermute {
             }
         } // namespaces
     }
-}// kate: indent-mode cstyle; space-indent on; indent-width 4;
+}
+// kate: indent-mode cstyle; space-indent on; indent-width 4;

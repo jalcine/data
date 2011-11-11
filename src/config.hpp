@@ -27,10 +27,11 @@
 
 /* #undef DEBUG */
 
-#define WNTRDATA_DATA_DIR "/usr/share/wintermute"
+#define DOMSTORAGE_MAXSTR 1.0
+#define WNTRDATA_DATA_DIR "/usr/share/wintermute/data"
 #define WNTRDATA_LING_DIR "ling"
 #define WNTRDATA_ONTO_DIR "onto"
-#define WNTRDATA_DEFAULT_LOCALE "en"
+#define WNTRDATA_DEFAULT_LOCALE ""
 
 #endif // __WNTRDATA_CONFIG_HPP__
 

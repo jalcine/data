@@ -26,7 +26,7 @@
 #define	ONTOLOGY_HPP
 
 #include <QString>
-#include <QVector>
+#include <QMap>
 #include <Soprano/Model>
 
 using namespace std;
@@ -44,9 +44,6 @@ namespace Wintermute {
 
             /**
              * @brief Configuration class for the ontology section.
-             *
-             *
-             *
              * @class Configuration ontology.hpp "src/ontology.hpp"
              */
             class System : public QObject {
@@ -73,7 +70,7 @@ namespace Wintermute {
              * According to the definition of resources in the RDF syntax documentation
              * <http://www.w3.org/TR/REC-rdf-syntax> it's defined as,
              * <blockquote>
-             * All things being described by RDF expressions are called resources.
+             * All things being described by RDF expressions are called <b>resources</b>.
              * A resource may be an entire Web page; such as the HTML document "http://www.w3.org/Overview.html"
              * for example. A resource may be a part of a Web page; e.g. a specific HTML or XML element within
              * the document source. A resource may also be a whole collection of pages; e.g. an entire Web site.
@@ -82,10 +79,11 @@ namespace Wintermute {
              * of URIs allows the introduction of identifiers for any entity imaginable.
              * </blockquote>
              *
-             * This class provides a means of convience over RDF-XML (mainly SPARQL and RDFQL) so that
-             * properties of resources can be properly queried.
+             * This class provides a means of convience over RDF-XML parsing languages (mainly SPARQL and RDFQL) so that
+             * properties of resources can be properly queried and modified.
              *
              * @class Resource ontology.hpp "src/ontology.hpp"
+             * @todo Add 'operator==()', 'operator!=()', and 'operator=()' to this method for convience.
              */
             class Resource : public QObject {
                 public:
@@ -125,7 +123,7 @@ namespace Wintermute {
                     virtual ~Resource();
 
                     /**
-                     * @brief
+                     * @brief Obtains the object from its said text representation.
                      *
                      * @fn object
                      * @param
@@ -133,7 +131,7 @@ namespace Wintermute {
                     const Resource* object(const QString& ) const;
 
                     /**
-                     * @brief
+                     * @brief Obtains the object from its said text representation.
                      *
                      * @fn object
                      * @param
@@ -141,15 +139,15 @@ namespace Wintermute {
                     const Resource* object(const Resource& ) const;
 
                     /**
-                     * @brief
+                     * @brief Sets the object according to its said text representation.
                      *
                      * @fn setObject
                      * @param
                      */
-                    void setObject(const QString& );
+                    void setObject(const QString& , const Resource& );
 
                     /**
-                     * @brief
+                     * @brief 
                      *
                      * @fn setObject
                      * @param
@@ -189,13 +187,14 @@ namespace Wintermute {
                     Repository(const QString&);
                     Repository(const Repository&);
                     virtual ~Repository();
-                    const Resource* obtainResource(const QString &) const;
+                    Resource* obtainResource(const QString &) const;
 
-                    static const Repository* obtainRepository(const QString&);
-                    static const Resource* obtainResource(const QString&, const QString&);
+                    static Repository* obtainRepository(const QString&);
+                    static Resource* obtainResource(const QString&, const QString&);
                     static const int countOntologies();
 
                 private:
+                    static QMap<QString, Repository*> s_repos;
                     void load(const QString& = "") const;
                     const QString getPath() const;
                     mutable QString m_repo;

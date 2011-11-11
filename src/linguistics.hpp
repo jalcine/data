@@ -24,10 +24,8 @@
 #ifndef LINGUISTICS_HPP
 #define	LINGUISTICS_HPP
 
-#include <string>
+#include <QString>
 #include <QObject>
-
-using std::string;
 
 namespace Wintermute {
     namespace Data {
@@ -41,7 +39,7 @@ namespace Wintermute {
              */
             class System {
                 private:
-                    static QString s_storageDir; /**< Holds the location of the linguistic info. */
+                    static QString s_dir; /**< Holds the location of the linguistic info. */
                     static QString s_lcl; /**< Holds the current locale in use. */
 
                 public:
@@ -68,8 +66,7 @@ namespace Wintermute {
                     static const inline QString locale() { return s_lcl; }
 
                     /**
-                     * @brief
-                     *
+                     * @brief Obtains a list of all of the locales known to the system.
                      * @fn locales
                      */
                     static const QStringList locales();
@@ -80,8 +77,18 @@ namespace Wintermute {
                      * @fn getDirectory
                      * @return string
                      */
-                    static const inline QString directory() { return s_storageDir; }
-                    static void load ( const QString = s_storageDir, const QString = s_lcl );
+                    static const inline QString directory() { return s_dir; }
+                    
+                    /** 
+                     * @brief Loads the system with a specific storage directory and locale.
+                     * @fn load
+                     */
+                    static void load ( const QString = s_dir, const QString = s_lcl );
+                    
+                    /**
+                     * @brief Unloads all information from the system.
+                     * @fn unload
+                     */
                     static void unload();
             };
         } // namespaces

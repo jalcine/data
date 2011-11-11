@@ -9,7 +9,8 @@
 
 <!--
   This ontology _should_ represent a user of Wintermute. It'd need to
-  take the Person ability of Wintermute and implement a new 
+  take the Person ability of COSMO and implement a new means of defining
+  the user/
 
  -->
 

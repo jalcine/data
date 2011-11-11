@@ -57,7 +57,6 @@
 #include "models.hpp"
 #include "adaptors.hpp"
 #include <wntr/plugins.hpp>
-#include <QtPlugin>
 
 using Wintermute::Plugins::AbstractPlugin;
 
