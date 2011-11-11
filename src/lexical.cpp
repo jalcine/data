@@ -172,19 +172,20 @@ namespace Wintermute {
                 void DomStorage::generate() {
                     QDir d(System::directory ());
                     d.setFilter (QDir::Dirs | QDir::NoDotAndDotDot);
-                    QStringList l_lst = d.entryList ();
+                    QStringList l_lclLst = d.entryList ();
 
-                    foreach(QString l_str, l_lst){
-                        const QString l_pth = d.absolutePath () + "/" + l_str + "/node.xml";
+                    foreach(const QString l_lcl, l_lclLst){
+                        qDebug() << "(data) [DomStorage] Parsing locale" << l_lcl << "...";
+                        const QString l_pth = d.absolutePath () + "/" + l_lcl + "/node.xml";
                         QDomDocument l_spawnDom("Store");
-                        QFile* l_file;
+                        QFile* l_file = new QFile(l_pth);
 
-                        if (!QFile::exists (l_pth)){
-                            qWarning() << "(data) [DomStorage] Can't find" << l_pth << ".";
+                        if (!l_file->exists () || !l_file->isReadable ()){
+                            qWarning() << "(data) [DomStorage] Can't access" << l_pth << ".";
+                            l_file->deleteLater ();
                             continue;
                         }
 
-                        l_file = new QFile(l_pth);
                         if (!l_spawnDom.setContent (l_file)){
                             qWarning() << "(data) [DomStorage] Parse error in" << l_pth << ".";
                             continue;
@@ -221,8 +222,8 @@ namespace Wintermute {
                     const QDomElement l_root = p_dom.documentElement ();
                     const QString l_lcl = l_root.attribute ("locale");
                     const QDomNodeList l_lst = l_root.elementsByTagName ("Data");
+                    qDebug () << "(data) [DomStorage] Spawning locale" << l_lcl << "...";
                     boost::progress_display l_prgs(l_lst.count ());
-                    DomStorage l_str;
 
                     for (int i = 0; i < l_lst.count (); i++){
                         QDomElement l_ele = l_lst.at (i).toElement ();
@@ -245,7 +246,7 @@ namespace Wintermute {
 
                         if (!l_dt.flags ().isEmpty ()){
                             QFile* l_file = new QFile(getPath(l_dt));
-                            if (!l_file->open (QIODevice::ReadWrite | QIODevice::Truncate)){
+                            if (!l_file->open (QIODevice::ReadWrite | QIODevice::Truncate) || !l_file->isWritable () || l_file->permissions () != QFile::WriteUser){
                                 qWarning() << "(data) [DomStorage] Generation failed for" << l_dt.symbol () << ":" << l_file->errorString ();
                                 continue;
                             } else {
@@ -255,6 +256,8 @@ namespace Wintermute {
                         }
                         ++l_prgs;
                     }
+
+                    qDebug () << "(data) [DomStorage] Locale" << l_lcl << "spawned.";
                 }
 
                 QDomDocument* DomStorage::getSpawnDoc(const Data& p_dt) {
@@ -389,7 +392,7 @@ namespace Wintermute {
                         this->DomBackend::m_ele->appendChild (l_ele);
                     }
 
-                    qDebug() << "(data) [DomSaveModel] Saved" << this->Model::m_dt.id ();
+                    //qDebug() << "(data) [DomSaveModel] Saved" << this->Model::m_dt.id ();
                 }
 
                 void DomSaveModel::saveFrom(const Data& p_dt) {
@@ -427,12 +430,12 @@ namespace Wintermute {
                     }
                 }
 
-                // @note Wintermute considers its local data to be stored to disk. Currently, DomStorage represents the local nodes.
+                /// @note Wintermute considers its local data to be stored to disk. Currently, DomStorage represents the local nodes.
                 const int Cache::countFlags(){
                     return DomStorage::countFlags();
                 }
 
-                // @note Wintermute considers its local data to be stored to disk. Currently, DomStorage represents the local nodes.
+                /// @note Wintermute considers its local data to be stored to disk. Currently, DomStorage represents the local nodes.
                 const int Cache::countSymbols(){
                     return DomStorage::countSymbols();
                 }
