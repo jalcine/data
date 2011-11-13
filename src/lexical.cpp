@@ -180,7 +180,7 @@ namespace Wintermute {
                         QDomDocument l_spawnDom("Store");
                         QFile* l_file = new QFile(l_pth);
 
-                        if (!l_file->exists () || !l_file->isReadable ()){
+                        if (!l_file->exists ()){
                             qWarning() << "(data) [DomStorage] Can't access" << l_pth << ".";
                             l_file->deleteLater ();
                             continue;
@@ -227,11 +227,7 @@ namespace Wintermute {
 
                     for (int i = 0; i < l_lst.count (); i++){
                         QDomElement l_ele = l_lst.at (i).toElement ();
-
-                        if (l_ele.isNull ()){
-                            qWarning() << "null" << i;
-                            continue;
-                        }
+                        if (l_ele.isNull ()) continue;
 
                         DomLoadModel l_ldM(&l_ele);
                         QDomDocument l_newDom("Data");
@@ -246,6 +242,7 @@ namespace Wintermute {
 
                         if (!l_dt.flags ().isEmpty ()){
                             QFile* l_file = new QFile(getPath(l_dt));
+                            qDebug() << l_dt;
                             if (!l_file->open (QIODevice::ReadWrite | QIODevice::Truncate) || !l_file->isWritable () || l_file->permissions () != QFile::WriteUser){
                                 qWarning() << "(data) [DomStorage] Generation failed for" << l_dt.symbol () << ":" << l_file->errorString ();
                                 continue;
