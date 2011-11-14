@@ -1,0 +1,7 @@
+build
+*~
+*.kdev4
+doc
+lib
+CMakeLists.txt.user*
+src/config.hpp
