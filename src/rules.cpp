@@ -416,8 +416,11 @@ namespace Wintermute {
                 }
 
                 Storage* Cache::addStorage (Storage *p_str){
-                    if (!hasStorage(p_str->type ()))
+                    if (!hasStorage(p_str->type ())){
                         s_stores << p_str;
+                        qDebug() << "(data) [Cache] Added rules cache backend" << p_str->type() << ".";
+                    }
+
                     return p_str;
                 }
 

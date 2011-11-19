@@ -483,11 +483,13 @@ namespace Wintermute {
                 }
 
                 /// @todo Allow this to be configurable (adding to plug-in settings). Default would be 'DomStorage'.
-                Storage* Cache::addStorage(Storage* l_str){
-                    if (!hasStorage(l_str->type ()))
-                        s_stores << l_str;
+                Storage* Cache::addStorage(Storage* p_str){
+                    if (!hasStorage(p_str->type ())){
+                        s_stores << p_str;
+                        qDebug() << "(data) [Cache] Added lexical cache backend" << p_str->type() << ".";
+                    }
 
-                    return l_str;
+                    return p_str;
                 }
 
                 /// @todo Find a way to call all of the storages in parallel and then kill all of the other ones when none (or one has) found information.

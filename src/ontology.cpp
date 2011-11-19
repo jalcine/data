@@ -37,7 +37,7 @@ namespace Wintermute {
             QMap<QString, Repository*> Repository::s_repos;
 
             void System::load() {
-                //const Repository* l_repo = Repository::obtainRepository("COSMO");
+                const Repository* l_repo = Repository::obtainRepository("COSMO");
                 qDebug() << "(data) [System] # ontology # Loaded.";
             }
 

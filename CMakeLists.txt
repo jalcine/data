@@ -17,13 +17,13 @@ list(APPEND CMAKE_MODULE_PATH "cmake/Modules")
 find_package(Wintermute 0.01 REQUIRED)
 find_package(PythonLibs 2.7 REQUIRED)
 find_package(Boost 1.46 COMPONENTS
-		python
-		REQUIRED)
+    python
+    REQUIRED)
 find_package(Qt4 COMPONENTS
-		QtCore
-		QtXml
-		QtDBus
-		REQUIRED)
+    QtCore
+    QtXml
+    QtDBus
+    REQUIRED)
 
 include("${QT_USE_FILE}")
 include(WintermuteMacros)
@@ -42,17 +42,17 @@ set(WNTRDATA_LING_DIR "ling" CACHE PATH "The name of the folder that contains th
 set(WNTRDATA_ONTO_DIR "onto" CACHE PATH "The name of the folder that contains the ontology information. There should be no trailing or leading slashes.")
 set(WNTRDATA_INCLUDE_DIR "${WINTER_PLUGIN_INCLUDE_INSTALL_DIR}/data")
 set(WNTRDATA_INCLUDE_DIRS "${WNTRDATA_INCLUDE_DIR}"
-		${PYTHON_INCLUDE_DIR}
-		${WINTERMUTE_INCLUDE_DIRS}
-		${QT_INCLUDE_DIR}
-		${SOPRANO_INCLUDE_DIR}
-		${Boost_INCLUDE_DIRS})
+        ${PYTHON_INCLUDE_DIR}
+        ${WINTERMUTE_INCLUDE_DIRS}
+        ${QT_INCLUDE_DIR}
+        ${SOPRANO_INCLUDE_DIR}
+        ${Boost_INCLUDE_DIRS})
 set(WNTRDATA_CMAKE_DIR "${CMAKE_INSTALL_PREFIX}/share/cmake/WntrData")
 set(WNTRDATA_LIBRARIES "${PYTHON_LIBRARIES}"
-		${QT_LIBRARIES}
-		${SOPRANO_LIBRARIES}
-		${WINTERMUTE_LIBRARIES}
-		${Boost_LIBRARIES})
+        ${QT_LIBRARIES}
+        ${SOPRANO_LIBRARIES}
+        ${WINTERMUTE_LIBRARIES}
+        ${Boost_LIBRARIES})
 
 include_directories(${WNTRDATA_INCLUDE_DIRS})
 add_subdirectory(src)
@@ -73,14 +73,14 @@ configure_file("${PROJECT_SOURCE_DIR}/spec.in"
 
 ## Installs
 install(FILES "${PROJECT_BINARY_DIR}/InstallFiles/WntrDataConfig.cmake"
-							"${PROJECT_BINARY_DIR}/InstallFiles/WntrDataConfigVersion.cmake"
-		DESTINATION "${WNTRDATA_CMAKE_DIR}")
+              "${PROJECT_BINARY_DIR}/InstallFiles/WntrDataConfigVersion.cmake"
+        DESTINATION "${WNTRDATA_CMAKE_DIR}")
 
 install(FILES ${CMAKE_MODULES}
-		DESTINATION "${CMAKE_MODULE_DIR}")
+        DESTINATION "${CMAKE_MODULE_DIR}")
 
 install(FILES "${PROJECT_BINARY_DIR}/InstallFiles/${WNTRDATA_UUID}.spec"
-		DESTINATION "${WINTER_PLUGINSPEC_INSTALL_DIR}")
+        DESTINATION "${WINTER_PLUGINSPEC_INSTALL_DIR}")
 
 install(DIRECTORY "data/${WNTRDATA_LING_DIR}" "data/${WNTRDATA_ONTO_DIR}"
-		DESTINATION "${WNTRDATA_DATA_DIR}")
+        DESTINATION "${WNTRDATA_DATA_DIR}")

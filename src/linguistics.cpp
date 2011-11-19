@@ -54,7 +54,7 @@ namespace Wintermute {
                 Lexical::Cache::clearStorage();
                 Rules::Cache::clearStorage();
                 qDebug() << "(data) [System] # ling # System unloaded.";
-            }
+            }            
 
             void System::setLocale ( const QString p_lcl ) {
                 if ( p_lcl.isEmpty() )
