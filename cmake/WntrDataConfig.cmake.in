@@ -7,7 +7,7 @@
 # Tell the user project where to find our headers and libraries
 set(WNTRDATA_INCLUDE_DIRS "@WNTRDATA_INCLUDE_DIRS@")
 set(WNTRDATA_LIBRARY_DIRS "@WNTRDATA_LIB_DIR@")
- 
+
 # Our library dependencies (contains definitions for IMPORTED targets)
 include("@CMAKE_INSTALL_PREFIX@/share/cmake/WntrData/WntrDataLibraryDepends.cmake")
  
