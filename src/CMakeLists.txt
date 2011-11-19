@@ -1,5 +1,6 @@
 project(WntrDataLib)
 cmake_minimum_required(VERSION 2.8)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 ## Files
 file(GLOB WNTRDATA_SHPP *.hpp)
