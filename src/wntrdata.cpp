@@ -22,6 +22,7 @@
 #include <QtPlugin>
 #include <wntr/core.hpp>
 #include <wntr/ipc.hpp>
+
 #include "wntrdata.hpp"
 
 namespace Wintermute {

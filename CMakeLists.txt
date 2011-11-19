@@ -22,7 +22,13 @@ find_package(Boost 1.46 COMPONENTS
 find_package(Qt4 COMPONENTS
     QtCore
     QtXml
+<<<<<<< .merge_file_RaQFHj
+<<<<<<< .merge_file_CtgTTJ
     QtDBus
+=======
+>>>>>>> .merge_file_MfdcBJ
+=======
+>>>>>>> .merge_file_2SDGtj
     QtGui
     REQUIRED)
 
