@@ -9,16 +9,16 @@ file(GLOB CMAKE_MODULES "${PROJECT_SOURCE_DIR}/cmake/Modules/*.cmake")
 QT4_WRAP_CPP(WNTRDATA_SCPP "${WNTRDATA_SHPP}")
 
 ## Targets
-add_library(wntrdata SHARED ${WNTRDATA_SCPP})
+add_library(wintermute-plugin-data SHARED ${WNTRDATA_SCPP})
 
-set_target_properties(wntrdata
+set_target_properties(wintermute-plugin-data
     PROPERTIES
     VERSION ${GENERIC_LIB_VERSION}
     SOVERSION ${GENERIC_LIB_SOVERSION})
 
-target_link_libraries(wntrdata ${WNTRDATA_LIBRARIES})
+target_link_libraries(wintermute-plugin-data ${WNTRDATA_LIBRARIES})
 
-install(TARGETS wntrdata
+install(TARGETS wintermute-plugin-data
     EXPORT WntrDataLibraryDepends
     LIBRARY DESTINATION "${WINTER_PLUGIN_INSTALL_DIR}")
 
