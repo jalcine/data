@@ -892,6 +892,7 @@ namespace Wintermute {
     }
 }
 
+Q_DECLARE_TYPEINFO(Wintermute::Data::Linguistics::Lexical::Data, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Lexical::Data)
 
 #endif

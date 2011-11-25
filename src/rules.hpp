@@ -871,6 +871,9 @@ namespace Wintermute {
 }
 
 Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Rules::Bond)
+Q_DECLARE_TYPEINFO(Wintermute::Data::Linguistics::Rules::Bond, Q_MOVABLE_TYPE);
+
 Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Rules::Chain)
+Q_DECLARE_TYPEINFO(Wintermute::Data::Linguistics::Rules::Chain, Q_MOVABLE_TYPE);
 
 #endif

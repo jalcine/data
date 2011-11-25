@@ -32,8 +32,13 @@ namespace Wintermute {
         System::System() : m_dir(WNTRDATA_DATA_DIR) { }
 
         void System::start ( ) {
-            Wintermute::Data::Linguistics::System::load ( System::directory() + QString ( "/" ) + QString ( WNTRDATA_LING_DIR ) );
-            Wintermute::Data::Ontology::System::load();
+            qDBusRegisterMetaType<Lexical::Data>();
+            qDBusRegisterMetaType<Rules::Bond>();
+            qDBusRegisterMetaType<Rules::Chain>();
+
+            Linguistics::System::setLocale ( Core::arguments ()->value ("locale").toString () );
+            Linguistics::System::load ( System::directory() + QString ( "/" ) + QString ( WNTRDATA_LING_DIR ) );
+            Ontology::System::load();
             emit s_config->started();
         }
 
@@ -56,11 +61,9 @@ namespace Wintermute {
             return s_config;
         }
 
-        void Plugin::initialize () const {
-            Data::Linguistics::System::setLocale ( Core::arguments ()->value ("locale").toString () );
-
-            connect(Wintermute::Core::instance (),SIGNAL(started()),Wintermute::Data::System::instance (),SLOT(start()));
-            connect(Wintermute::Core::instance (),SIGNAL(stopped()),Wintermute::Data::System::instance (),SLOT(stop()));
+        void Plugin::start () const {
+            connect(this,SIGNAL(started()), Wintermute::Data::System::instance (),SLOT(start()));
+            connect(this,SIGNAL(stopped()), Wintermute::Data::System::instance (),SLOT(stop()));
 
             Data::SystemAdaptor* l_adpt = new Data::SystemAdaptor;
             Data::NodeAdaptor* l_adpt2 = new Data::NodeAdaptor;
@@ -71,10 +74,7 @@ namespace Wintermute {
             Wintermute::IPC::System::registerObject ("/Rules"  , l_adpt3);
         }
 
-        void Plugin::deinitialize () const {
-        }
-
-        QObject* Plugin::instance () const { return System::instance(); }
+        void Plugin::stop () const { }
     }
 }
 

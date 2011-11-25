@@ -29,6 +29,7 @@ find_package(Qt4 COMPONENTS
 include("${QT_USE_FILE}")
 include(WintermuteMacros)
 include(WintermuteDefaults)
+enable_doxygen()
 
 find_package(PkgConfig REQUIRED)
 pkg_search_module(SOPRANO REQUIRED soprano)

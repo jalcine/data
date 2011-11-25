@@ -72,7 +72,7 @@ namespace Wintermute {
                 void pseudo(const QDBusMessage&, Lexical::Data&) const;
                 void read(const QDBusMessage&, Lexical::Data& ) const;
                 void write(const Lexical::Data&, const QDBusMessage&);
-                const bool exists(const QDBusMessage&, const Lexical::Data& ) const;
+                const bool exists(const QDBusMessage&, const QString& ) const;
                 const bool isPseudo(const Lexical::Data& ,const QDBusMessage&) const;
                 virtual void quit(const QDBusMessage&) const;
         };
@@ -97,5 +97,9 @@ namespace Wintermute {
         };
     }
 }
+
+Q_DECLARE_INTERFACE(Wintermute::Data::NodeAdaptor,"org.thesii.Wintermute.Data.NodeAdaptor")
+Q_DECLARE_INTERFACE(Wintermute::Data::RuleAdaptor,"org.thesii.Wintermute.Data.RulesAdaptor")
+Q_DECLARE_INTERFACE(Wintermute::Data::SystemAdaptor,"org.thesii.Wintermute.Data.SystemAdaptor")
 
 #endif // ADAPTORS_HPP

@@ -21,8 +21,8 @@
  * Boston, MA  02110-1301  USA
  */
 
-#include "adaptors.hpp"
 #include "wntrdata.hpp"
+#include "adaptors.hpp"
 #include <QDBusConnection>
 
 namespace Wintermute {
@@ -78,18 +78,18 @@ namespace Wintermute {
         }
 
         //const bool NodeAdaptor::exists(const QDBusArgument &p_data, const QDBusMessage& p_msg) const {
-        const bool NodeAdaptor::exists(const QDBusMessage& p_msg, const Lexical::Data& p_dt) const {
-            const QDBusArgument l_argDt = p_msg.arguments().at(0).value<QDBusArgument>();
-            Lexical::Data l_dt;
-            l_argDt >> l_dt;
+        const bool NodeAdaptor::exists(const QDBusMessage& p_msg, const QString& p_dt) const {
+            const Lexical::Data l_dt = QVariant::fromValue<QString>(p_dt).value<Lexical::Data>();
             qDebug() << l_dt;
             const bool l_rslt = Lexical::Cache::exists (l_dt);
             QDBusConnection::sessionBus().send (p_msg.createReply (l_rslt));
+            return l_rslt;
         }
 
         const bool NodeAdaptor::isPseudo (const Lexical::Data &p_data, const QDBusMessage& p_msg) const {
             const bool l_rslt = Lexical::Cache::isPseudo (p_data);
             QDBusConnection::sessionBus().send (p_msg.createReply (l_rslt));
+            return l_rslt;
         }
 
         void NodeAdaptor::quit(const QDBusMessage& p_msg) const {
