@@ -125,7 +125,12 @@ namespace Wintermute {
                 DomStorage::DomStorage() : Storage() { }
 
                 const QString DomStorage::getPath(const Data& p_dt){
-                    return System::directory () + QString("/") + p_dt.locale() + QString("/node/") + p_dt.id () + QString(".node");
+                    const QString l_bsPth = System::directory () + QString("/") + p_dt.locale() + QString("/node/");
+                    QDir* l_bsDir = new QDir(l_bsPth);
+                    if (!l_bsDir->exists())
+                        l_bsDir->mkpath(l_bsPth);
+
+                    return l_bsPth + p_dt.id() + QString(".node");
                 }
 
                 const bool DomStorage::exists (const Data &p_dt) const {
@@ -151,20 +156,9 @@ namespace Wintermute {
                 void DomStorage::saveFrom (const Data &p_dt){
                     QDomDocument l_dom("Data");
                     l_dom.appendChild (l_dom.createElement ("Data"));
-                    QFile* l_file = new QFile(getPath (p_dt));
-
-                    if (!l_file->exists ()){
-                        l_file->open (QIODevice::WriteOnly | QIODevice::Truncate);
-                        l_file->write ("<!-- Generated -->");
-                        l_file->close ();
-                    }
-
                     QDomElement l_elem = l_dom.documentElement ();
                     DomSaveModel l_domSvMdl(&l_elem);
                     l_domSvMdl.saveFrom (p_dt);
-                    l_file->open (QIODevice::WriteOnly | QIODevice::Truncate);
-                    l_file->write (l_dom.toByteArray (4));
-                    l_file->close ();
                 }
 
                 const QString DomStorage::type () const { return "Dom"; }
@@ -240,6 +234,7 @@ namespace Wintermute {
                         l_svM.saveFrom (l_dt);
                         l_newDom.appendChild (l_root);
 
+#if 0
                         if (!l_dt.flags ().isEmpty ()){
                             QFile* l_file = new QFile(getPath(l_dt));
                             qDebug() << l_dt;
@@ -251,6 +246,7 @@ namespace Wintermute {
                                 l_file->close();
                             }
                         }
+#endif
                         ++l_prgs;
                     }
 
@@ -354,7 +350,7 @@ namespace Wintermute {
                     FlagMapping l_mp;
                     QDomNodeList l_ndlst = this->DomBackend::m_ele->elementsByTagName ("Flag");
 
-                    if (!(l_mp.isEmpty () || l_ndlst.isEmpty ())) {
+                    if (!l_ndlst.isEmpty ()) {
                         for (int i = 0; i < l_ndlst.count (); i++){
                             QDomElement l_elem = l_ndlst.at (i).toElement ();
                             l_mp.insert (l_elem.attribute ("guid"),l_elem.attribute ("link"));
@@ -371,25 +367,44 @@ namespace Wintermute {
                 DomSaveModel::~DomSaveModel() { }
 
                 void DomSaveModel::save()  {
-                    if (this->DomBackend::m_ele->isNull()) return;
+                    if (this->DomBackend::m_ele->isNull()) return;                    
 
                     this->DomBackend::m_ele->setAttribute ("symbol" , this->Model::m_dt.symbol().toLower ());
                     this->DomBackend::m_ele->setAttribute ("locale" , this->Model::m_dt.locale ());
 
-                    while (this->DomBackend::m_ele->hasChildNodes ())
-                        this->DomBackend::m_ele->removeChild (this->DomBackend::m_ele->firstChild ());
+                    /*while (this->DomBackend::m_ele->hasChildNodes ())
+                        this->DomBackend::m_ele->removeChild (this->DomBackend::m_ele->firstChild ());*/
 
                     QDomDocument l_dom = this->DomBackend::m_ele->ownerDocument ();
 
-                    for(FlagMapping::ConstIterator itr = this->Model::m_dt.flags ().begin ();
-                        itr != this->Model::m_dt.flags ().end (); itr++) {
-                        QDomElement l_ele = l_dom.createElement ("Flag");
-                        l_ele.setAttribute ("guid",itr.key ());
-                        l_ele.setAttribute ("link",itr.value ());
-                        this->DomBackend::m_ele->appendChild (l_ele);
+                    if (!this->Model::m_dt.flags().empty()){
+                        for(FlagMapping::ConstIterator itr = this->Model::m_dt.flags ().begin ();
+                            itr != this->Model::m_dt.flags ().end (); itr++) {
+                            QDomElement l_ele = l_dom.createElement ("Flag");
+                            l_ele.setAttribute ("guid",itr.key ());
+                            l_ele.setAttribute ("link",itr.value ());
+                            this->DomBackend::m_ele->appendChild (l_ele);
+                        }
+                    } else
+                        qDebug() << "No flags for" << this->Model::m_dt.id();
+
+                    const QString l_str = l_dom.toByteArray(4);
+
+                    QFile* l_file = new QFile(DomStorage::getPath (this->Model::m_dt));
+                    if (!l_file->exists ()){
+                        l_file->open (QIODevice::WriteOnly | QIODevice::Truncate);
+                        l_file->write ("<!-- Generated -->");
+                        l_file->close ();
                     }
 
-                    //qDebug() << "(data) [DomSaveModel] Saved" << this->Model::m_dt.id ();
+                    l_file->open (QIODevice::WriteOnly | QIODevice::Append);
+                    l_file->write(l_str.toUtf8());
+                    l_file->close ();
+
+                    if (l_file->size() > 0)
+                        qDebug() << "(data) [DomSaveModel] Saved" << this->Model::m_dt.id () << "with" << l_file->size() << "bytes";
+                    else
+                        qDebug() << l_file->fileName() << l_str;
                 }
 
                 void DomSaveModel::saveFrom(const Data& p_dt) {
@@ -411,16 +426,10 @@ namespace Wintermute {
                 }
 
                 void Cache::write (const Data &p_dt){
-                    Storage* l_fdStr = NULL;
-                    foreach (Storage* l_str, Cache::s_stores){
-                        if (l_str->exists (p_dt))
-                            l_fdStr = l_str;
-                        else continue;
-                    }
-
-                    if (l_fdStr)
-                        l_fdStr->saveFrom (p_dt);
-                    else {
+                    if (!Cache::s_stores.empty()){
+                        foreach (Storage* l_str, Cache::s_stores)
+                            l_str->saveFrom (p_dt);
+                    } else {
                         DomStorage *l_domStr = new DomStorage;
                         l_domStr->saveFrom (p_dt);
                         delete l_domStr;
@@ -460,7 +469,7 @@ namespace Wintermute {
                 }
 
                 /// @todo Find a way to call all of the storages in parallel and then kill all of the other ones when none (or one has) found information.
-                void Cache::pseudo (Data &p_psDt){
+                void Cache::psuedo (Data &p_psDt){
                     foreach (Storage* l_str, Cache::s_stores){
                         if (l_str->hasPseudo (p_psDt)){
                             l_str->loadPseudo(p_psDt);
