@@ -1,122 +1,116 @@
-/**
- * @file    adaptors.cpp
- * @author  Wintermute Developers <wintermute-devel@lists.launchpad.net>
- *
- *
- *
- *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * Wintermute Linguistics is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Wintermute Linguistics; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor,
- * Boston, MA  02110-1301  USA
- */
-
+#include <QtCore/QMetaObject>
+#include <QtCore/QByteArray>
+#include <QtCore/QList>
+#include <QtCore/QMap>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+#include <QtCore/QVariant>
+#include <QDebug>
+#include "models.hpp"
 #include "adaptors.hpp"
 #include "wntrdata.hpp"
-#include <QDBusConnection>
 
 namespace Wintermute {
     namespace Data {
-        SystemAdaptor::SystemAdaptor() : Adaptor(System::instance ()) {
-            setAutoRelaySignals (true);
-            QDBusConnection::sessionBus().connect ("org.thesii.Wintermute","/Master",
-                                      "org.thesii.Wintermute.Master","aboutToQuit",
-                                      this,SLOT(quit()));
+        NodeAdaptor::NodeAdaptor(): QDBusAbstractAdaptor(NodeManager::instance()) {
+            setAutoRelaySignals(true);
         }
 
-        const QString SystemAdaptor::directory () const { return System::directory (); }
+        NodeAdaptor::~NodeAdaptor() { }
 
-        void SystemAdaptor::setDirectory (const QString &p_dir) const { System::setDirectory(p_dir); }
-
-        void SystemAdaptor::stop(const QDBusMessage& p_msg) {
-            System::stop();
-            emit stopped ();
+        bool NodeAdaptor::exists(LexicalData in0) {
+            bool out0;
+            QMetaObject::invokeMethod(parent(), "exists", Q_RETURN_ARG(bool, out0), Q_ARG(LexicalData, in0));
+            return out0;
         }
 
-        void SystemAdaptor::start(const QDBusMessage& p_msg) {
-            System::start();
-            emit started ();
+        void NodeAdaptor::generate() {
+            QMetaObject::invokeMethod(parent(), "generate");
         }
 
-        void SystemAdaptor::quit (const QDBusMessage& p_msg) const {
-            emit aboutToQuit ();
-            System::stop ();
-            CoreAdaptor::haltSystem ();
+        bool NodeAdaptor::isPseudo(LexicalData in0) {
+            bool out0;
+            QMetaObject::invokeMethod(parent(), "isPseudo", Q_RETURN_ARG(bool, out0), Q_ARG(LexicalData, in0));
+            return out0;
         }
 
-        NodeAdaptor::NodeAdaptor() : Adaptor(System::instance()) { }
-
-        void NodeAdaptor::registerBackend (const QDBusMessage& p_msg) {
-            //const Lexical::Storage* l_str = Lexical::Cache::addStorage (*p_bcknd);
-            //emit nodeBackendRegistered (l_str->type ());
+        void NodeAdaptor::quit() {
+            QMetaObject::invokeMethod(parent(), "quit");
         }
 
-        void NodeAdaptor::write (const Lexical::Data &p_data, const QDBusMessage& p_msg) {
-            Lexical::Cache::write (p_data);
+        LexicalData NodeAdaptor::read(LexicalData in0) {
+            /*LexicalData out0;
+            QMetaObject::invokeMethod(parent(), "read", Q_RETURN_ARG(LexicalData, out0), Q_ARG(LexicalData, in0));
+            return out0;*/
+            NodeManager::instance()->read(in0);
+            qDebug() << "(data) [NodeAdaptor]" << in0;
+            return in0;
         }
 
-        void NodeAdaptor::generate (const QDBusMessage& p_msg) {
-            Lexical::Cache::generate ();
+        LexicalData NodeAdaptor::write(LexicalData in0) {
+            LexicalData out0;
+            QMetaObject::invokeMethod(parent(), "write", Q_RETURN_ARG(LexicalData, out0), Q_ARG(LexicalData, in0));
+            return out0;
         }
 
-        void NodeAdaptor::read (const QDBusMessage& p_msg, Lexical::Data &p_data) const {
-            Lexical::Cache::read (p_data);
+        RuleAdaptor::RuleAdaptor() : QDBusAbstractAdaptor(RuleManager::instance()) {
+            setAutoRelaySignals(true);
         }
 
-        void NodeAdaptor::pseudo (const QDBusMessage& p_msg, Lexical::Data &p_data) const {
-            Lexical::Cache::pseudo (p_data);
+        RuleAdaptor::~RuleAdaptor() { }
+
+        bool RuleAdaptor::exists(const QString &in0, const QString &in1) {
+            bool out0;
+            QMetaObject::invokeMethod(parent(), "exists", Q_RETURN_ARG(bool, out0), Q_ARG(QString, in0), Q_ARG(QString, in1));
+            return out0;
         }
 
-        //const bool NodeAdaptor::exists(const QDBusArgument &p_data, const QDBusMessage& p_msg) const {
-        const bool NodeAdaptor::exists(const QDBusMessage& p_msg, const Lexical::Data& p_dt) const {
-            const QDBusArgument l_argDt = p_msg.arguments().at(0).value<QDBusArgument>();
-            Lexical::Data l_dt;
-            l_argDt >> l_dt;
-            qDebug() << l_dt;
-            const bool l_rslt = Lexical::Cache::exists (l_dt);
-            QDBusConnection::sessionBus().send (p_msg.createReply (l_rslt));
+        void RuleAdaptor::quit() {
+            QMetaObject::invokeMethod(parent(), "quit");
         }
 
-        const bool NodeAdaptor::isPseudo (const Lexical::Data &p_data, const QDBusMessage& p_msg) const {
-            const bool l_rslt = Lexical::Cache::isPseudo (p_data);
-            QDBusConnection::sessionBus().send (p_msg.createReply (l_rslt));
+        RulesChain RuleAdaptor::read(RulesChain in0) {
+            RulesChain out0;
+            QMetaObject::invokeMethod(parent(), "read", Q_RETURN_ARG(RulesChain, out0), Q_ARG(RulesChain, in0));
+            return out0;
         }
 
-        void NodeAdaptor::quit(const QDBusMessage& p_msg) const {
-            p_msg.createErrorReply (QDBusError::AccessDenied,"Cannot stop the Lexical::Node service.");
+        RulesChain RuleAdaptor::write(RulesChain in0) {
+            RulesChain out0;
+            QMetaObject::invokeMethod(parent(), "write", Q_RETURN_ARG(RulesChain, out0), Q_ARG(RulesChain, in0));
+            return out0;
         }
 
-        RuleAdaptor::RuleAdaptor() : Adaptor(System::instance()) { }
-
-        void RuleAdaptor::read (const QDBusMessage& p_msg, Rules::Chain &p_chn) const {
-            Rules::Cache::read (p_chn);
+        SystemAdaptor::SystemAdaptor() : QDBusAbstractAdaptor(System::instance()) {
+            setAutoRelaySignals(true);
         }
 
-        void RuleAdaptor::write (const Rules::Chain &p_chn, const QDBusMessage& p_msg) {
-            Rules::Cache::write (p_chn);
+        SystemAdaptor::~SystemAdaptor() { }
+
+        QString SystemAdaptor::directory() const {
+            return qvariant_cast< QString >(parent()->property("Directory"));
         }
 
-        const bool RuleAdaptor::exists (const QString &p_1, const QString &p_2, const QDBusMessage& p_msg) const {
-            const bool l_rslt = Rules::Cache::exists (p_1,p_2);
-            QDBusConnection::sessionBus().send (p_msg.createReply (l_rslt));
+        void SystemAdaptor::setDirectory(const QString &value) {
+            parent()->setProperty("Directory", qVariantFromValue(value));
         }
 
-        void RuleAdaptor::registerBackend (const QDBusMessage& p_msg, Rules::Backend &p_bcknd){
-
+        bool SystemAdaptor::localeExists(const QString &in0) {
+            bool out0;
+            QMetaObject::invokeMethod(parent(), "localeExists", Q_RETURN_ARG(bool, out0), Q_ARG(QString, in0));
+            return out0;
         }
 
-        void RuleAdaptor::quit (const QDBusMessage& p_msg) const {
-            p_msg.createErrorReply (QDBusError::AccessDenied,"Cannot stop the Rules::Bond service.");
+        void SystemAdaptor::quit() {
+            QMetaObject::invokeMethod(parent(), "quit");
+        }
+
+        void SystemAdaptor::start() {
+            QMetaObject::invokeMethod(parent(), "start");
+        }
+
+        void SystemAdaptor::stop() {
+            QMetaObject::invokeMethod(parent(), "stop");
         }
     }
 }

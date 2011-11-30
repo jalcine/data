@@ -122,44 +122,8 @@ namespace Wintermute {
                      */
                     virtual ~Resource();
 
-                    /**
-                     * @brief Obtains the object from its said text representation.
-                     *
-                     * @fn object
-                     * @param
-                     */
-                    const Resource* object(const QString& ) const;
-
-                    /**
-                     * @brief Obtains the object from its said text representation.
-                     *
-                     * @fn object
-                     * @param
-                     */
-                    const Resource* object(const Resource& ) const;
-
-                    /**
-                     * @brief Sets the object according to its said text representation.
-                     *
-                     * @fn setObject
-                     * @param
-                     */
-                    void setObject(const QString& , const Resource& );
-
-                    /**
-                     * @brief 
-                     *
-                     * @fn setObject
-                     * @param
-                     */
-                    void setObject(const Resource& );
-
-                    /**
-                     * @brief
-                     *
-                     * @fn countConcepts
-                     */
-                    static const int countConcepts();
+                    Resource& attribute(const QString& ) const;
+                    void setAttribute(const QString&, const Resource&);
 
                 private:
                     const Repository* m_repo;

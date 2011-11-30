@@ -24,16 +24,72 @@
 #include <wntr/ipc.hpp>
 
 #include "wntrdata.hpp"
+#include "adaptors.hpp"
+
+using namespace Wintermute::Data::Linguistics;
 
 namespace Wintermute {
     namespace Data {
         System* System::s_config = NULL;
+        NodeManager* NodeManager::s_inst = NULL;
+        RuleManager* RuleManager::s_inst = NULL;
 
-        System::System() : m_dir(WNTRDATA_DATA_DIR) { }
+        RuleManager::RuleManager() : QObject(System::instance()) { }
+
+        RuleManager* RuleManager::instance() {
+            if (!s_inst) s_inst = new RuleManager;
+            return s_inst;
+        }
+
+        NodeManager::NodeManager() : QObject(System::instance()) { }
+
+        void NodeManager::generate() {
+            Lexical::Cache::generate();
+        }
+
+        void NodeManager::pseudo(Lexical::Data &p_dt) const {
+            Lexical::Cache::psuedo(p_dt);
+        }
+
+        void NodeManager::read(Lexical::Data &p_dt) const {
+            Lexical::Cache::read(p_dt);
+        }
+
+        void NodeManager::write(const Lexical::Data &p_dt) {
+            Lexical::Cache::write(p_dt);
+        }
+
+        const bool NodeManager::exists(const Lexical::Data &p_dt) const {
+            return Lexical::Cache::exists(p_dt);
+        }
+
+        const bool NodeManager::isPseudo(const Lexical::Data &p_dt) const {
+            return Lexical::Cache::isPseudo(p_dt);
+        }
+
+        NodeManager* NodeManager::instance() {
+            if (!s_inst) s_inst = new NodeManager;
+            return s_inst;
+        }
+
+        System::System() : m_dir(WNTRDATA_DATA_DIR) {
+            connect(this,SIGNAL(started()),this,SLOT(registerDataTypes()));
+        }
+
+        void System::registerDataTypes() {
+            qRegisterMetaType<Lexical::Data>("LexicalData");
+            qRegisterMetaType<Rules::Bond>("RulesBond");
+            qRegisterMetaType<Rules::Chain>("RulesChain");
+
+            qDBusRegisterMetaType<Lexical::Data>();
+            qDBusRegisterMetaType<Rules::Bond>();
+            qDBusRegisterMetaType<Rules::Chain>();
+        }
 
         void System::start ( ) {
-            Wintermute::Data::Linguistics::System::load ( System::directory() + QString ( "/" ) + QString ( WNTRDATA_LING_DIR ) );
-            Wintermute::Data::Ontology::System::load();
+            Linguistics::System::setLocale ( Core::arguments ()->value ("locale").toString () );
+            Linguistics::System::load ( System::directory() + QString ( "/" ) + QString ( WNTRDATA_LING_DIR ) );
+            Ontology::System::load();
             emit s_config->started();
         }
 
@@ -56,25 +112,20 @@ namespace Wintermute {
             return s_config;
         }
 
-        void Plugin::initialize () const {
-            Data::Linguistics::System::setLocale ( Core::arguments ()->value ("locale").toString () );
+        void Plugin::start () const {
+            connect(this,SIGNAL(started()), Wintermute::Data::System::instance (),SLOT(start()));
+            connect(this,SIGNAL(stopped()), Wintermute::Data::System::instance (),SLOT(stop()));
 
-            connect(Wintermute::Core::instance (),SIGNAL(started()),Wintermute::Data::System::instance (),SLOT(start()));
-            connect(Wintermute::Core::instance (),SIGNAL(stopped()),Wintermute::Data::System::instance (),SLOT(stop()));
-
-            Data::SystemAdaptor* l_adpt = new Data::SystemAdaptor;
-            Data::NodeAdaptor* l_adpt2 = new Data::NodeAdaptor;
-            Data::RuleAdaptor* l_adpt3 = new Data::RuleAdaptor;
+            Data::SystemAdaptor* l_adpt = new Data::SystemAdaptor(System::instance());
+            Data::NodeAdaptor* l_adpt2 = new Data::NodeAdaptor(NodeManager::instance());
+            Data::RuleAdaptor* l_adpt3 = new Data::RuleAdaptor(RuleManager::instance());
 
             Wintermute::IPC::System::registerObject ("/System" , l_adpt);
             Wintermute::IPC::System::registerObject ("/Nodes"  , l_adpt2);
             Wintermute::IPC::System::registerObject ("/Rules"  , l_adpt3);
         }
 
-        void Plugin::deinitialize () const {
-        }
-
-        QObject* Plugin::instance () const { return System::instance(); }
+        void Plugin::stop () const { }
     }
 }
 

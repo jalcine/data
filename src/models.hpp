@@ -28,6 +28,9 @@
 #include "rules.hpp"
 #include "linguistics.hpp"
 
+typedef Wintermute::Data::Linguistics::Lexical::Data LexicalData;
+typedef Wintermute::Data::Linguistics::Rules::Chain RulesChain;
+
 
 #endif /* MODELS_HPP */
 // kate: indent-mode cstyle; space-indent on; indent-width 4;

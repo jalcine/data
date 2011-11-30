@@ -1,10 +1,14 @@
 ## Wintermute's Data API
 
+[Plugin]
+Enabled=true
+Type=API
+
 [Version]
 Plugin=@WNTRDATA_VERSION@
 UUID=@WNTRDATA_UUID@
 Compat=@Wintermute_VERSION@
-Library=wntrdata
+Library=wintermute-plugin-data
 
 [Description]
 Name=Data API

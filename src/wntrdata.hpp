@@ -55,7 +55,7 @@
 #include "ontology.hpp"
 #include "linguistics.hpp"
 #include "models.hpp"
-#include "adaptors.hpp"
+#include "interfaces.hpp"
 #include <wntr/plugins.hpp>
 
 using Wintermute::Plugins::AbstractPlugin;
@@ -64,6 +64,43 @@ namespace Wintermute {
     namespace Data {
         struct Plugin;
         struct System;
+        struct NodeManager;
+        struct RuleManager;
+
+        class NodeManager : public QObject {
+            friend class NodeAdaptor;
+            friend class NodeInterface;
+            Q_OBJECT
+            Q_DISABLE_COPY(NodeManager)
+
+            private:
+                static NodeManager* s_inst;
+                NodeManager();
+
+            signals:
+                void nodeCreated(const QString&);
+
+            public slots:
+                void generate();
+                void pseudo(LexicalData&) const;
+                void read(LexicalData& ) const;
+                void write(const LexicalData& );
+                const bool exists(const LexicalData& ) const;
+                const bool isPseudo(const LexicalData& ) const;
+                static NodeManager* instance();
+        };
+
+        class RuleManager : public QObject {
+            Q_OBJECT
+            Q_DISABLE_COPY(RuleManager)
+
+            private:
+                static RuleManager* s_inst;
+                RuleManager();
+
+            public slots:
+                static RuleManager* instance();
+        };
 
         /**
          * @brief Manages the data location representing WntrData.
@@ -71,6 +108,7 @@ namespace Wintermute {
          */
         class System : public QObject {
             friend class SystemAdaptor;
+            friend class SystemInterface;
             Q_OBJECT
             Q_DISABLE_COPY(System)
 
@@ -128,6 +166,8 @@ namespace Wintermute {
                  * @fn Deinitialize
                  */
                 static void start();
+
+                static void registerDataTypes();
         };
 
        class Plugin : public AbstractPlugin {
@@ -137,9 +177,8 @@ namespace Wintermute {
                 ~Plugin() { }
                 Plugin(Plugin const &k) : AbstractPlugin(k) { }
 
-                virtual void initialize() const;
-                virtual void deinitialize() const;
-                virtual QObject* instance() const;
+                virtual void start() const;
+                virtual void stop() const;
         };
     }
 }

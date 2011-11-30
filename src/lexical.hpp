@@ -595,7 +595,7 @@ namespace Wintermute {
                          * @fn pseudo
                          * @param
                          */
-                        static void pseudo( Data & );
+                        static void psuedo( Data & );
                         /**
                          * @brief
                          *
@@ -771,6 +771,9 @@ namespace Wintermute {
                  * @class DomStorage models.hpp "src/models.hpp"
                  */
                 class DomStorage : public Storage {
+                    friend class DomLoadModel;
+                    friend class DomSaveModel;
+
                     private:
                         /**
                          * @brief
@@ -892,6 +895,7 @@ namespace Wintermute {
     }
 }
 
+Q_DECLARE_TYPEINFO(Wintermute::Data::Linguistics::Lexical::Data, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Lexical::Data)
 
 #endif
