@@ -1,11 +1,13 @@
-Wintermute Database Module (WntrData)
+Wintermute Data API (wintermute-plugin-data)
 ----------------------------
 
 1. Introduction
 
 This module is the core of the data engines of Wintermute. In this module, the
 essence of ontology structures are found, as well as Wintermute's ability to
-store and retrieve data via a flexible data framework.
+store and retrieve data via a flexible data framework. Check out
+<http://www.thesii.org/wiki/Wintermute:Techbase:Projects/Data>
+for more information.
 
 2. About WntrData
 
