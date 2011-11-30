@@ -21,8 +21,6 @@
  * Boston, MA  02110-1301  USA
  */
 
-#ifdef ADAPTORS_HPP
-
 #include "models.hpp"
 #include <wntr/adaptors.hpp>
 
@@ -68,9 +66,9 @@ namespace Wintermute {
 
             public slots:
                 Q_NOREPLY void generate();
-                void pseudo(Lexical::Data&) const;
-                void read(Lexical::Data& ) const;
-                void write(const Lexical::Data& );
+                Lexical::Data& pseudo(Lexical::Data&) const;
+                Lexical::Data& read(Lexical::Data& ) const;
+                Lexical::Data& write(const Lexical::Data& );
                 const bool exists(const Lexical::Data& ) const;
                 const bool isPseudo(const Lexical::Data& ) const;
                 virtual void quit() const;
@@ -87,12 +85,10 @@ namespace Wintermute {
                 void ruleCreated(const QString&);
 
             public slots:
-                void read(Rules::Chain&) const;
-                void write(const Rules::Chain& );
+                Rules::Chain& read(Rules::Chain&) const;
+                Rules::Chain& write(const Rules::Chain& );
                 const bool exists(const QString&, const QString& ) const;
                 virtual void quit() const;
         };
     }
 }
-
-#endif // DBUS_HPP

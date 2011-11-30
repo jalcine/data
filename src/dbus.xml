@@ -1,6 +1,5 @@
 <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node>
-
   <interface name="org.thesii.Wintermute.Data.System">
     <property name="Directory" type="s" access="readwrite"/>
     <signal name="stopped" />
@@ -21,54 +20,58 @@
   <interface name="org.thesii.Wintermute.Data.Nodes">
     <signal name="nodeCreated">
       <arg type="s" direction="out"/>
-    </signal>
+    </signal>    
     <method name="generate">
       <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
     </method>
-    <method name="psuedo">
-       <arg type="a(iiii)" direction="in" />
-       <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="LexicalData"/>
-    </method>
-    <method name="isPseudo">
-       <arg type="b" direction="out" />
-       <arg type="a(iiii)" direction="in" />
-       <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="LexicalData"/>
-    </method>
-    <method name="exists">
-       <arg type="b" direction="out" />
-       <arg type="a(iiii)" direction="in" />
-       <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="LexicalData"/>
+    <method name="quit">
     </method>
     <method name="read">
-        <arg type="a(iiii)" direction="in" />
+        <arg type="LexicalData" direction="out" />
+        <arg type="LexicalData" direction="in" />
         <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="LexicalData"/>
+        <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="LexicalData"/>
     </method>
     <method name="write">
-        <arg type="a(iiii)" direction="in" />
+        <arg type="LexicalData" direction="out" />
+        <arg type="LexicalData" direction="in" />
+        <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="LexicalData"/>
+        <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="LexicalData"/>
+    </method>
+    <method name="exists">
+        <arg type="b" direction="out" />
+        <arg type="LexicalData" direction="in" />
         <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="LexicalData"/>
     </method>
-    <method name="quit" />
+    <method name="isPseudo">
+        <arg type="b" direction="out" />
+        <arg type="LexicalData" direction="in" />
+        <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="LexicalData"/>
+    </method>
   </interface>
 
   <interface name="org.thesii.Wintermute.Data.Rules">
     <signal name="ruleCreated">
       <arg type="s" direction="out"/>
     </signal>
-    <method name="read">
-       <arg type="RulesChain" direction="in">
-           <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="LexicalData"/>
-       </arg>
-    </method>
     <method name="write">
-       <arg type="a" direction="in">
-           <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="LexicalData"/>
-       </arg>
+        <arg type="RulesChain" direction="out" />
+        <arg type="RulesChain" direction="in" />
+        <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="RulesChain"/>
+        <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="RulesChain"/>
+    </method>
+    <method name="read">
+        <arg type="RulesChain" direction="out" />
+        <arg type="RulesChain" direction="in" />
+        <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="RulesChain"/>
+        <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="RulesChain"/>
     </method>
     <method name="exists">
       <arg type="b" direction="out"/>
       <arg type="s" direction="in"/>
       <arg type="s" direction="in"/>
     </method>
-    <method name="quit" />
+    <method name="quit">
+    </method>
   </interface>
 </node>
