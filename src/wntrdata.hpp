@@ -58,6 +58,7 @@
 #include "interfaces.hpp"
 #include <wntr/plugins.hpp>
 
+using namespace Wintermute::Data::Linguistics;
 using Wintermute::Plugins::AbstractPlugin;
 
 namespace Wintermute {
@@ -82,11 +83,11 @@ namespace Wintermute {
 
             public slots:
                 void generate();
-                void pseudo(LexicalData&) const;
-                void read(LexicalData& ) const;
-                void write(const LexicalData& );
-                const bool exists(const LexicalData& ) const;
-                const bool isPseudo(const LexicalData& ) const;
+                void pseudo(Lexical::Data& ) const;
+                void read(Lexical::Data& ) const;
+                void write(const Lexical::Data& );
+                const bool exists(const Lexical::Data& ) const;
+                const bool isPseudo(const Lexical::Data& ) const;
                 static NodeManager* instance();
         };
 
@@ -100,6 +101,9 @@ namespace Wintermute {
 
             public slots:
                 static RuleManager* instance();
+                void read(Rules::Chain& );
+                void write(Rules::Chain& );
+                const bool exists(const QString&, const QString& ) const;
         };
 
         /**
@@ -113,7 +117,7 @@ namespace Wintermute {
             Q_DISABLE_COPY(System)
 
             private:
-                static System* s_config;
+                static System* s_inst;
                 QString m_dir;
                 System();
 

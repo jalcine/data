@@ -38,6 +38,12 @@
         <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="LexicalData"/>
         <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="LexicalData"/>
     </method>
+    <method name="pseudo">
+        <arg type="LexicalData" direction="out" />
+        <arg type="LexicalData" direction="in" />
+        <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="LexicalData"/>
+        <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="LexicalData"/>
+    </method>
     <method name="exists">
         <arg type="b" direction="out" />
         <arg type="LexicalData" direction="in" />

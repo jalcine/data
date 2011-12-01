@@ -1,3 +1,27 @@
+/**
+ * @file adaptors.hpp
+ * @author Wintermute Developers <wintermute-devel@lists.launchpad.net>
+ *
+ * @legalese
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ * @endlegalese
+ */
+
+#include "adaptors.hpp"
+#include "wntrdata.hpp"
 #include <QtCore/QMetaObject>
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
@@ -5,14 +29,12 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 #include <QtCore/QVariant>
-#include <QDebug>
-#include "models.hpp"
-#include "adaptors.hpp"
-#include "wntrdata.hpp"
 
 namespace Wintermute {
     namespace Data {
-        NodeAdaptor::NodeAdaptor(): QDBusAbstractAdaptor(NodeManager::instance()) {
+        NodeAdaptor::NodeAdaptor()
+            : QDBusAbstractAdaptor(NodeManager::instance()) {
+            // constructor
             setAutoRelaySignals(true);
         }
 
@@ -24,64 +46,71 @@ namespace Wintermute {
             return out0;
         }
 
-        void NodeAdaptor::generate() {
+        void NodeAdaptor::generate(){
             QMetaObject::invokeMethod(parent(), "generate");
         }
 
-        bool NodeAdaptor::isPseudo(LexicalData in0) {
+        bool NodeAdaptor::isPseudo(LexicalData in0){
             bool out0;
             QMetaObject::invokeMethod(parent(), "isPseudo", Q_RETURN_ARG(bool, out0), Q_ARG(LexicalData, in0));
             return out0;
         }
 
-        void NodeAdaptor::quit() {
+        LexicalData NodeAdaptor::pseudo(LexicalData in0){
+            LexicalData out0;
+            QMetaObject::invokeMethod(parent(), "pseudo", Q_RETURN_ARG(LexicalData, out0), Q_ARG(LexicalData, in0));
+            return out0;
+        }
+
+        void NodeAdaptor::quit(){
             QMetaObject::invokeMethod(parent(), "quit");
         }
 
-        LexicalData NodeAdaptor::read(LexicalData in0) {
-            /*LexicalData out0;
+        LexicalData NodeAdaptor::read(LexicalData in0){
+            LexicalData out0;
             QMetaObject::invokeMethod(parent(), "read", Q_RETURN_ARG(LexicalData, out0), Q_ARG(LexicalData, in0));
-            return out0;*/
-            NodeManager::instance()->read(in0);
-            qDebug() << "(data) [NodeAdaptor]" << in0;
-            return in0;
+            return out0;
         }
 
-        LexicalData NodeAdaptor::write(LexicalData in0) {
+        LexicalData NodeAdaptor::write(LexicalData in0){
             LexicalData out0;
             QMetaObject::invokeMethod(parent(), "write", Q_RETURN_ARG(LexicalData, out0), Q_ARG(LexicalData, in0));
             return out0;
         }
 
-        RuleAdaptor::RuleAdaptor() : QDBusAbstractAdaptor(RuleManager::instance()) {
+        RuleAdaptor::RuleAdaptor()
+            : QDBusAbstractAdaptor(RuleManager::instance()) {
             setAutoRelaySignals(true);
         }
 
-        RuleAdaptor::~RuleAdaptor() { }
+        RuleAdaptor::~RuleAdaptor(){ }
 
-        bool RuleAdaptor::exists(const QString &in0, const QString &in1) {
+        bool RuleAdaptor::exists(const QString &in0, const QString &in1){
             bool out0;
             QMetaObject::invokeMethod(parent(), "exists", Q_RETURN_ARG(bool, out0), Q_ARG(QString, in0), Q_ARG(QString, in1));
             return out0;
         }
 
-        void RuleAdaptor::quit() {
+        void RuleAdaptor::quit(){
             QMetaObject::invokeMethod(parent(), "quit");
         }
 
-        RulesChain RuleAdaptor::read(RulesChain in0) {
+        RulesChain RuleAdaptor::read(RulesChain in0){
             RulesChain out0;
             QMetaObject::invokeMethod(parent(), "read", Q_RETURN_ARG(RulesChain, out0), Q_ARG(RulesChain, in0));
             return out0;
         }
 
-        RulesChain RuleAdaptor::write(RulesChain in0) {
+        RulesChain RuleAdaptor::write(RulesChain in0){
             RulesChain out0;
             QMetaObject::invokeMethod(parent(), "write", Q_RETURN_ARG(RulesChain, out0), Q_ARG(RulesChain, in0));
             return out0;
         }
 
-        SystemAdaptor::SystemAdaptor() : QDBusAbstractAdaptor(System::instance()) {
+
+        SystemAdaptor::SystemAdaptor()
+            : QDBusAbstractAdaptor(System::instance()){
+            // constructor
             setAutoRelaySignals(true);
         }
 
@@ -95,7 +124,7 @@ namespace Wintermute {
             parent()->setProperty("Directory", qVariantFromValue(value));
         }
 
-        bool SystemAdaptor::localeExists(const QString &in0) {
+        bool SystemAdaptor::localeExists(const QString &in0){
             bool out0;
             QMetaObject::invokeMethod(parent(), "localeExists", Q_RETURN_ARG(bool, out0), Q_ARG(QString, in0));
             return out0;

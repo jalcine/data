@@ -77,13 +77,66 @@ namespace Wintermute {
                 /// @todo Use MD-5 hashing from another library (QCA has it) so we can eliminate md5.*pp.
                 const QString Data::idFromString (const QString p_sym) { return QString::fromStdString (md5(p_sym.toLower ().toStdString ())); }
 
+                Data::operator QVariant() const {
+                    return QVariant::fromValue(*this);
+                }
+
                 Data::~Data () { }
 
                 QDebug operator<<(QDebug dbg, const Data& p_nd) {
-                    dbg.space ();
-                    dbg << "(Lexical::Data) ID:"<< p_nd.m_id << ", Locale:"<< p_nd.m_lcl
-                        << ", Symbol:"<< p_nd.m_sym << ", Flags:"<< p_nd.m_flg;
-                    return dbg.space ();
+                    dbg << "(Lexical::Data) ID:" << p_nd.m_id << ", Locale:" << p_nd.m_lcl
+                        << ", Symbol:"<< p_nd.m_sym << ", Flags:" << p_nd.m_flg;
+                    return dbg.nospace();
+                }
+
+                const QDBusArgument& operator>> (const QDBusArgument &p_arg, Data& p_dt) {
+                    p_arg.beginStructure();
+                    p_arg >> p_dt.m_lcl >> p_dt.m_id >> p_dt.m_sym;
+
+                    p_arg.beginMap();
+
+                    while (!p_arg.atEnd()){
+                        FlagMapping::key_type l_key;
+                        FlagMapping::mapped_type l_value;
+                        p_arg.beginMapEntry();
+                        p_arg >> l_key >> l_value;
+                        p_arg.endMapEntry();
+                        p_dt.m_flg.insert(l_key,l_value);
+                    }
+
+                    p_arg.endMap();
+
+                    p_arg.endStructure();
+                    return p_arg;
+                }
+
+                QDBusArgument& operator<< (QDBusArgument &p_arg, const Data& p_dt) {
+                    p_arg.beginStructure();
+                    p_arg << p_dt.m_lcl << p_dt.m_id << p_dt.m_sym;
+
+                    p_arg.beginMap(QVariant::String, QVariant::String);
+
+                    FlagMapping::ConstIterator l_itr = p_dt.m_flg.constBegin(), l_end = p_dt.m_flg.constEnd();
+                    for (; l_itr != l_end; ++l_itr){
+                        p_arg.beginMapEntry();
+                        p_arg << l_itr.key() << l_itr.value();
+                        p_arg.endMapEntry();
+                    }
+
+                    p_arg.endMap();
+
+                    p_arg.endStructure();
+                    return p_arg;
+                }
+
+                QDataStream& operator<<(QDataStream& p_strm, const Data& p_dt){
+                    p_strm << p_dt.m_id << p_dt.m_lcl << p_dt.m_sym << p_dt.m_flg;
+                    return p_strm;
+                }
+
+                QDataStream& operator>>(QDataStream& p_strm, Data& p_dt){
+                    p_strm >> p_dt.m_id >> p_dt.m_lcl >> p_dt.m_sym >> p_dt.m_flg;
+                    return p_strm;
                 }
 
                 Model::Model() { }
@@ -155,10 +208,24 @@ namespace Wintermute {
                 /// @todo When semantics become powerful, add the generating Wintermute's ID (and place of origin, if possible).
                 void DomStorage::saveFrom (const Data &p_dt){
                     QDomDocument l_dom("Data");
-                    l_dom.appendChild (l_dom.createElement ("Data"));
-                    QDomElement l_elem = l_dom.documentElement ();
+                    QDomElement l_elem = l_dom.createElement ("Data");
+                    l_dom.appendChild (l_elem);
+
                     DomSaveModel l_domSvMdl(&l_elem);
                     l_domSvMdl.saveFrom (p_dt);
+                    const QString l_str = l_dom.toByteArray(4);
+
+                    QFile* l_file = new QFile(DomStorage::getPath(p_dt));
+                    if (!l_file->exists ()){
+                        l_file->open (QIODevice::WriteOnly | QIODevice::Truncate);
+                        l_file->write ("<!--Generated-->\n");
+                        l_file->close ();
+                    }
+
+                    l_file->open (QIODevice::WriteOnly | QIODevice::Append);
+                    l_file->write(l_str.toUtf8());
+                    l_file->close ();
+
                 }
 
                 const QString DomStorage::type () const { return "Dom"; }
@@ -217,7 +284,6 @@ namespace Wintermute {
                     const QString l_lcl = l_root.attribute ("locale");
                     const QDomNodeList l_lst = l_root.elementsByTagName ("Data");
                     qDebug () << "(data) [DomStorage] Spawning locale" << l_lcl << "...";
-                    boost::progress_display l_prgs(l_lst.count ());
 
                     for (int i = 0; i < l_lst.count (); i++){
                         QDomElement l_ele = l_lst.at (i).toElement ();
@@ -227,6 +293,7 @@ namespace Wintermute {
                         QDomDocument l_newDom("Data");
                         const Data* l_bsDt = l_ldM.load();
                         Data l_dt(l_bsDt->id (),l_lcl,l_bsDt->symbol (),l_bsDt->flags ());
+                        QVariant l_vr = QVariant::fromValue(l_dt);
 
                         QDomElement l_root = l_newDom.createElement ("Data");
                         l_root.setAttribute ("locale",l_lcl);
@@ -234,20 +301,18 @@ namespace Wintermute {
                         l_svM.saveFrom (l_dt);
                         l_newDom.appendChild (l_root);
 
-#if 0
-                        if (!l_dt.flags ().isEmpty ()){
-                            QFile* l_file = new QFile(getPath(l_dt));
-                            qDebug() << l_dt;
-                            if (!l_file->open (QIODevice::ReadWrite | QIODevice::Truncate) || !l_file->isWritable () || l_file->permissions () != QFile::WriteUser){
-                                qWarning() << "(data) [DomStorage] Generation failed for" << l_dt.symbol () << ":" << l_file->errorString ();
-                                continue;
-                            } else {
-                                l_file->write (l_newDom.toByteArray (4));
-                                l_file->close();
-                            }
+                        const QString l_str = l_newDom.toByteArray(4);
+
+                        QFile* l_file = new QFile(DomStorage::getPath(l_dt));
+                        if (!l_file->exists ()){
+                            l_file->open (QIODevice::WriteOnly | QIODevice::Truncate);
+                            l_file->write ("<!-- Generated -->");
+                            l_file->close ();
                         }
-#endif
-                        ++l_prgs;
+
+                        l_file->open (QIODevice::WriteOnly | QIODevice::Append);
+                        l_file->write(l_str.toUtf8());
+                        l_file->close ();
                     }
 
                     qDebug () << "(data) [DomStorage] Locale" << l_lcl << "spawned.";
@@ -348,7 +413,7 @@ namespace Wintermute {
                     }
 
                     FlagMapping l_mp;
-                    QDomNodeList l_ndlst = this->DomBackend::m_ele->elementsByTagName ("Flag");
+                    QDomNodeList l_ndlst = this->DomBackend::m_ele->childNodes();
 
                     if (!l_ndlst.isEmpty ()) {
                         for (int i = 0; i < l_ndlst.count (); i++){
@@ -367,7 +432,7 @@ namespace Wintermute {
                 DomSaveModel::~DomSaveModel() { }
 
                 void DomSaveModel::save()  {
-                    if (this->DomBackend::m_ele->isNull()) return;                    
+                    if (this->DomBackend::m_ele->isNull()) return;
 
                     this->DomBackend::m_ele->setAttribute ("symbol" , this->Model::m_dt.symbol().toLower ());
                     this->DomBackend::m_ele->setAttribute ("locale" , this->Model::m_dt.locale ());
@@ -385,26 +450,11 @@ namespace Wintermute {
                             l_ele.setAttribute ("link",itr.value ());
                             this->DomBackend::m_ele->appendChild (l_ele);
                         }
-                    } else
-                        qDebug() << "No flags for" << this->Model::m_dt.id();
-
-                    const QString l_str = l_dom.toByteArray(4);
-
-                    QFile* l_file = new QFile(DomStorage::getPath (this->Model::m_dt));
-                    if (!l_file->exists ()){
-                        l_file->open (QIODevice::WriteOnly | QIODevice::Truncate);
-                        l_file->write ("<!-- Generated -->");
-                        l_file->close ();
+                    } else {
+                        //qDebug() << "No flags for" << this->Model::m_dt.id();
                     }
 
-                    l_file->open (QIODevice::WriteOnly | QIODevice::Append);
-                    l_file->write(l_str.toUtf8());
-                    l_file->close ();
-
-                    if (l_file->size() > 0)
-                        qDebug() << "(data) [DomSaveModel] Saved" << this->Model::m_dt.id () << "with" << l_file->size() << "bytes";
-                    else
-                        qDebug() << l_file->fileName() << l_str;
+                    //qDebug() << "(data) [DomSaveModel] Saved" << this->Model::m_dt.id ();
                 }
 
                 void DomSaveModel::saveFrom(const Data& p_dt) {
@@ -469,7 +519,7 @@ namespace Wintermute {
                 }
 
                 /// @todo Find a way to call all of the storages in parallel and then kill all of the other ones when none (or one has) found information.
-                void Cache::psuedo (Data &p_psDt){
+                void Cache::pseudo (Data &p_psDt){
                     foreach (Storage* l_str, Cache::s_stores){
                         if (l_str->hasPseudo (p_psDt)){
                             l_str->loadPseudo(p_psDt);
@@ -546,20 +596,6 @@ namespace Wintermute {
                     }
 
                     qDebug() << "(data) [Cache] Dumped data.";
-                }
-
-                const QDBusArgument& operator>> (const QDBusArgument &p_arg, Data& p_dt) {
-                    p_arg.beginStructure();
-                    p_arg >> p_dt.m_lcl >> p_dt.m_id >> p_dt.m_flg >> p_dt.m_sym;
-                    p_arg.endStructure();
-                    return p_arg;
-                }
-
-                QDBusArgument& operator<< (QDBusArgument &p_arg, const Data& p_dt) {
-                    p_arg.beginStructure();
-                    p_arg << p_dt.m_lcl << p_dt.m_id << p_dt.m_flg << p_dt.m_sym;
-                    p_arg.endStructure();
-                    return p_arg;
                 }
 
             } /** end namespace Lexical */

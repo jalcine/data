@@ -20,10 +20,10 @@
  * Boston, MA 02111-1307, USA.
  * @endlegalese
  */
- 
+
 #ifndef LEXICAL_HPP
 #define LEXICAL_HPP
- 
+
 #include <QObject>
 #include <QList>
 #include <QMultiMap>
@@ -79,10 +79,12 @@ namespace Wintermute {
                  * @class Data models.hpp "src/models.hpp"
                  * @see FlagMapping
                  */
-                class Data : public QObject {
+                struct Data : public QObject {
+                    friend QDebug operator<<(QDebug dbg, const Data&);
                     friend QDBusArgument& operator<< (QDBusArgument&, const Data&);
                     friend const QDBusArgument& operator>> (const QDBusArgument&, Data&);
-                    friend QDebug operator<<(QDebug dbg, const Data&);
+                    friend QDataStream& operator<<(QDataStream&, const Data&);
+                    friend QDataStream& operator>>(QDataStream&, Data&);
 
                     Q_OBJECT
                     Q_PROPERTY(QString Locale READ locale WRITE setLocale)
@@ -90,7 +92,7 @@ namespace Wintermute {
                     Q_PROPERTY(QString ID READ id WRITE setID)
                     Q_PROPERTY(FlagMapping Flags READ flags WRITE setFlags)
 
-                    private:
+                    //private:
                         QString m_id;
                         QString m_lcl;
                         QString m_sym;
@@ -106,6 +108,7 @@ namespace Wintermute {
                          * @param DataFlagMap The flags of the Data.
                          */
                         explicit Data(const QString , const QString , const QString = "" , const FlagMapping = FlagMapping());
+                        operator QVariant() const;
 
                         /**
                          * @brief Null constructor.
@@ -197,20 +200,6 @@ namespace Wintermute {
                          * @param QString The text to be transformed into its proper ID.
                          */
                         static const QString idFromString(const QString);
-
-                        QDBusArgument &operator<< (QDBusArgument &p_arg) {
-                            p_arg.beginStructure();
-                            p_arg << m_id << m_lcl << m_sym << m_flg;
-                            p_arg.endStructure();
-                            return p_arg;
-                        }
-
-                        const QDBusArgument &operator>> (const QDBusArgument &p_arg) {
-                            p_arg.beginStructure();
-                            p_arg >> m_id >> m_lcl >> m_sym >> m_flg;
-                            p_arg.endStructure();
-                            return p_arg;
-                        }
 
                         static const Data Null; /**< Represents an empty set of data. */
                 };
@@ -595,7 +584,7 @@ namespace Wintermute {
                          * @fn pseudo
                          * @param
                          */
-                        static void psuedo( Data & );
+                        static void pseudo( Data & );
                         /**
                          * @brief
                          *

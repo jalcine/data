@@ -22,19 +22,28 @@
 #include <QtPlugin>
 #include <wntr/core.hpp>
 #include <wntr/ipc.hpp>
-
 #include "wntrdata.hpp"
 #include "adaptors.hpp"
 
-using namespace Wintermute::Data::Linguistics;
-
 namespace Wintermute {
     namespace Data {
-        System* System::s_config = NULL;
+        System* System::s_inst = NULL;
         NodeManager* NodeManager::s_inst = NULL;
         RuleManager* RuleManager::s_inst = NULL;
 
         RuleManager::RuleManager() : QObject(System::instance()) { }
+
+        const bool RuleManager::exists(const QString &p_1, const QString &p_2) const {
+            return Rules::Cache::exists(p_1,p_2);
+        }
+
+        void RuleManager::read(Rules::Chain &p_chn) {
+            Rules::Cache::read(p_chn);
+        }
+
+        void RuleManager::write(Rules::Chain &p_chn) {
+            Rules::Cache::write(p_chn);
+        }
 
         RuleManager* RuleManager::instance() {
             if (!s_inst) s_inst = new RuleManager;
@@ -48,7 +57,7 @@ namespace Wintermute {
         }
 
         void NodeManager::pseudo(Lexical::Data &p_dt) const {
-            Lexical::Cache::psuedo(p_dt);
+            Lexical::Cache::pseudo(p_dt);
         }
 
         void NodeManager::read(Lexical::Data &p_dt) const {
@@ -60,6 +69,7 @@ namespace Wintermute {
         }
 
         const bool NodeManager::exists(const Lexical::Data &p_dt) const {
+            qDebug() << "(data) [NodeManager] Exists? " << p_dt << Lexical::Cache::exists(p_dt);
             return Lexical::Cache::exists(p_dt);
         }
 
@@ -77,9 +87,10 @@ namespace Wintermute {
         }
 
         void System::registerDataTypes() {
-            qRegisterMetaType<Lexical::Data>("LexicalData");
-            qRegisterMetaType<Rules::Bond>("RulesBond");
-            qRegisterMetaType<Rules::Chain>("RulesChain");
+            qRegisterMetaType<Lexical::Data>("Wintermute::Data::Linguistics::Lexical::Data");
+            qRegisterMetaTypeStreamOperators<Lexical::Data>("Wintermute::Data::Linguistics::Lexical::Data");
+            //qRegisterMetaTypeStreamOperators<Rules::Bond>();
+            //qRegisterMetaTypeStreamOperators<Rules::Chain>();
 
             qDBusRegisterMetaType<Lexical::Data>();
             qDBusRegisterMetaType<Rules::Bond>();
@@ -90,44 +101,44 @@ namespace Wintermute {
             Linguistics::System::setLocale ( Core::arguments ()->value ("locale").toString () );
             Linguistics::System::load ( System::directory() + QString ( "/" ) + QString ( WNTRDATA_LING_DIR ) );
             Ontology::System::load();
-            emit s_config->started();
+            emit s_inst->started();
         }
 
         void System::stop ( ) {
             Wintermute::Data::Ontology::System::unload();
             Wintermute::Data::Linguistics::System::unload();
-            emit s_config->stopped();
+            emit s_inst->stopped();
         }
 
-        const QString System::directory () { return s_config->m_dir; }
+        const QString System::directory () { return s_inst->m_dir; }
 
         void System::setDirectory(const QString& p_dir) {
             stop();
-            s_config->m_dir = p_dir;
+            s_inst->m_dir = p_dir;
             start();
         }
 
         System* System::instance () {
-            if (!s_config) s_config = new System;
-            return s_config;
+            if (!s_inst) s_inst = new System;
+            return s_inst;
         }
 
         void Plugin::start () const {
             connect(this,SIGNAL(started()), Wintermute::Data::System::instance (),SLOT(start()));
             connect(this,SIGNAL(stopped()), Wintermute::Data::System::instance (),SLOT(stop()));
 
-            Data::SystemAdaptor* l_adpt = new Data::SystemAdaptor(System::instance());
-            Data::NodeAdaptor* l_adpt2 = new Data::NodeAdaptor(NodeManager::instance());
-            Data::RuleAdaptor* l_adpt3 = new Data::RuleAdaptor(RuleManager::instance());
+            Data::NodeAdaptor* l_adpt2 = new Data::NodeAdaptor;
+            Data::RuleAdaptor* l_adpt3 = new Data::RuleAdaptor;
+            Data::SystemAdaptor* l_adpt = new Data::SystemAdaptor;
 
-            Wintermute::IPC::System::registerObject ("/System" , l_adpt);
             Wintermute::IPC::System::registerObject ("/Nodes"  , l_adpt2);
             Wintermute::IPC::System::registerObject ("/Rules"  , l_adpt3);
+            Wintermute::IPC::System::registerObject ("/System" , l_adpt);
         }
 
         void Plugin::stop () const { }
     }
 }
 
-Q_EXPORT_PLUGIN2(WntrData, Wintermute::Data::Plugin)
+Q_EXPORT_PLUGIN2(Wintermute-Plugin-Data, Wintermute::Data::Plugin)
 // kate: indent-mode cstyle; space-indent on; indent-width 4;
