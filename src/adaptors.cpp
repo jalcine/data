@@ -92,16 +92,16 @@ namespace Wintermute {
             QMetaObject::invokeMethod(parent(), "quit");
         }
 
-        RulesChain RuleAdaptor::read(RulesChain in0){
-            RulesChain out0;
-            QMetaObject::invokeMethod(parent(), "read", Q_RETURN_ARG(RulesChain, out0), Q_ARG(RulesChain, in0));
-            return out0;
+        QString RuleAdaptor::read(QString in0){
+            Rules::Chain l_chn = Rules::Chain::fromString(in0);
+            RuleManager::instance()->read(l_chn);
+            return l_chn.toString();
         }
 
-        RulesChain RuleAdaptor::write(RulesChain in0){
-            RulesChain out0;
-            QMetaObject::invokeMethod(parent(), "write", Q_RETURN_ARG(RulesChain, out0), Q_ARG(RulesChain, in0));
-            return out0;
+        QString RuleAdaptor::write(QString in0){
+            Rules::Chain l_chn = Rules::Chain::fromString(in0);
+            RuleManager::instance()->write(l_chn);
+            return l_chn.toString();
         }
 
 

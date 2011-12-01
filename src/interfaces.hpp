@@ -115,15 +115,16 @@ namespace Wintermute {
                     return asyncCallWithArgumentList(QLatin1String("quit"), argumentList);
                 }
 
-                inline QDBusPendingReply<RulesChain> read(RulesChain in0) {
+                inline QDBusPendingReply<Rules::Chain> read(Rules::Chain in0) {
                     QList<QVariant> argumentList;
-                    argumentList << qVariantFromValue(in0);
+                    qDebug() << in0.toString();
+                    argumentList << in0.toString();
                     return asyncCallWithArgumentList(QLatin1String("read"), argumentList);
                 }
 
-                inline QDBusPendingReply<RulesChain> write(RulesChain in0) {
+                inline QDBusPendingReply<Rules::Chain> write(Rules::Chain in0) {
                     QList<QVariant> argumentList;
-                    argumentList << qVariantFromValue(in0);
+                    argumentList << in0.toString();
                     return asyncCallWithArgumentList(QLatin1String("write"), argumentList);
                 }
 

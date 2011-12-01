@@ -92,16 +92,12 @@ namespace Wintermute {
         "      <arg direction=\"out\" type=\"s\"/>\n"
         "    </signal>\n"
         "    <method name=\"write\">\n"
-        "      <arg direction=\"out\" type=\"Wintermute::Data::Linguistics::Rules::Chain\"/>\n"
-        "      <arg direction=\"in\" type=\"Wintermute::Data::Linguistics::Rules::Chain\"/>\n"
-        "      <annotation value=\"Wintermute::Data::Linguistics::Rules::Chain\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
-        "      <annotation value=\"Wintermute::Data::Linguistics::Rules::Chain\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+        "      <arg direction=\"out\" type=\"s\"/>\n"
+        "      <arg direction=\"in\" type=\"s\"/>\n"
         "    </method>\n"
         "    <method name=\"read\">\n"
-        "      <arg direction=\"out\" type=\"Wintermute::Data::Linguistics::Rules::Chain\"/>\n"
-        "      <arg direction=\"in\" type=\"Wintermute::Data::Linguistics::Rules::Chain\"/>\n"
-        "      <annotation value=\"Wintermute::Data::Linguistics::Rules::Chain\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
-        "      <annotation value=\"Wintermute::Data::Linguistics::Rules::Chain\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+        "      <arg direction=\"out\" type=\"s\"/>\n"
+        "      <arg direction=\"in\" type=\"s\"/>\n"
         "    </method>\n"
         "    <method name=\"exists\">\n"
         "      <arg direction=\"out\" type=\"b\"/>\n"
@@ -119,8 +115,8 @@ namespace Wintermute {
             public Q_SLOTS: // METHODS
                 bool exists(const QString &in0, const QString &in1);
                 void quit();
-                Rules::Chain read(Rules::Chain in0);
-                Rules::Chain write(Rules::Chain in0);
+                QString read(QString in0);
+                QString write(QString in0);
             Q_SIGNALS: // SIGNALS
                 void ruleCreated(const QString &in0);
         };

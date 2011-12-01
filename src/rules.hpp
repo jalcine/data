@@ -168,6 +168,10 @@ namespace Wintermute {
                          */
                         static const double matches(const QString& , const QString& );
 
+                        QString toString() const;
+
+                        static Bond fromString(const QString& );
+
                     private:
                         StringMap m_props; /**< Holds all of the attributes. */
                 };
@@ -249,6 +253,10 @@ namespace Wintermute {
                          * @fn type
                          */
                         const QString type() const;
+
+                        QString toString() const;
+
+                        static Chain fromString(const QString& );
                         
                         /**
                          * @brief

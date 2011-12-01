@@ -34,14 +34,17 @@ namespace Wintermute {
         RuleManager::RuleManager() : QObject(System::instance()) { }
 
         const bool RuleManager::exists(const QString &p_1, const QString &p_2) const {
+            qDebug() << p_1 << p_2;
             return Rules::Cache::exists(p_1,p_2);
         }
 
         void RuleManager::read(Rules::Chain &p_chn) {
+            qDebug() << p_chn.toString();
             Rules::Cache::read(p_chn);
         }
 
         void RuleManager::write(Rules::Chain &p_chn) {
+            qDebug() << p_chn.toString();
             Rules::Cache::write(p_chn);
         }
 
@@ -72,7 +75,7 @@ namespace Wintermute {
         }
 
         const bool NodeManager::exists(const Lexical::Data &p_dt) const {
-            qDebug() << "(data) [NodeManager] Exists? " << p_dt.symbol() << Lexical::Cache::exists(p_dt);
+            qDebug() << "(data) [NodeManager] Exists? " << p_dt.id() << Lexical::Cache::exists(p_dt);
             return Lexical::Cache::exists(p_dt);
         }
 
@@ -90,7 +93,6 @@ namespace Wintermute {
         }
 
         void System::registerDataTypes() {
-            qRegisterMetaType<Lexical::Data>("Wintermute::Data::Linguistics::Lexical::Data");
             qRegisterMetaType<QVariantMap>("QVariantMap");
             qRegisterMetaTypeStreamOperators<Lexical::Data>("Wintermute::Data::Linguistics::Lexical::Data");
             //qRegisterMetaTypeStreamOperators<Rules::Bond>();
