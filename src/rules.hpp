@@ -84,6 +84,7 @@ namespace Wintermute {
                     Q_OBJECT
                     Q_PROPERTY(QString With READ with WRITE setWith)
                     Q_PROPERTY(StringMap Attributes READ attributes WRITE setAttributes)
+                    friend QDebug operator<<(QDebug , const Bond& );
                     friend QDBusArgument& operator<< (QDBusArgument& , const Bond& );
                     friend const QDBusArgument& operator>> (const QDBusArgument& , Bond& );
 

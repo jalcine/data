@@ -107,7 +107,9 @@ namespace Wintermute {
                     QJson::Parser* l_parser = new QJson::Parser;
                     QVariantMap l_map = l_parser->parse(p_str.toAscii()).toMap();
                     Bond l_bnd;
-                    QJson::QObjectHelper::qvariant2qobject(l_map,&l_bnd);
+                    QVariantMap::ConstIterator l_itr = l_map.constBegin(), l_end = l_map.constEnd();
+                    for (; l_itr != l_end; ++l_itr)
+                        l_bnd.m_props.insert(l_itr.key(),l_itr.value().toString());
                     return l_bnd;
                 }
 
@@ -118,6 +120,11 @@ namespace Wintermute {
                     for (; l_itr != l_end; ++l_itr)
                         l_map.insert(l_itr.key(),l_itr.value());
                     return QString(l_serializer->serialize(l_map));
+                }
+
+                QDebug operator<<(QDebug p_dbg, const Bond& p_bnd){
+                    p_dbg << p_bnd.m_props;
+                    return p_dbg;
                 }
 
                 Bond::~Bond () { }
@@ -150,14 +157,14 @@ namespace Wintermute {
                 QString Chain::toString() const {
                     QJson::Serializer* l_serializer = new QJson::Serializer;
                     QVariantMap l_map;
-                    QStringList l_bndLst;
+                    QVariantList l_bndLst;
 
                     foreach (const Bond l_bnd, m_bndVtr)
-                        l_bndLst << l_bnd.toString();
+                        l_bndLst << qVariantFromValue(l_bnd.toString());
 
+                    l_map["Type"] = m_typ;
                     l_map["Bonds"] = l_bndLst;
                     l_map["Locale"] = m_lcl;
-                    l_map["Type"] = m_typ;
                     return QString(l_serializer->serialize(l_map));
                 }
 
@@ -165,12 +172,16 @@ namespace Wintermute {
                     QJson::Parser* l_parser = new QJson::Parser;
                     QVariantMap l_map = l_parser->parse(p_str.toAscii()).toMap();
                     Chain l_chn;
-                    qDebug() << l_map;
                     l_chn.m_lcl = l_map["Locale"].toString();
                     l_chn.m_typ = l_map["Type"].toString();
+                    QStringList l_bndLst = l_map["Bonds"].toStringList();
+                    l_bndLst.removeAll("{  }");
+                    QStringList::ConstIterator l_itr = l_bndLst.constBegin(), l_end = l_bndLst.constEnd();
 
-                    foreach (const QString l_str, l_map["Bonds"].toStringList())
+                    for (; l_itr != l_end; ++l_itr){
+                        const QString l_str = *l_itr;
                         l_chn.m_bndVtr << Bond::fromString(l_str);
+                    }
 
                     return l_chn;
                 }
