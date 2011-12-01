@@ -15,6 +15,7 @@ list(APPEND CMAKE_MODULE_PATH "cmake/Modules")
 
 ## Packages
 find_package(Wintermute 0.01 REQUIRED)
+find_package(QJson REQUIRED)
 find_package(PythonLibs 2.7 REQUIRED)
 find_package(Boost 1.46 COMPONENTS
     python
@@ -45,6 +46,7 @@ set(WNTRDATA_ONTO_DIR "onto" CACHE PATH "The name of the folder that contains th
 set(WNTRDATA_INCLUDE_DIR "${WINTER_PLUGIN_INCLUDE_INSTALL_DIR}/data")
 set(WNTRDATA_INCLUDE_DIRS "${WNTRDATA_INCLUDE_DIR}"
         ${PYTHON_INCLUDE_DIR}
+        ${qjson_INCLUDE_DIR}
         ${WINTERMUTE_INCLUDE_DIRS}
         ${QT_INCLUDE_DIR}
         ${SOPRANO_INCLUDE_DIR}
@@ -52,6 +54,7 @@ set(WNTRDATA_INCLUDE_DIRS "${WNTRDATA_INCLUDE_DIR}"
 set(WNTRDATA_CMAKE_DIR "${CMAKE_INSTALL_PREFIX}/share/cmake/WntrData")
 set(WNTRDATA_LIBRARIES "${PYTHON_LIBRARIES}"
         ${QT_LIBRARIES}
+        ${qjson_LIBRARIES}
         ${SOPRANO_LIBRARIES}
         ${WINTERMUTE_LIBRARIES}
         ${Boost_LIBRARIES})
@@ -72,6 +75,8 @@ configure_file("${PROJECT_SOURCE_DIR}/config.hpp.in"
 
 configure_file("${PROJECT_SOURCE_DIR}/spec.in"
 		"${PROJECT_BINARY_DIR}/InstallFiles/${WNTRDATA_UUID}.spec" @ONLY)
+
+#dbus_add_activation_service(org.thesii.Wintermute.Data.service.in)
 
 ## Installs
 install(FILES "${PROJECT_BINARY_DIR}/InstallFiles/WntrDataConfig.cmake"

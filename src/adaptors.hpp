@@ -45,32 +45,24 @@ namespace Wintermute {
         "    </method>\n"
         "    <method name=\"quit\"/>\n"
         "    <method name=\"read\">\n"
-        "      <arg direction=\"out\" type=\"Wintermute::Data::Linguistics::Lexical::Data\"/>\n"
-        "      <arg direction=\"in\" type=\"Wintermute::Data::Linguistics::Lexical::Data\"/>\n"
-        "      <annotation value=\"Wintermute::Data::Linguistics::Lexical::Data\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
-        "      <annotation value=\"Wintermute::Data::Linguistics::Lexical::Data\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+        "      <arg direction=\"out\" type=\"s\"/>\n"
+        "      <arg direction=\"in\" type=\"s\"/>\n"
         "    </method>\n"
         "    <method name=\"write\">\n"
-        "      <arg direction=\"out\" type=\"Wintermute::Data::Linguistics::Lexical::Data\"/>\n"
-        "      <arg direction=\"in\" type=\"Wintermute::Data::Linguistics::Lexical::Data\"/>\n"
-        "      <annotation value=\"Wintermute::Data::Linguistics::Lexical::Data\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
-        "      <annotation value=\"Wintermute::Data::Linguistics::Lexical::Data\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+        "      <arg direction=\"out\" type=\"s\"/>\n"
+        "      <arg direction=\"in\" type=\"s\"/>\n"
         "    </method>\n"
         "    <method name=\"pseudo\">\n"
-        "      <arg direction=\"out\" type=\"Wintermute::Data::Linguistics::Lexical::Data\"/>\n"
-        "      <arg direction=\"in\" type=\"Wintermute::Data::Linguistics::Lexical::Data\"/>\n"
-        "      <annotation value=\"Wintermute::Data::Linguistics::Lexical::Data\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
-        "      <annotation value=\"Wintermute::Data::Linguistics::Lexical::Data\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+        "      <arg direction=\"out\" type=\"s\"/>\n"
+        "      <arg direction=\"in\" type=\"s\"/>\n"
         "    </method>\n"
         "    <method name=\"exists\">\n"
         "      <arg direction=\"out\" type=\"b\"/>\n"
-        "      <arg direction=\"in\" type=\"Wintermute::Data::Linguistics::Lexical::Data\"/>\n"
-        "      <annotation value=\"Wintermute::Data::Linguistics::Lexical::Data\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+        "      <arg direction=\"in\" type=\"s\"/>\n"
         "    </method>\n"
         "    <method name=\"isPseudo\">\n"
         "      <arg direction=\"out\" type=\"b\"/>\n"
-        "      <arg direction=\"in\" type=\"Wintermute::Data::Linguistics::Lexical::Data\"/>\n"
-        "      <annotation value=\"Wintermute::Data::Linguistics::Lexical::Data\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+        "      <arg direction=\"in\" type=\"s\"/>\n"
         "    </method>\n"
         "  </interface>\n"
                 "")
@@ -80,18 +72,18 @@ namespace Wintermute {
 
         public: // PROPERTIES
         public Q_SLOTS: // METHODS
-            bool exists(Lexical::Data in0);
+            bool exists(QString in0);
             Q_NOREPLY void generate();
-            bool isPseudo(Lexical::Data in0);
-            Lexical::Data pseudo(Lexical::Data in0);
+            bool isPseudo(QString in0);
+            QString pseudo(QString in0);
             void quit();
-            Lexical::Data read(Lexical::Data in0);
-            Lexical::Data write(Lexical::Data in0);
+            QString read(QString in0);
+            QString write(QString in0);
         Q_SIGNALS: // SIGNALS
             void nodeCreated(const QString &in0);
         };
 
-        class RuleAdaptor: public QDBusAbstractAdaptor{
+        class RuleAdaptor: public QDBusAbstractAdaptor {
             Q_OBJECT
             Q_CLASSINFO("D-Bus Interface", "org.thesii.Wintermute.Data.Rules")
             Q_CLASSINFO("D-Bus Introspection", ""

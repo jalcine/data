@@ -51,7 +51,7 @@ namespace Wintermute {
             public slots:
                 inline QDBusPendingReply<bool> exists(Lexical::Data in0) {
                     QList<QVariant> argumentList;
-                    argumentList << qVariantFromValue(in0);
+                    argumentList << in0.toString();
                     return asyncCallWithArgumentList(QLatin1String("exists"), argumentList);
                 }
 
@@ -62,13 +62,13 @@ namespace Wintermute {
 
                 inline QDBusPendingReply<bool> isPseudo(Lexical::Data in0) {
                     QList<QVariant> argumentList;
-                    argumentList << qVariantFromValue(in0);
+                    argumentList << qVariantFromValue(in0.toString());
                     return asyncCallWithArgumentList(QLatin1String("isPseudo"), argumentList);
                 }
 
                 inline QDBusPendingReply<Lexical::Data> pseudo(Lexical::Data in0) {
                     QList<QVariant> argumentList;
-                    argumentList << qVariantFromValue(in0);
+                    argumentList << qVariantFromValue(in0.toString());
                     return asyncCallWithArgumentList(QLatin1String("pseudo"), argumentList);
                 }
 
@@ -79,13 +79,13 @@ namespace Wintermute {
 
                 inline QDBusPendingReply<Lexical::Data> read(Lexical::Data in0) {
                     QList<QVariant> argumentList;
-                    argumentList << qVariantFromValue(in0);
+                    argumentList << qVariantFromValue(in0.toString());
                     return asyncCallWithArgumentList(QLatin1String("read"), argumentList);
                 }
 
                 inline QDBusPendingReply<Lexical::Data> write(Lexical::Data in0) {
                     QList<QVariant> argumentList;
-                    argumentList << qVariantFromValue(in0);
+                    argumentList << qVariantFromValue(in0.toString());
                     return asyncCallWithArgumentList(QLatin1String("write"), argumentList);
                 }
 

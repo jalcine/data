@@ -21,11 +21,14 @@
  * @endlegalese
 */
 
-#include <QFile>
 #include <QDir>
-#include <boost/progress.hpp>
-#include "lexical.hpp"
+#include <QFile>
+#include <qjson/parser.h>
+#include <qjson/serializer.h>
+#include <qjson/qobjecthelper.h>
+
 #include "md5.hpp"
+#include "lexical.hpp"
 
 namespace Wintermute {
     namespace Data {
@@ -39,10 +42,10 @@ namespace Wintermute {
                 Data::Data(const Data &p_dt) : m_id(p_dt.m_id),
                     m_lcl(p_dt.m_lcl), m_sym(p_dt.m_sym), m_flg(p_dt.m_flg) { }
 
-                Data::Data(QString p_id, QString p_lcl, QString p_sym, FlagMapping p_flg) : m_id(p_id),
+                Data::Data(QString p_id, QString p_lcl, QString p_sym, QVariantMap p_flg) : m_id(p_id),
                     m_lcl(p_lcl), m_sym(p_sym), m_flg(p_flg) { }
 
-                const FlagMapping Data::flags () const { return m_flg; }
+                const QVariantMap Data::flags () const { return m_flg; }
 
                 const QString Data::symbol () const { return m_sym; }
 
@@ -56,7 +59,7 @@ namespace Wintermute {
 
                 void Data::setID (const QString &l_id) { m_id = l_id; }
 
-                void Data::setFlags(const FlagMapping& l_flg) {
+                void Data::setFlags(const QVariantMap& l_flg) {
                     m_flg = l_flg;
                 }
 
@@ -77,8 +80,22 @@ namespace Wintermute {
                 /// @todo Use MD-5 hashing from another library (QCA has it) so we can eliminate md5.*pp.
                 const QString Data::idFromString (const QString p_sym) { return QString::fromStdString (md5(p_sym.toLower ().toStdString ())); }
 
+                QString Data::toString() const {
+                    QJson::Serializer* l_serializer = new QJson::Serializer;
+                    QVariantMap l_map = QJson::QObjectHelper::qobject2qvariant(this);
+                    return QString(l_serializer->serialize(l_map));
+                }
+
+                Data Data::fromString(const QString &p_str) {
+                    Data l_dt;
+                    QJson::Parser* l_parser = new QJson::Parser;
+                    QVariantMap l_map = l_parser->parse(p_str.toAscii()).toMap();
+                    QJson::QObjectHelper::qvariant2qobject(l_map,&l_dt);
+                    return l_dt;
+                }
+
                 Data::operator QVariant() const {
-                    return QVariant::fromValue(*this);
+                    return QVariant::fromValue(toString());
                 }
 
                 Data::~Data () { }
@@ -96,8 +113,8 @@ namespace Wintermute {
                     p_arg.beginMap();
 
                     while (!p_arg.atEnd()){
-                        FlagMapping::key_type l_key;
-                        FlagMapping::mapped_type l_value;
+                        QVariantMap::key_type l_key;
+                        QVariantMap::mapped_type l_value;
                         p_arg.beginMapEntry();
                         p_arg >> l_key >> l_value;
                         p_arg.endMapEntry();
@@ -116,10 +133,11 @@ namespace Wintermute {
 
                     p_arg.beginMap(QVariant::String, QVariant::String);
 
-                    FlagMapping::ConstIterator l_itr = p_dt.m_flg.constBegin(), l_end = p_dt.m_flg.constEnd();
+                    QVariantMap::ConstIterator l_itr = p_dt.m_flg.constBegin(), l_end = p_dt.m_flg.constEnd();
                     for (; l_itr != l_end; ++l_itr){
                         p_arg.beginMapEntry();
-                        p_arg << l_itr.key() << l_itr.value();
+                        p_arg << l_itr.key()
+                              << l_itr.value().toString();
                         p_arg.endMapEntry();
                     }
 
@@ -130,11 +148,13 @@ namespace Wintermute {
                 }
 
                 QDataStream& operator<<(QDataStream& p_strm, const Data& p_dt){
+                    qDebug() << p_dt.m_id << p_dt.m_lcl << p_dt.m_sym << p_dt.m_flg;
                     p_strm << p_dt.m_id << p_dt.m_lcl << p_dt.m_sym << p_dt.m_flg;
                     return p_strm;
                 }
 
                 QDataStream& operator>>(QDataStream& p_strm, Data& p_dt){
+                    qDebug() << p_dt.m_id << p_dt.m_lcl << p_dt.m_sym << p_dt.m_flg;
                     p_strm >> p_dt.m_id >> p_dt.m_lcl >> p_dt.m_sym >> p_dt.m_flg;
                     return p_strm;
                 }
@@ -412,7 +432,7 @@ namespace Wintermute {
                         return false;
                     }
 
-                    FlagMapping l_mp;
+                    QVariantMap l_mp;
                     QDomNodeList l_ndlst = this->DomBackend::m_ele->childNodes();
 
                     if (!l_ndlst.isEmpty ()) {
@@ -443,11 +463,11 @@ namespace Wintermute {
                     QDomDocument l_dom = this->DomBackend::m_ele->ownerDocument ();
 
                     if (!this->Model::m_dt.flags().empty()){
-                        for(FlagMapping::ConstIterator itr = this->Model::m_dt.flags ().begin ();
+                        for(QVariantMap::ConstIterator itr = this->Model::m_dt.flags ().begin ();
                             itr != this->Model::m_dt.flags ().end (); itr++) {
                             QDomElement l_ele = l_dom.createElement ("Flag");
                             l_ele.setAttribute ("guid",itr.key ());
-                            l_ele.setAttribute ("link",itr.value ());
+                            l_ele.setAttribute ("link",itr.value ().toString());
                             this->DomBackend::m_ele->appendChild (l_ele);
                         }
                     } else {
@@ -602,4 +622,3 @@ namespace Wintermute {
         }
     }
 }
-

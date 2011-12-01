@@ -83,9 +83,9 @@ namespace Wintermute {
 
             public slots:
                 void generate();
-                void pseudo(Lexical::Data& ) const;
-                void read(Lexical::Data& ) const;
-                void write(const Lexical::Data& );
+                Lexical::Data& pseudo(Lexical::Data& ) const;
+                Lexical::Data& read(Lexical::Data& ) const;
+                const Lexical::Data& write(const Lexical::Data& );
                 const bool exists(const Lexical::Data& ) const;
                 const bool isPseudo(const Lexical::Data& ) const;
                 static NodeManager* instance();
