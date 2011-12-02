@@ -4,26 +4,30 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 ## Files
 file(GLOB WNTRDATA_HEADERS *.hpp)
+list(REMOVE_ITEM WNTRDATA_HEADERS "dbus.hpp")
 file(GLOB WNTRDATA_SOURCES *.cpp)
+
 file(GLOB ontology_SUBDIR_H "ontology/*.hpp")
 file(GLOB ontology_SUBDIR_S "ontology/*.cpp")
+
 set(WNTRDATA_HEADERS ${WNTRDATA_HEADERS} ${ontology_SUBDIR_H})
 set(WNTRDATA_SOURCES ${WNTRDATA_SOURCES} ${ontology_SUBDIR_S})
 file(GLOB WNTRDATA_CMAKE_MODULES "${PROJECT_SOURCE_DIR}/cmake/Modules/*.cmake")
 QT4_WRAP_CPP(WNTRDATA_SOURCES ${WNTRDATA_HEADERS})
 
+
 include_directories("ontology")
 ## Targets
-add_library(wntrdata SHARED ${WNTRDATA_SOURCES})
+add_library(wplugin-data SHARED ${WNTRDATA_SOURCES})
 
-set_target_properties(wntrdata
+set_target_properties(wplugin-data
     PROPERTIES
     VERSION ${GENERIC_LIB_VERSION}
     SOVERSION ${GENERIC_LIB_SOVERSION})
 
-target_link_libraries(wntrdata ${WNTRDATA_LIBRARIES})
+target_link_libraries(wplugin-data ${WNTRDATA_LIBRARIES})
 
-install(TARGETS wntrdata
+install(TARGETS wplugin-data
     EXPORT WntrDataLibraryDepends
     LIBRARY DESTINATION "${WINTER_PLUGIN_INSTALL_DIR}")
 

@@ -22,61 +22,130 @@
 #include <QtPlugin>
 #include <wntr/core.hpp>
 #include <wntr/ipc.hpp>
-
 #include "wntrdata.hpp"
+#include "adaptors.hpp"
 
 namespace Wintermute {
     namespace Data {
-        System* System::s_config = NULL;
+        System* System::s_inst = NULL;
+        NodeManager* NodeManager::s_inst = NULL;
+        RuleManager* RuleManager::s_inst = NULL;
 
-        System::System() : m_dir(WNTRDATA_DATA_DIR) { }
+        RuleManager::RuleManager() : QObject(System::instance()) { }
+
+        const bool RuleManager::exists(const QString &p_1, const QString &p_2) const {
+            qDebug() << p_1 << p_2;
+            return Rules::Cache::exists(p_1,p_2);
+        }
+
+        void RuleManager::read(Rules::Chain &p_chn) {
+            qDebug() << p_chn.toString();
+            Rules::Cache::read(p_chn);
+        }
+
+        void RuleManager::write(Rules::Chain &p_chn) {
+            qDebug() << p_chn.toString();
+            Rules::Cache::write(p_chn);
+        }
+
+        RuleManager* RuleManager::instance() {
+            if (!s_inst) s_inst = new RuleManager;
+            return s_inst;
+        }
+
+        NodeManager::NodeManager() : QObject(System::instance()) { }
+
+        void NodeManager::generate() {
+            Lexical::Cache::generate();
+        }
+
+        Lexical::Data& NodeManager::pseudo(Lexical::Data &p_dt) const {
+            Lexical::Cache::pseudo(p_dt);
+            return p_dt;
+        }
+
+        Lexical::Data& NodeManager::read(Lexical::Data &p_dt) const {
+            Lexical::Cache::read(p_dt);
+            return p_dt;
+        }
+
+        const Lexical::Data& NodeManager::write(const Lexical::Data &p_dt) {
+            Lexical::Cache::write(p_dt);
+            return p_dt;
+        }
+
+        const bool NodeManager::exists(const Lexical::Data &p_dt) const {
+            qDebug() << "(data) [NodeManager] Exists? " << p_dt.id() << Lexical::Cache::exists(p_dt);
+            return Lexical::Cache::exists(p_dt);
+        }
+
+        const bool NodeManager::isPseudo(const Lexical::Data &p_dt) const {
+            return Lexical::Cache::isPseudo(p_dt);
+        }
+
+        NodeManager* NodeManager::instance() {
+            if (!s_inst) s_inst = new NodeManager;
+            return s_inst;
+        }
+
+        System::System() : m_dir(WNTRDATA_DATA_DIR) {
+            connect(this,SIGNAL(started()),this,SLOT(registerDataTypes()));
+        }
+
+        void System::registerDataTypes() {
+            qRegisterMetaType<QVariantMap>("QVariantMap");
+            qRegisterMetaTypeStreamOperators<Lexical::Data>("Wintermute::Data::Linguistics::Lexical::Data");
+            //qRegisterMetaTypeStreamOperators<Rules::Bond>();
+            //qRegisterMetaTypeStreamOperators<Rules::Chain>();
+
+            qDBusRegisterMetaType<Lexical::Data>();
+            qDBusRegisterMetaType<QVariantMap>();
+            qDBusRegisterMetaType<Rules::Bond>();
+            qDBusRegisterMetaType<Rules::Chain>();
+        }
 
         void System::start ( ) {
-            Wintermute::Data::Linguistics::System::load ( System::directory() + QString ( "/" ) + QString ( WNTRDATA_LING_DIR ) );
-            Wintermute::Data::Ontology::System::load();
-            emit s_config->started();
+            Linguistics::System::setLocale ( Core::arguments ()->value ("locale").toString () );
+            Linguistics::System::load ( System::directory() + QString ( "/" ) + QString ( WNTRDATA_LING_DIR ) );
+            Ontology::System::load();
+            emit s_inst->started();
         }
 
         void System::stop ( ) {
             Wintermute::Data::Ontology::System::unload();
             Wintermute::Data::Linguistics::System::unload();
-            emit s_config->stopped();
+            emit s_inst->stopped();
         }
 
-        const QString System::directory () { return s_config->m_dir; }
+        const QString System::directory () { return s_inst->m_dir; }
 
         void System::setDirectory(const QString& p_dir) {
             stop();
-            s_config->m_dir = p_dir;
+            s_inst->m_dir = p_dir;
             start();
         }
 
         System* System::instance () {
-            if (!s_config) s_config = new System;
-            return s_config;
+            if (!s_inst) s_inst = new System;
+            return s_inst;
         }
 
-        void Plugin::initialize () const {
-            Data::Linguistics::System::setLocale ( Core::arguments ()->value ("locale").toString () );
+        void Plugin::start () const {
+            connect(this,SIGNAL(started()), Wintermute::Data::System::instance (),SLOT(start()));
+            connect(this,SIGNAL(stopped()), Wintermute::Data::System::instance (),SLOT(stop()));
 
-            connect(Wintermute::Core::instance (),SIGNAL(started()),Wintermute::Data::System::instance (),SLOT(start()));
-            connect(Wintermute::Core::instance (),SIGNAL(stopped()),Wintermute::Data::System::instance (),SLOT(stop()));
-
-            Data::SystemAdaptor* l_adpt = new Data::SystemAdaptor;
             Data::NodeAdaptor* l_adpt2 = new Data::NodeAdaptor;
             Data::RuleAdaptor* l_adpt3 = new Data::RuleAdaptor;
+            Data::SystemAdaptor* l_adpt = new Data::SystemAdaptor;
 
-            Wintermute::IPC::System::registerObject ("/System" , l_adpt);
             Wintermute::IPC::System::registerObject ("/Nodes"  , l_adpt2);
             Wintermute::IPC::System::registerObject ("/Rules"  , l_adpt3);
+            Wintermute::IPC::System::registerObject ("/System" , l_adpt);
         }
 
-        void Plugin::deinitialize () const {
-        }
-
-        QObject* Plugin::instance () const { return System::instance(); }
+        void Plugin::stop () const { }
     }
 }
 
-Q_EXPORT_PLUGIN2(WntrData, Wintermute::Data::Plugin)
+Q_EXPORT_PLUGIN2(Wintermute-Plugin-Data, Wintermute::Data::Plugin)
 // kate: indent-mode cstyle; space-indent on; indent-width 4;

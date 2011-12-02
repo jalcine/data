@@ -55,15 +55,56 @@
 #include "ontology.hpp"
 #include "linguistics.hpp"
 #include "models.hpp"
-#include "adaptors.hpp"
+#include "interfaces.hpp"
 #include <wntr/plugins.hpp>
 
+using namespace Wintermute::Data::Linguistics;
 using Wintermute::Plugins::AbstractPlugin;
 
 namespace Wintermute {
     namespace Data {
         struct Plugin;
         struct System;
+        struct NodeManager;
+        struct RuleManager;
+
+        class NodeManager : public QObject {
+            friend class NodeAdaptor;
+            friend class NodeInterface;
+            Q_OBJECT
+            Q_DISABLE_COPY(NodeManager)
+
+            private:
+                static NodeManager* s_inst;
+                NodeManager();
+
+            signals:
+                void nodeCreated(const QString&);
+
+            public slots:
+                void generate();
+                Lexical::Data& pseudo(Lexical::Data& ) const;
+                Lexical::Data& read(Lexical::Data& ) const;
+                const Lexical::Data& write(const Lexical::Data& );
+                const bool exists(const Lexical::Data& ) const;
+                const bool isPseudo(const Lexical::Data& ) const;
+                static NodeManager* instance();
+        };
+
+        class RuleManager : public QObject {
+            Q_OBJECT
+            Q_DISABLE_COPY(RuleManager)
+
+            private:
+                static RuleManager* s_inst;
+                RuleManager();
+
+            public slots:
+                static RuleManager* instance();
+                void read(Rules::Chain& );
+                void write(Rules::Chain& );
+                const bool exists(const QString&, const QString& ) const;
+        };
 
         /**
          * @brief Manages the data location representing WntrData.
@@ -71,11 +112,12 @@ namespace Wintermute {
          */
         class System : public QObject {
             friend class SystemAdaptor;
+            friend class SystemInterface;
             Q_OBJECT
             Q_DISABLE_COPY(System)
 
             private:
-                static System* s_config;
+                static System* s_inst;
                 QString m_dir;
                 System();
 
@@ -128,6 +170,8 @@ namespace Wintermute {
                  * @fn Deinitialize
                  */
                 static void start();
+
+                static void registerDataTypes();
         };
 
        class Plugin : public AbstractPlugin {
@@ -137,9 +181,8 @@ namespace Wintermute {
                 ~Plugin() { }
                 Plugin(Plugin const &k) : AbstractPlugin(k) { }
 
-                virtual void initialize() const;
-                virtual void deinitialize() const;
-                virtual QObject* instance() const;
+                virtual void start() const;
+                virtual void stop() const;
         };
     }
 }

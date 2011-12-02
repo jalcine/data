@@ -12,4 +12,4 @@ set(WNTRDATA_LIBRARY_DIRS "@WNTRDATA_LIB_DIR@")
 include("@CMAKE_INSTALL_PREFIX@/share/cmake/WntrData/WntrDataLibraryDepends.cmake")
  
 # These are IMPORTED targets created by WntrDataLibraryDepends.cmake
-set(WNTRDATA_LIBRARIES wntrdata)
+set(WNTRDATA_LIBRARIES wintermute-plugin-data)

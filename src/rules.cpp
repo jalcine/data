@@ -26,6 +26,9 @@
 #include <QFile>
 #include <QDir>
 #include <algorithm>
+#include <qjson/parser.h>
+#include <qjson/serializer.h>
+#include <qjson/qobjecthelper.h>
 
 using std::unique;
 
@@ -100,11 +103,35 @@ namespace Wintermute {
 
                 const bool Bond::operator == (const Bond& p_bnd) const { return m_props == p_bnd.m_props; }
 
+                Bond Bond::fromString(const QString &p_str) {
+                    QJson::Parser* l_parser = new QJson::Parser;
+                    QVariantMap l_map = l_parser->parse(p_str.toAscii()).toMap();
+                    Bond l_bnd;
+                    QVariantMap::ConstIterator l_itr = l_map.constBegin(), l_end = l_map.constEnd();
+                    for (; l_itr != l_end; ++l_itr)
+                        l_bnd.m_props.insert(l_itr.key(),l_itr.value().toString());
+                    return l_bnd;
+                }
+
+                QString Bond::toString() const {
+                    QJson::Serializer* l_serializer = new QJson::Serializer;
+                    QVariantMap l_map;
+                    StringMap::ConstIterator l_itr = m_props.constBegin(), l_end = m_props.constEnd();
+                    for (; l_itr != l_end; ++l_itr)
+                        l_map.insert(l_itr.key(),l_itr.value());
+                    return QString(l_serializer->serialize(l_map));
+                }
+
+                QDebug operator<<(QDebug p_dbg, const Bond& p_bnd){
+                    p_dbg << p_bnd.m_props;
+                    return p_dbg;
+                }
+
                 Bond::~Bond () { }
 
                 Chain::Chain() { }
 
-                Chain::Chain(const QString& p_lcl, const QString& p_typ, const BondList &p_vtr) : m_bndVtr(p_vtr),
+                Chain::Chain(const QString& p_lcl, const QString& p_typ, const QList<Bond> &p_vtr) : m_bndVtr(p_vtr),
                     m_typ(p_typ), m_lcl(p_lcl) { }
 
                 Chain::Chain(const Chain &p_chn) : m_bndVtr(p_chn.m_bndVtr), m_lcl(p_chn.m_lcl), m_typ(p_chn.m_typ) { }
@@ -115,7 +142,7 @@ namespace Wintermute {
                     m_lcl = p_chn.m_lcl;
                 }
 
-                const BondList Chain::bonds () const { return m_bndVtr; }
+                const QList<Bond> Chain::bonds () const { return m_bndVtr; }
 
                 const QString Chain::type () const { return m_typ; }
 
@@ -125,7 +152,39 @@ namespace Wintermute {
                     m_typ = p_typ;
                 }
 
-                void Chain::setBonds (const BondList &p_bnd) { m_bndVtr = p_bnd; }
+                void Chain::setBonds (const QList<Bond> &p_bnd) { m_bndVtr = p_bnd; }
+
+                QString Chain::toString() const {
+                    QJson::Serializer* l_serializer = new QJson::Serializer;
+                    QVariantMap l_map;
+                    QVariantList l_bndLst;
+
+                    foreach (const Bond l_bnd, m_bndVtr)
+                        l_bndLst << qVariantFromValue(l_bnd.toString());
+
+                    l_map["Type"] = m_typ;
+                    l_map["Bonds"] = l_bndLst;
+                    l_map["Locale"] = m_lcl;
+                    return QString(l_serializer->serialize(l_map));
+                }
+
+                Chain Chain::fromString(const QString &p_str) {
+                    QJson::Parser* l_parser = new QJson::Parser;
+                    QVariantMap l_map = l_parser->parse(p_str.toAscii()).toMap();
+                    Chain l_chn;
+                    l_chn.m_lcl = l_map["Locale"].toString();
+                    l_chn.m_typ = l_map["Type"].toString();
+                    QStringList l_bndLst = l_map["Bonds"].toStringList();
+                    l_bndLst.removeAll("{  }");
+                    QStringList::ConstIterator l_itr = l_bndLst.constBegin(), l_end = l_bndLst.constEnd();
+
+                    for (; l_itr != l_end; ++l_itr){
+                        const QString l_str = *l_itr;
+                        l_chn.m_bndVtr << Bond::fromString(l_str);
+                    }
+
+                    return l_chn;
+                }
 
                 Chain::~Chain () { }
 
@@ -175,7 +234,7 @@ namespace Wintermute {
 
                 const Chain* DomLoadModel::load () const {
                     Chain* l_chn = new Chain();
-                    BondList l_bndVtr;
+                    QList<Bond> l_bndVtr;
                     obtainBonds(l_bndVtr,*m_elem);
                     unique(l_bndVtr.begin (),l_bndVtr.end ());
 
@@ -185,7 +244,7 @@ namespace Wintermute {
                     return l_chn;
                 }
 
-                void DomLoadModel::obtainBonds(BondList& p_bndVtr, QDomElement p_elem) const {
+                void DomLoadModel::obtainBonds(QList<Bond>& p_bndVtr, QDomElement p_elem) const {
                     if (p_elem.nodeName () != "Rule")
                         return;
 
@@ -225,7 +284,7 @@ namespace Wintermute {
 
                 /// @todo Allow rules to be inherited upon load.
                 void DomLoadModel::loadTo (Chain &p_chn) const {
-                    BondList l_bndVtr;
+                    QList<Bond> l_bndVtr;
                     obtainBonds(l_bndVtr,*m_elem);
 
                     unique(l_bndVtr.begin (),l_bndVtr.end ());
@@ -245,7 +304,7 @@ namespace Wintermute {
                 void DomSaveModel::save () { }
 
                 void DomSaveModel::saveFrom (const Chain &p_chn) {
-                    const BondList l_bndVtr = p_chn.bonds();
+                    const QList<Bond> l_bndVtr = p_chn.bonds();
                     const QString l_bndTyp = p_chn.type();
                     
                     setBonds(l_bndVtr);
@@ -253,7 +312,7 @@ namespace Wintermute {
                     save();
                 }
                 
-                void DomSaveModel::setBonds(const BondList& p_bndVtr) { }
+                void DomSaveModel::setBonds(const QList<Bond>& p_bndVtr) { }
                 
                 void DomSaveModel::setType(const QString& p_bndTyp) {}
 

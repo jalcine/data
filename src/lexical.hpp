@@ -20,10 +20,10 @@
  * Boston, MA 02111-1307, USA.
  * @endlegalese
  */
- 
+
 #ifndef LEXICAL_HPP
 #define LEXICAL_HPP
- 
+
 #include <QObject>
 #include <QList>
 #include <QMultiMap>
@@ -54,18 +54,6 @@ namespace Wintermute {
                 struct DomBackend;
 
                 /**
-                 * @brief A collection of flags.
-                 *
-                 * This typedef encapsulates a QMultiMap that holds a one-to-many
-                 * mapping of values. This flag collection is used by the parser
-                 * to hold the vital ontological value up to the lexicosyntactical
-                 * binding ID.
-                 *
-                 * @typedef FlagMapping
-                 */
-                typedef QMultiMap<QString, QString> FlagMapping;
-
-                /**
                  * @brief The lexical POD format of linguistics parsing.
                  *
                  * The Data object represents the internal workings of the lexical
@@ -77,24 +65,26 @@ namespace Wintermute {
                  *
                  * @note This class can be considered this a POD (<b>p</b>lain <b>o</b>l' <b>data format) of Wintermute.
                  * @class Data models.hpp "src/models.hpp"
-                 * @see FlagMapping
+                 * @see QVariantMap
                  */
-                class Data : public QObject {
+                struct Data : public QObject {
+                    friend QDebug operator<<(QDebug dbg, const Data&);
                     friend QDBusArgument& operator<< (QDBusArgument&, const Data&);
                     friend const QDBusArgument& operator>> (const QDBusArgument&, Data&);
-                    friend QDebug operator<<(QDebug dbg, const Data&);
+                    friend QDataStream& operator<<(QDataStream&, const Data&);
+                    friend QDataStream& operator>>(QDataStream&, Data&);
 
                     Q_OBJECT
-                    Q_PROPERTY(QString Locale READ locale WRITE setLocale)
-                    Q_PROPERTY(QString Symbol READ symbol WRITE setSymbol)
-                    Q_PROPERTY(QString ID READ id WRITE setID)
-                    Q_PROPERTY(FlagMapping Flags READ flags WRITE setFlags)
+                    Q_PROPERTY(const QString Locale READ locale WRITE setLocale)
+                    Q_PROPERTY(const QString Symbol READ symbol WRITE setSymbol)
+                    Q_PROPERTY(const QString ID READ id WRITE setID)
+                    Q_PROPERTY(const QVariantMap Flags READ flags WRITE setFlags)
 
-                    private:
+                    //private:
                         QString m_id;
                         QString m_lcl;
                         QString m_sym;
-                        FlagMapping m_flg;
+                        QVariantMap m_flg;
 
                     public:
                         /**
@@ -105,7 +95,9 @@ namespace Wintermute {
                          * @param string The symbol of the Data.
                          * @param DataFlagMap The flags of the Data.
                          */
-                        explicit Data(const QString , const QString , const QString = "" , const FlagMapping = FlagMapping());
+                        explicit Data(const QString , const QString , const QString = "" , const QVariantMap = QVariantMap());
+
+                        operator QVariant() const;
 
                         /**
                          * @brief Null constructor.
@@ -133,6 +125,10 @@ namespace Wintermute {
                          * @param The Data to be copied.
                          */
                         void operator=(const Data&);
+
+                        QString toString() const;
+
+                        static Data fromString(const QString& );
 
                         /**
                          * @brief Deconstructor.
@@ -162,7 +158,7 @@ namespace Wintermute {
                          * @brief Returns the flags of the Data.
                          * @fn flags
                          */
-                        const FlagMapping flags() const;
+                        const QVariantMap flags() const;
 
                         /**
                          * @brief Changes the symbol of the Data to p_dt.
@@ -180,7 +176,7 @@ namespace Wintermute {
                          * @fn setFlags
                          * @param p_flg The flags for the Data to hold now.
                          */
-                        void setFlags( const FlagMapping& );
+                        void setFlags( const QVariantMap& );
 
                         void setLocale(const QString&);
                         void setID(const QString&);
@@ -197,20 +193,6 @@ namespace Wintermute {
                          * @param QString The text to be transformed into its proper ID.
                          */
                         static const QString idFromString(const QString);
-
-                        QDBusArgument &operator<< (QDBusArgument &p_arg) {
-                            p_arg.beginStructure();
-                            p_arg << m_id << m_lcl << m_sym << m_flg;
-                            p_arg.endStructure();
-                            return p_arg;
-                        }
-
-                        const QDBusArgument &operator>> (const QDBusArgument &p_arg) {
-                            p_arg.beginStructure();
-                            p_arg >> m_id >> m_lcl >> m_sym >> m_flg;
-                            p_arg.endStructure();
-                            return p_arg;
-                        }
 
                         static const Data Null; /**< Represents an empty set of data. */
                 };
@@ -771,6 +753,9 @@ namespace Wintermute {
                  * @class DomStorage models.hpp "src/models.hpp"
                  */
                 class DomStorage : public Storage {
+                    friend class DomLoadModel;
+                    friend class DomSaveModel;
+
                     private:
                         /**
                          * @brief
@@ -892,6 +877,7 @@ namespace Wintermute {
     }
 }
 
+Q_DECLARE_TYPEINFO(Wintermute::Data::Linguistics::Lexical::Data, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(Wintermute::Data::Linguistics::Lexical::Data)
 
 #endif

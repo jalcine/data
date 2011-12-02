@@ -31,8 +31,8 @@ using std::unique;
 namespace Wintermute {
     namespace Data {
         namespace Linguistics {
-            QString System::s_dir = QString(WNTRDATA_DATA_DIR) + "/" + QString(WNTRDATA_LING_DIR);
-            QString System::s_lcl = QString(WNTRDATA_DEFAULT_LOCALE);
+            QString System::s_dir = QString(WNTR_DATA_DIR) + "/" + QString(WNTRDATA_LING_DIR);
+            QString System::s_lcl = QString(WNTR_LOCALE);
 
             void System::load ( const QString p_dir, const QString p_lcl ) {
                 qDebug() << "(data) [System] # ling # System loading...";
