@@ -1,9 +1,10 @@
 #ifndef QUERY_HPP
 #define QUERY_HPP
 
-#include <QObject>
-#include <QString>
+// Qt
 #include <QUrl>
+#include <QString>
+#include <QStringList>
 
 
 namespace Wintermute {

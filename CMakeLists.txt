@@ -32,6 +32,14 @@ include(WintermuteMacros)
 include(WintermuteDefaults)
 enable_doxygen()
 
+if(not CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE RelWithDebInfo)
+endif()
+
+if(not CMAKE_INSTALL_PREFIX)
+    set(CMAKE_INSTALL_PREFIX /usr)
+endif()
+
 find_package(PkgConfig REQUIRED)
 pkg_search_module(SOPRANO REQUIRED soprano)
 ## update: The above should be removed and have the FindSoprano.cmake used instead at (http://websvn.kde.org/%2Acheckout%2A/trunk/KDE/kdelibs/cmake/modules/FindSoprano.cmake)
