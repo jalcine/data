@@ -25,7 +25,7 @@
 #ifndef __WNTRDATA_CONFIG_HPP__
 #define __WNTRDATA_CONFIG_HPP__
 
-#cmakedefine DEBUG
+#cmakedefine01 DEBUG
 
 #define DOMSTORAGE_MAXSTR 1.0
 #define WNTRDATA_DATA_DIR "@WNTRDATA_DATA_DIR@"
