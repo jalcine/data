@@ -1,9 +1,9 @@
 /**
- * @file ontology.hpp
- * @author Wintermute Developers <wintermute-devel@lists.launchpad.net>
- * @date March 29, 2011, 2:25 PM
- * @namespace Wintermute::Data::Ontology
- * @legalese
+ * \file ontology.hpp
+ * \author Wintermute Developers <wintermute-devel\lists.launchpad.net>
+ * \date March 29, 2011, 2:25 PM
+ * \namespace Wintermute::Data::Ontology
+ * \legalese
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
@@ -18,54 +18,69 @@
  * License along with this library; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- * @endlegalese
+ * \endlegalese
  *
  */
 
 #ifndef ONTOLOGY_HPP
 #define	ONTOLOGY_HPP
 
+// Qt
 #include <QString>
-#include <QMap>
+#include <QStringList>
+
+// Soprano
 #include <Soprano/Model>
+#include <Soprano/Client/SparqlModel>
+
+// Local
+#include "query.hpp"
 
 using namespace std;
-
-using std::map;
-using std::pair;
-using std::string;
 
 namespace Wintermute {
     namespace Data {
         namespace Ontology {
             struct System;
-            struct Repository;
             struct Resource;
+            struct Repository;
+
+            typedef QString Concept;
 
             /**
-             * @brief Configuration class for the ontology section.
-             * @class Configuration ontology.hpp "src/ontology.hpp"
+             * \brief Configuration class for the ontology section.
              */
             class System : public QObject {
                 Q_OBJECT
 
-                public:
-                    /**
-                     * @brief Initializes the ontology system.
-                     * Runs all of the necessary initialziation code to get the ontology system on its toes.
-                     * @fn Initialize
-                     */
-                    Q_INVOKABLE static void load();
-                    /**
-                     * @brief Deinitializes the ontology system/
-                     * Runs all of the necessary deinitialization code to have the ontology system be safely shut down.
-                     * @fn Deinitialize
-                     */
-                    Q_INVOKABLE static void unload();
+            private:
+                QUrl systemOntology;
+
+            public:
+                /**
+                 * \brief Return URL of the system ontology
+                 *
+                 * \return URL of the system ontology
+                 */
+                static QUrl getSystemOntology();
+
+                /**
+                 * \brief Initializes the ontology system.
+                 *
+                 * Runs all of the necessary initialization code to get the ontology system on its toes.
+                 */
+                Q_INVOKABLE static void load();
+
+                /**
+                 * \brief Deinitializes the ontology system.
+                 *
+                 * Runs all of the necessary deinitialization code to have the ontology system be safely shut down.
+                 */
+                Q_INVOKABLE static void unload();
             };
 
             /**
-             * @brief Represents an object being described.
+             * \brief Represents an object being described.
              *
              * According to the definition of resources in the RDF syntax documentation
              * <http://www.w3.org/TR/REC-rdf-syntax> it's defined as,
@@ -82,48 +97,52 @@ namespace Wintermute {
              * This class provides a means of convience over RDF-XML parsing languages (mainly SPARQL and RDFQL) so that
              * properties of resources can be properly queried and modified.
              *
-             * @class Resource ontology.hpp "src/ontology.hpp"
-             * @todo Add 'operator==()', 'operator!=()', and 'operator=()' to this method for convience.
+             * \class Resource ontology.hpp "src/ontology.hpp"
+             * \todo Add 'operator==()', 'operator!=()', and 'operator=()' to this method for convience.
              */
             class Resource : public QObject {
                 public:
                     /**
-                     * @brief Default constructor.
+                     * \brief Default constructor.
                      *
-                     * @fn Resource
-                     * @param p_parent The parent object.
+                     * \fn Resource
+                     * \param parent The parent object.
                      */
-                    explicit Resource( const QObject* = NULL );
+                    explicit Resource( const QObject* parent = NULL );
 
                     /**
-                     * @brief Initializating constructor.
+                     * \brief Copy constructor.
+                     *
+                     * \fn Resource
+                     * \param resource The Resource to be copied.
+                     */
+                    Resource( const Resource& resource );
+
+                    /**
+                     * \brief Initializating constructor.
                      *
                      * Creates a new Resource from its parent Repository and
                      * its corresponding Node within the ontology.
                      *
-                     * @fn Resource
-                     * @param p_repo The parent repository.
-                     * @param p_node The Soprano::Node that this Resource represents.
+                     * \fn Resource
+                     * \param node The Soprano::Node that this Resource represents.
+                     * \param parent The parent repository.
                      */
-                    Resource( const Repository* , const Soprano::Node& );
+                    Resource( const Soprano::Node& node, const Repository* parent );
 
                     /**
-                     * @brief Copy constructor.
+                     * \brief Deconstructor.
                      *
-                     * @fn Resource
-                     * @param p_resource The Resource to be copied.
-                     */
-                    Resource( const Resource& );
-
-                    /**
-                     * @brief Deconstructor.
-                     *
-                     * @fn ~Resource
+                     * \fn ~Resource
                      */
                     virtual ~Resource();
 
-                    Resource& attribute(const QString& ) const;
-                    void setAttribute(const QString&, const Resource&);
+                    /**
+                     * \brief
+                     *
+                     * \fn countConcepts
+                     */
+                    static const int countConcepts();
 
                 private:
                     const Repository* m_repo;
@@ -132,14 +151,15 @@ namespace Wintermute {
             };
 
             /**
-             * @brief Represents an entire ontological store.
+             * \brief Represents an entire ontological store.
              *
              * Repostiories represent the entire encompassing set of Resources
              * in their native format (that being RDF-XML, for now).
              *
-             * @todo Obtain the specified Resource from the internal ontology when requested.
+             * \todo Obtain the specified Resource from the internal ontology when requested.
+             * \todo Document methods.
              *
-             * @class Repository ontology.hpp "src/ontology.hpp"
+             * \class Repository ontology.hpp "src/ontology.hpp"
              */
             class Repository : public QObject {
                 Q_OBJECT
@@ -147,22 +167,30 @@ namespace Wintermute {
                     void loaded() const;
 
                 public:
-                    explicit Repository(const QObject* = NULL);
-                    Repository(const QString&);
-                    Repository(const Repository&);
+                    explicit Repository(const QObject* parent = NULL);
+                    Repository(const QString& p_str);
+                    Repository(const Repository& p_repo);
                     virtual ~Repository();
-                    Resource* obtainResource(const QString &) const;
+
+                    /**
+                     * \brief Returns a pointer to the Resource object representing given Concept.
+                     *
+                     * \param concept concept to search for
+                     * \return pointer to the object representing the concept
+                     */
+                    Resource* obtainResource(Concept const& concept) const;
+                    static Resource* obtainResource(const QString&, const QString&);
 
                     static Repository* obtainRepository(const QString&);
-                    static Resource* obtainResource(const QString&, const QString&);
                     static const int countOntologies();
 
                 private:
                     static QMap<QString, Repository*> s_repos;
                     void load(const QString& = "") const;
                     const QString getPath() const;
-                    mutable QString m_repo;
-                    mutable Soprano::Model* m_model;
+
+                    mutable QString m_repoName;
+                    mutable Soprano::Client::SparqlModel* m_model;
             };
         }
     }

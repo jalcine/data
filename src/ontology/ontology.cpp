@@ -24,6 +24,7 @@
 
 #include "config.hpp"
 #include "ontology.hpp"
+#include "query.hpp"
 #include "wntrdata.hpp"
 #include <QtDebug>
 #include <Soprano/Soprano>
@@ -36,6 +37,10 @@ namespace Wintermute {
         namespace Ontology {
             QMap<QString, Repository*> Repository::s_repos;
 
+            QUrl System::getSystemOntology() {
+                return QUrl(QString(WNTRDATA_ONTO_DIR)+QString("/COSMO.owl"));
+            }
+
             void System::load() {
                 const Repository* l_repo = Repository::obtainRepository("COSMO");
                 qDebug() << "(data) [System] # ontology # Loaded.";
@@ -45,14 +50,16 @@ namespace Wintermute {
                 qDebug() << "(data) [System] # ontology # Unloaded.";
             }
 
-            Repository::Repository(const QString &p_str) : m_repo(p_str) { load(); }
+            const int Resource::countConcepts () { return 0; }
 
-            Repository::Repository(const Repository &p_repo) : m_repo(p_repo.m_repo), m_model(p_repo.m_model) { }
+            Repository::Repository(const QString &p_str) : m_repoName(p_str) { load(); }
 
-            Repository* Repository::obtainRepository(const QString& p_repoName){
+            Repository::Repository(const Repository &p_repo) : m_repoName(p_repo.m_repoName), m_model(p_repo.m_model) { }
+
+            Repository* Repository::obtainRepository(const QString& p_repoName) {
                 Repository* l_repo = NULL;
                 
-                if (Repository::s_repos.count(p_repoName) == 0){
+                if (Repository::s_repos.count(p_repoName) == 0) {
                     l_repo = new Repository(p_repoName);
                     Repository::s_repos.insert(p_repoName,l_repo);
                 } else 
@@ -65,18 +72,31 @@ namespace Wintermute {
 
             const QString Repository::getPath() const {
                 return QUrl::fromLocalFile (Data::System::directory () + QString("/")
-                        + QString(WNTRDATA_ONTO_DIR) + QString("/") + m_repo + QString(".owl")).toString ();
+                        + QString(WNTRDATA_ONTO_DIR) + QString("/") + m_repoName + QString(".owl")).toString ();
             }
 
             void Repository::load(const QString& p_repoName) const {
-                qDebug() << "(data) [Repository] Loading ontology" << m_repo << "...";
+                qDebug() << "(data) [Repository] Loading ontology" << m_repoName << "...";
                 if (!p_repoName.isEmpty ())
-                    m_repo = p_repoName;
+                    m_repoName = p_repoName;
            }
 
-            /// @todo Figure out how to use SPARQL to obtain a resource. I (Jacky A.) am having no luck whatsoever.
-            Resource* Repository::obtainResource(const QString& p_res) const {
-                return NULL;
+            Resource* Repository::obtainResource(const Concept& concept) const {
+                Query query;
+                query.setBase(QUrl("http://micra.com/COSMO/COSMO.owl#"));
+                query.addPrefix("rdf", QUrl("http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
+                query.addPrefix("owl", QUrl("http://www.w3.org/2002/07/owl#"));
+
+                QStringList variables;
+                variables.append("x");
+                query.addVariables("SELECT", variables);
+
+                query.addTriple("?x", "owl:Class", "?res");
+                query.addTriple("?res", "rdf:ID", concept);
+
+                QueryResultIterator it = m_model->executeQuery(query.getContents());
+                QList<BindingSet> bindingSets = it.allBindings();
+                return new Resource(bindingSets[0]["x"], this);
             }
 
             Resource* Repository::obtainResource(const QString& p_repository, const QString& p_res){                
@@ -85,7 +105,7 @@ namespace Wintermute {
                 else return l_repo->obtainResource(p_res);
             }
 
-            Repository::~Repository() { qDebug() << "Destroyed repository" << m_repo << "."; }
+            Repository::~Repository() { qDebug() << "Destroyed repository" << m_repoName << "."; }
         }
     }
 }

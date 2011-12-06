@@ -8,7 +8,7 @@ Type=API
 Plugin=@WNTRDATA_VERSION@
 UUID=@WNTRDATA_UUID@
 Compat=@Wintermute_VERSION@
-Library=wintermute-plugin-data
+Library=wplugin-data
 
 [Description]
 Name=Data API

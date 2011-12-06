@@ -3,31 +3,37 @@ cmake_minimum_required(VERSION 2.8)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 ## Files
-file(GLOB WNTRDATA_SHPP *.hpp)
-file(GLOB WNTRDATA_SCPP *.cpp)
-file(GLOB CMAKE_MODULES "${PROJECT_SOURCE_DIR}/cmake/Modules/*.cmake")
+file(GLOB WNTRDATA_HEADERS *.hpp)
+list(REMOVE_ITEM WNTRDATA_HEADERS "dbus.hpp")
+file(GLOB WNTRDATA_SOURCES *.cpp)
 
-list(REMOVE_ITEM WNTRDATA_SHPP "dbus.hpp")
+file(GLOB ontology_SUBDIR_H "ontology/*.hpp")
+file(GLOB ontology_SUBDIR_S "ontology/*.cpp")
 
-QT4_WRAP_CPP(WNTRDATA_SCPP "${WNTRDATA_SHPP}")
+set(WNTRDATA_HEADERS ${WNTRDATA_HEADERS} ${ontology_SUBDIR_H})
+set(WNTRDATA_SOURCES ${WNTRDATA_SOURCES} ${ontology_SUBDIR_S})
+file(GLOB WNTRDATA_CMAKE_MODULES "${PROJECT_SOURCE_DIR}/cmake/Modules/*.cmake")
+QT4_WRAP_CPP(WNTRDATA_SOURCES ${WNTRDATA_HEADERS})
 
+
+include_directories("ontology")
 ## Targets
-add_library(wintermute-plugin-data SHARED ${WNTRDATA_SCPP})
+add_library(wplugin-data SHARED ${WNTRDATA_SOURCES})
 
-set_target_properties(wintermute-plugin-data
+set_target_properties(wplugin-data
     PROPERTIES
     VERSION ${GENERIC_LIB_VERSION}
     SOVERSION ${GENERIC_LIB_SOVERSION})
 
-target_link_libraries(wintermute-plugin-data ${WNTRDATA_LIBRARIES})
+target_link_libraries(wplugin-data ${WNTRDATA_LIBRARIES})
 
-install(TARGETS wintermute-plugin-data
+install(TARGETS wplugin-data
     EXPORT WntrDataLibraryDepends
     LIBRARY DESTINATION "${WINTER_PLUGIN_INSTALL_DIR}")
 
 install(EXPORT WntrDataLibraryDepends
     DESTINATION "${WNTRDATA_CMAKE_DIR}")
 
-install(FILES ${WNTRDATA_SHPP}
+install(FILES ${WNTRDATA_HEADERS}
     DESTINATION "${WNTRDATA_INCLUDE_DIR}"
     COMPONENT dev)
