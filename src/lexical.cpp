@@ -313,7 +313,6 @@ namespace Wintermute {
                         QDomDocument l_newDom("Data");
                         const Data* l_bsDt = l_ldM.load();
                         Data l_dt(l_bsDt->id (),l_lcl,l_bsDt->symbol (),l_bsDt->flags ());
-                        QVariant l_vr = QVariant::fromValue(l_dt);
 
                         QDomElement l_root = l_newDom.createElement ("Data");
                         l_root.setAttribute ("locale",l_lcl);
@@ -321,18 +320,19 @@ namespace Wintermute {
                         l_svM.saveFrom (l_dt);
                         l_newDom.appendChild (l_root);
 
-                        const QString l_str = l_newDom.toByteArray(4);
-
                         QFile* l_file = new QFile(DomStorage::getPath(l_dt));
-                        if (!l_file->exists ()){
-                            l_file->open (QIODevice::WriteOnly | QIODevice::Truncate);
-                            l_file->write ("<!-- Generated -->");
-                            l_file->close ();
-                        }
 
-                        l_file->open (QIODevice::WriteOnly | QIODevice::Append);
-                        l_file->write(l_str.toUtf8());
-                        l_file->close ();
+                        if (!l_file->open (QIODevice::WriteOnly | QIODevice::Truncate)){
+                            l_file->setPermissions(QFile::WriteOther);
+                            //qWarning() << "(data) [DomStorage] Failed to spawn node" << l_dt.id() << ":" << l_file->errorString();
+                        }
+                        else {
+                            QDataStream l_stream(l_file);
+                            l_stream << "<!-- Generated -->" << endl
+                                     << l_newDom.toByteArray(4);
+                            l_file->close ();
+                            //qDebug() << "(data) [DomStorage] Wrote" << l_dt.id() << "with" << l_file->size() << "bytes.";
+                        }
                     }
 
                     qDebug () << "(data) [DomStorage] Locale" << l_lcl << "spawned.";
@@ -495,6 +495,7 @@ namespace Wintermute {
                     return "";
                 }
 
+                /// @todo Consider allowing the developer to specify where they'd like to save information.
                 void Cache::write (const Data &p_dt){
                     if (!Cache::s_stores.empty()){
                         foreach (Storage* l_str, Cache::s_stores)
@@ -507,14 +508,10 @@ namespace Wintermute {
                 }
 
                 /// @note Wintermute considers its local data to be stored to disk. Currently, DomStorage represents the local nodes.
-                const int Cache::countFlags(){
-                    return DomStorage::countFlags();
-                }
+                const int Cache::countFlags(){ return DomStorage::countFlags(); }
 
                 /// @note Wintermute considers its local data to be stored to disk. Currently, DomStorage represents the local nodes.
-                const int Cache::countSymbols(){
-                    return DomStorage::countSymbols();
-                }
+                const int Cache::countSymbols(){ return DomStorage::countSymbols(); }
 
                 /// @todo Find a way to call all of the storages in parallel and then kill all of the other ones when none (or one has) found information.
                 const bool Cache::exists(const Data& p_dt) {
@@ -522,7 +519,6 @@ namespace Wintermute {
                         if (l_str->exists (p_dt))
                             return true;
                     }
-
                     return false;
                 }
 
@@ -534,7 +530,6 @@ namespace Wintermute {
                             return true;
                         } else continue;
                     }
-
                     return false;
                 }
 

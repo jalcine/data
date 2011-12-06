@@ -34,17 +34,14 @@ namespace Wintermute {
         RuleManager::RuleManager() : QObject(System::instance()) { }
 
         const bool RuleManager::exists(const QString &p_1, const QString &p_2) const {
-            qDebug() << p_1 << p_2;
             return Rules::Cache::exists(p_1,p_2);
         }
 
         void RuleManager::read(Rules::Chain &p_chn) {
-            qDebug() << p_chn.toString();
             Rules::Cache::read(p_chn);
         }
 
         void RuleManager::write(Rules::Chain &p_chn) {
-            qDebug() << p_chn.toString();
             Rules::Cache::write(p_chn);
         }
 
@@ -64,8 +61,10 @@ namespace Wintermute {
             return p_dt;
         }
 
+        /// @todo Should this return a pseudo node of the passed data if the said node doesn't exist?
         Lexical::Data& NodeManager::read(Lexical::Data &p_dt) const {
-            Lexical::Cache::read(p_dt);
+            if (!Lexical::Cache::read(p_dt))
+                Lexical::Cache::pseudo(p_dt);
             return p_dt;
         }
 

@@ -54,7 +54,7 @@ namespace Wintermute {
                 struct DomBackend;
 
                 /**
-                 * @brief The lexical POD format of linguistics parsing.
+                 * @brief The lexical POD (plain ol' data) format of linguistics parsing.
                  *
                  * The Data object represents the internal workings of the lexical
                  * bindings. Data objects hold information about the locale of the
@@ -422,52 +422,54 @@ namespace Wintermute {
                 class Storage : public virtual Backend {
                     public:
                         /**
-                         * @brief
-                         *
-                         * @fn GenericStorage
+                         * @brief Null constructor.
+                         * @fn Storage
                          */
                         Storage();
+
                         /**
-                         * @brief
-                         *
+                         * @brief Copy constructor.
                          * @fn Storage
-                         * @param
+                         * @param Storage The object to be copied.
                          */
                         Storage(const Storage&);
+
                         /**
-                         * @brief
-                         *
+                         * @brief Builds a @see Storage object from a @see Backend
                          * @fn Storage
                          * @param
                          */
-                        Storage(const Backend&);
+                        explicit Storage(const Backend&);
+
                         /**
-                         * @brief
-                         *
+                         * @brief Equality operator.
                          * @fn operator ==
                          * @param
                          */
                         bool operator==(const Storage&) const;
+
                         /**
-                         * @brief
-                         *
+                         * @brief Reports the kind of data storage this @see Storage use.
                          * @fn type
+                         * @return A @see QString delinating the kind of data storage uses.
                          */
                         virtual const QString type() const = 0;
+
                         /**
-                         * @brief
-                         *
+                         * @brief Determines if a specific @see Data is available.
                          * @fn exists
-                         * @param
+                         * @param @see Data The @see Data in question.
                          */
                         virtual const bool exists(const Data& ) const = 0;
+
                         /**
                          * @brief
-                         *
                          * @fn loadTo
+                         * @note This method <b>edits</b> the Data passed to this method.
                          * @param
                          */
                         virtual void loadTo(Data&) const = 0;
+
                         /**
                          * @brief
                          *
