@@ -31,6 +31,7 @@
 
 // Soprano
 #include <Soprano/Model>
+#include <Soprano/Node>
 #include <Soprano/Client/SparqlModel>
 
 // Local
@@ -101,6 +102,9 @@ namespace Wintermute {
              * \todo Add 'operator==()', 'operator!=()', and 'operator=()' to this method for convience.
              */
             class Resource : public QObject {
+                Q_OBJECT
+                Q_DISABLE_COPY(Resource)
+
                 public:
                     /**
                      * \brief Default constructor.
@@ -108,15 +112,7 @@ namespace Wintermute {
                      * \fn Resource
                      * \param parent The parent object.
                      */
-                    explicit Resource( const QObject* parent = NULL );
-
-                    /**
-                     * \brief Copy constructor.
-                     *
-                     * \fn Resource
-                     * \param resource The Resource to be copied.
-                     */
-                    Resource( const Resource& resource );
+                    explicit Resource( QObject* = NULL );
 
                     /**
                      * \brief Initializating constructor.
@@ -128,7 +124,7 @@ namespace Wintermute {
                      * \param node The Soprano::Node that this Resource represents.
                      * \param parent The parent repository.
                      */
-                    Resource( const Soprano::Node& node, const Repository* parent );
+                    Resource( const Soprano::Node& , const Repository* , QObject* = NULL );
 
                     /**
                      * \brief Deconstructor.

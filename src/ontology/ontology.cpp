@@ -50,7 +50,22 @@ namespace Wintermute {
                 qDebug() << "(data) [System] # ontology # Unloaded.";
             }
 
+            Resource::Resource(const Soprano::Node &node, const Repository* repo, QObject* parent) : QObject(parent),
+                m_node(node), m_repo(repo){
+            }
+
+            Resource::Resource(const Resource &resource) : QObject(resource.parent()), m_node(resource.m_node), m_repo(resource.m_repo) {
+            }
+
+            Resource::Resource(QObject* parent) : QObject(parent){
+
+            }
+
             const int Resource::countConcepts () { return 0; }
+
+            Resource::~Resource() {
+
+            }
 
             Repository::Repository(const QString &p_str) : m_repoName(p_str) { load(); }
 
