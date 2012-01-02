@@ -31,135 +31,135 @@
 using namespace Wintermute::Data::Linguistics;
 
 namespace Wintermute {
-    namespace Data {
-        class NodeAdaptor: public QDBusAbstractAdaptor {
-            Q_OBJECT
-            Q_CLASSINFO("D-Bus Interface", "org.thesii.Wintermute.Data.Nodes")
-            Q_CLASSINFO("D-Bus Introspection", ""
-        "  <interface name=\"org.thesii.Wintermute.Data.Nodes\">\n"
-        "    <signal name=\"nodeCreated\">\n"
-        "      <arg direction=\"out\" type=\"s\"/>\n"
-        "    </signal>\n"
-        "    <method name=\"generate\">\n"
-        "      <annotation value=\"true\" name=\"org.freedesktop.DBus.Method.NoReply\"/>\n"
-        "    </method>\n"
-        "    <method name=\"quit\"/>\n"
-        "    <method name=\"read\">\n"
-        "      <arg direction=\"out\" type=\"s\"/>\n"
-        "      <arg direction=\"in\" type=\"s\"/>\n"
-        "    </method>\n"
-        "    <method name=\"write\">\n"
-        "      <arg direction=\"out\" type=\"s\"/>\n"
-        "      <arg direction=\"in\" type=\"s\"/>\n"
-        "    </method>\n"
-        "    <method name=\"pseudo\">\n"
-        "      <arg direction=\"out\" type=\"s\"/>\n"
-        "      <arg direction=\"in\" type=\"s\"/>\n"
-        "    </method>\n"
-        "    <method name=\"exists\">\n"
-        "      <arg direction=\"out\" type=\"b\"/>\n"
-        "      <arg direction=\"in\" type=\"s\"/>\n"
-        "    </method>\n"
-        "    <method name=\"isPseudo\">\n"
-        "      <arg direction=\"out\" type=\"b\"/>\n"
-        "      <arg direction=\"in\" type=\"s\"/>\n"
-        "    </method>\n"
-        "  </interface>\n"
+namespace Data {
+class NodeAdaptor: public QDBusAbstractAdaptor {
+    Q_OBJECT
+    Q_CLASSINFO("D-Bus Interface", "org.thesii.Wintermute.Data.Nodes")
+    Q_CLASSINFO("D-Bus Introspection", ""
+                "  <interface name=\"org.thesii.Wintermute.Data.Nodes\">\n"
+                "    <signal name=\"nodeCreated\">\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "    </signal>\n"
+                "    <method name=\"generate\">\n"
+                "      <annotation value=\"true\" name=\"org.freedesktop.DBus.Method.NoReply\"/>\n"
+                "    </method>\n"
+                "    <method name=\"quit\"/>\n"
+                "    <method name=\"read\">\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "      <arg direction=\"in\" type=\"s\"/>\n"
+                "    </method>\n"
+                "    <method name=\"write\">\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "      <arg direction=\"in\" type=\"s\"/>\n"
+                "    </method>\n"
+                "    <method name=\"pseudo\">\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "      <arg direction=\"in\" type=\"s\"/>\n"
+                "    </method>\n"
+                "    <method name=\"exists\">\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "      <arg direction=\"in\" type=\"s\"/>\n"
+                "    </method>\n"
+                "    <method name=\"isPseudo\">\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "      <arg direction=\"in\" type=\"s\"/>\n"
+                "    </method>\n"
+                "  </interface>\n"
                 "")
-        public:
-            NodeAdaptor();
-            virtual ~NodeAdaptor();
+public:
+    NodeAdaptor();
+    virtual ~NodeAdaptor();
 
-        public: // PROPERTIES
-        public Q_SLOTS: // METHODS
-            bool exists(QString in0);
-            Q_NOREPLY void generate();
-            bool isPseudo(QString in0);
-            QString pseudo(QString in0);
-            void quit();
-            QString read(QString in0);
-            QString write(QString in0);
-        Q_SIGNALS: // SIGNALS
-            void nodeCreated(const QString &in0);
-        };
+public: // PROPERTIES
+public Q_SLOTS: // METHODS
+    bool exists(QString in0);
+    Q_NOREPLY void generate();
+    bool isPseudo(QString in0);
+    QString pseudo(QString in0);
+    void quit();
+    QString read(QString in0);
+    QString write(QString in0);
+Q_SIGNALS: // SIGNALS
+    void nodeCreated(const QString &in0);
+};
 
-        class RuleAdaptor: public QDBusAbstractAdaptor {
-            Q_OBJECT
-            Q_CLASSINFO("D-Bus Interface", "org.thesii.Wintermute.Data.Rules")
-            Q_CLASSINFO("D-Bus Introspection", ""
-        "  <interface name=\"org.thesii.Wintermute.Data.Rules\">\n"
-        "    <signal name=\"ruleCreated\">\n"
-        "      <arg direction=\"out\" type=\"s\"/>\n"
-        "    </signal>\n"
-        "    <method name=\"write\">\n"
-        "      <arg direction=\"out\" type=\"s\"/>\n"
-        "      <arg direction=\"in\" type=\"s\"/>\n"
-        "    </method>\n"
-        "    <method name=\"read\">\n"
-        "      <arg direction=\"out\" type=\"s\"/>\n"
-        "      <arg direction=\"in\" type=\"s\"/>\n"
-        "    </method>\n"
-        "    <method name=\"exists\">\n"
-        "      <arg direction=\"out\" type=\"b\"/>\n"
-        "      <arg direction=\"in\" type=\"s\"/>\n"
-        "      <arg direction=\"in\" type=\"s\"/>\n"
-        "    </method>\n"
-        "    <method name=\"quit\"/>\n"
-        "  </interface>\n"
+class RuleAdaptor: public QDBusAbstractAdaptor {
+    Q_OBJECT
+    Q_CLASSINFO("D-Bus Interface", "org.thesii.Wintermute.Data.Rules")
+    Q_CLASSINFO("D-Bus Introspection", ""
+                "  <interface name=\"org.thesii.Wintermute.Data.Rules\">\n"
+                "    <signal name=\"ruleCreated\">\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "    </signal>\n"
+                "    <method name=\"write\">\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "      <arg direction=\"in\" type=\"s\"/>\n"
+                "    </method>\n"
+                "    <method name=\"read\">\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "      <arg direction=\"in\" type=\"s\"/>\n"
+                "    </method>\n"
+                "    <method name=\"exists\">\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "      <arg direction=\"in\" type=\"s\"/>\n"
+                "      <arg direction=\"in\" type=\"s\"/>\n"
+                "    </method>\n"
+                "    <method name=\"quit\"/>\n"
+                "  </interface>\n"
                 "")
-            public:
-                RuleAdaptor();
-                virtual ~RuleAdaptor();
+public:
+    RuleAdaptor();
+    virtual ~RuleAdaptor();
 
-            public: // PROPERTIES
-            public Q_SLOTS: // METHODS
-                bool exists(const QString &in0, const QString &in1);
-                void quit();
-                QString read(QString in0);
-                QString write(QString in0);
-            Q_SIGNALS: // SIGNALS
-                void ruleCreated(const QString &in0);
-        };
+public: // PROPERTIES
+public Q_SLOTS: // METHODS
+    bool exists(const QString &in0, const QString &in1);
+    void quit();
+    QString read(QString in0);
+    QString write(QString in0);
+Q_SIGNALS: // SIGNALS
+    void ruleCreated(const QString &in0);
+};
 
-        class SystemAdaptor: public QDBusAbstractAdaptor {
-            Q_OBJECT
-            Q_CLASSINFO("D-Bus Interface", "org.thesii.Wintermute.Data.System")
-            Q_CLASSINFO("D-Bus Introspection", ""
-        "  <interface name=\"org.thesii.Wintermute.Data.System\">\n"
-        "    <property access=\"readwrite\" type=\"s\" name=\"Directory\"/>\n"
-        "    <signal name=\"stopped\"/>\n"
-        "    <signal name=\"started\"/>\n"
-        "    <method name=\"quit\"/>\n"
-        "    <method name=\"stop\">\n"
-        "      <annotation value=\"true\" name=\"org.freedesktop.DBus.Method.NoReply\"/>\n"
-        "    </method>\n"
-        "    <method name=\"start\">\n"
-        "      <annotation value=\"true\" name=\"org.freedesktop.DBus.Method.NoReply\"/>\n"
-        "    </method>\n"
-        "    <method name=\"localeExists\">\n"
-        "      <arg direction=\"out\" type=\"b\"/>\n"
-        "      <arg direction=\"in\" type=\"s\"/>\n"
-        "    </method>\n"
-        "  </interface>\n"
+class SystemAdaptor: public QDBusAbstractAdaptor {
+    Q_OBJECT
+    Q_CLASSINFO("D-Bus Interface", "org.thesii.Wintermute.Data.System")
+    Q_CLASSINFO("D-Bus Introspection", ""
+                "  <interface name=\"org.thesii.Wintermute.Data.System\">\n"
+                "    <property access=\"readwrite\" type=\"s\" name=\"Directory\"/>\n"
+                "    <signal name=\"stopped\"/>\n"
+                "    <signal name=\"started\"/>\n"
+                "    <method name=\"quit\"/>\n"
+                "    <method name=\"stop\">\n"
+                "      <annotation value=\"true\" name=\"org.freedesktop.DBus.Method.NoReply\"/>\n"
+                "    </method>\n"
+                "    <method name=\"start\">\n"
+                "      <annotation value=\"true\" name=\"org.freedesktop.DBus.Method.NoReply\"/>\n"
+                "    </method>\n"
+                "    <method name=\"localeExists\">\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "      <arg direction=\"in\" type=\"s\"/>\n"
+                "    </method>\n"
+                "  </interface>\n"
                 "")
-        public:
-            SystemAdaptor();
-            virtual ~SystemAdaptor();
+public:
+    SystemAdaptor();
+    virtual ~SystemAdaptor();
 
-        public: // PROPERTIES
-            Q_PROPERTY(QString Directory READ directory WRITE setDirectory)
-            QString directory() const;
-            void setDirectory(const QString &value);
+public: // PROPERTIES
+    Q_PROPERTY(QString Directory READ directory WRITE setDirectory)
+    QString directory() const;
+    void setDirectory(const QString &value);
 
-        public Q_SLOTS: // METHODS
-            bool localeExists(const QString &in0);
-            void quit();
-            Q_NOREPLY void start();
-            Q_NOREPLY void stop();
-        Q_SIGNALS: // SIGNALS
-            void started();
-            void stopped();
-        };
-    }
+public Q_SLOTS: // METHODS
+    bool localeExists(const QString &in0);
+    void quit();
+    Q_NOREPLY void start();
+    Q_NOREPLY void stop();
+Q_SIGNALS: // SIGNALS
+    void started();
+    void stopped();
+};
+}
 }
 #endif

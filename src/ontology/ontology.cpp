@@ -33,95 +33,107 @@
 using namespace Soprano;
 
 namespace Wintermute {
-    namespace Data {
-        namespace Ontology {
-            QMap<QString, Repository*> Repository::s_repos;
+namespace Data {
+namespace Ontology {
+QMap<QString, Repository*> Repository::s_repos;
 
-            QUrl System::getSystemOntology() {
-                return QUrl(QString(WNTRDATA_ONTO_DIR)+QString("/COSMO.owl"));
-            }
+QUrl System::getSystemOntology() {
+    return QUrl(QString(WNTRDATA_ONTO_DIR)+QString("/COSMO.owl"));
+}
 
-            void System::load() {
-                const Repository* l_repo = Repository::obtainRepository("COSMO");
-                qDebug() << "(data) [System] # ontology # Loaded.";
-            }
+void System::load() {
+    const Repository* l_repo = Repository::obtainRepository("COSMO");
+    qDebug() << "(data) [System] # ontology # Loaded.";
+}
 
-            void System::unload() {
-                qDebug() << "(data) [System] # ontology # Unloaded.";
-            }
+void System::unload() {
+    qDebug() << "(data) [System] # ontology # Unloaded.";
+}
 
-            Resource::Resource(const Soprano::Node &node, const Repository* repo, QObject* parent) : QObject(parent),
-                m_node(node), m_repo(repo){
-            }
+Resource::Resource(const Soprano::Node &node, const Repository* repo, QObject* parent) : QObject(parent),
+        m_node(node), m_repo(repo) {
+}
 
-            Resource::Resource(const Resource &resource) : QObject(resource.parent()), m_node(resource.m_node), m_repo(resource.m_repo) {
-            }
+Resource::Resource(const Resource &resource) : QObject(resource.parent()), m_node(resource.m_node), m_repo(resource.m_repo) {
+}
 
-            Resource::Resource(QObject* parent) : QObject(parent){
+Resource::Resource(QObject* parent) : QObject(parent) {
 
-            }
+}
 
-            const int Resource::countConcepts () { return 0; }
+const int Resource::countConcepts () {
+    return 0;
+}
 
-            Resource::~Resource() {
+Resource::~Resource() {
 
-            }
+}
 
-            Repository::Repository(const QString &p_str) : m_repoName(p_str) { load(); }
+Repository::Repository(const QString &p_str) : m_repoName(p_str) {
+    load();
+}
 
-            Repository::Repository(const Repository &p_repo) : m_repoName(p_repo.m_repoName), m_model(p_repo.m_model) { }
+Repository::Repository(const Repository &p_repo) : m_repoName(p_repo.m_repoName), m_model(p_repo.m_model) { }
 
-            Repository* Repository::obtainRepository(const QString& p_repoName) {
-                Repository* l_repo = NULL;
-                
-                if (Repository::s_repos.count(p_repoName) == 0) {
-                    l_repo = new Repository(p_repoName);
-                    Repository::s_repos.insert(p_repoName,l_repo);
-                } else 
-                    l_repo = Repository::s_repos.value(p_repoName);
-                    
-                return l_repo;
-            }
+Repository* Repository::obtainRepository(const QString& p_repoName) {
+    Repository* l_repo = NULL;
 
-            const int Repository::countOntologies () { return 0; }
+    if (Repository::s_repos.count(p_repoName) == 0) {
+        l_repo = new Repository(p_repoName);
+        Repository::s_repos.insert(p_repoName,l_repo);
+    } else
+        l_repo = Repository::s_repos.value(p_repoName);
 
-            const QString Repository::getPath() const {
-                return QUrl::fromLocalFile (Data::System::directory () + QString("/")
-                        + QString(WNTRDATA_ONTO_DIR) + QString("/") + m_repoName + QString(".owl")).toString ();
-            }
+    return l_repo;
+}
 
-            void Repository::load(const QString& p_repoName) const {
-                qDebug() << "(data) [Repository] Loading ontology" << m_repoName << "...";
-                if (!p_repoName.isEmpty ())
-                    m_repoName = p_repoName;
-           }
+const QUrl Repository::url() const {
+    return QUrl::fromLocalFile (Data::System::directory () + QString("/")
+                                + QString(WNTRDATA_ONTO_DIR) + QString("/") + m_repoName + QString(".owl"));
+}
 
-            Resource* Repository::obtainResource(const Concept& concept) const {
-                Query query;
-                query.setBase(QUrl("http://micra.com/COSMO/COSMO.owl#"));
-                query.addPrefix("rdf", QUrl("http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
-                query.addPrefix("owl", QUrl("http://www.w3.org/2002/07/owl#"));
+const int Repository::countOntologies () {
+    return 0;
+}
 
-                QStringList variables;
-                variables.append("x");
-                query.addVariables("SELECT", variables);
+void Repository::load(const QString& p_repoName) const {
+    qDebug() << "(data) [Repository] Loading ontology" << m_repoName << "...";
+    if (!p_repoName.isEmpty ())
+        m_repoName = p_repoName;
+}
 
-                query.addTriple("?x", "owl:Class", "?res");
-                query.addTriple("?res", "rdf:ID", concept);
+Resource* Repository::obtainResource(const Concept& concept) const {
+    Query query;
+    query.setBase(this->url());
+    query.addPrefix("rdf", QUrl("http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
+    query.addPrefix("owl", QUrl("http://www.w3.org/2002/07/owl#"));
 
-                QueryResultIterator it = m_model->executeQuery(query.getContents());
-                QList<BindingSet> bindingSets = it.allBindings();
-                return new Resource(bindingSets[0]["x"], this);
-            }
+    QStringList variables;
+    variables.append("x");
+    query.addVariables("SELECT", variables);
 
-            Resource* Repository::obtainResource(const QString& p_repository, const QString& p_res){                
-                Repository* l_repo = Repository::obtainRepository(p_repository);
-                if (l_repo == NULL) return NULL;
-                else return l_repo->obtainResource(p_res);
-            }
+    query.addTriple("?x", "owl:Class", "?res");
+    query.addTriple("?res", "rdf:ID", concept);
 
-            Repository::~Repository() { qDebug() << "Destroyed repository" << m_repoName << "."; }
-        }
-    }
+    QueryResultIterator it = m_model->executeQuery(query.getContents());
+    QList<BindingSet> bindingSets = it.allBindings();
+
+    foreach(const BindingSet l_bndSt, bindingSets)
+    qDebug() << l_bndSt.bindingNames();
+
+    return new Resource(bindingSets[0]["x"], this);
+}
+
+Resource* Repository::obtainResource(const QString& p_repository, const QString& p_res) {
+    Repository* l_repo = Repository::obtainRepository(p_repository);
+    if (l_repo == NULL) return NULL;
+    else return l_repo->obtainResource(p_res);
+}
+
+Repository::~Repository() {
+    qDebug() << "Destroyed repository" << m_repoName << ".";
+}
+}
+}
 }
 // kate: indent-mode cstyle; space-indent on; indent-width 4;

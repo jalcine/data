@@ -28,71 +28,75 @@
 #include <QObject>
 
 namespace Wintermute {
-    namespace Data {
-        namespace Linguistics {
-            struct System;
+namespace Data {
+namespace Linguistics {
+struct System;
 
-            /**
-             * @brief An abstract static class representing the current configuration of the linguistics data.
-             * All configuration variables and their access methods specific for linguistic part of WntrData
-             * are defined here.
-             */
-            class System {
-                private:
-                    static QString s_dir; /**< Holds the location of the linguistic info. */
-                    static QString s_lcl; /**< Holds the current locale in use. */
+/**
+ * @brief An abstract static class representing the current configuration of the linguistics data.
+ * All configuration variables and their access methods specific for linguistic part of WntrData
+ * are defined here.
+ */
+class System {
+private:
+    static QString s_dir; /**< Holds the location of the linguistic info. */
+    static QString s_lcl; /**< Holds the current locale in use. */
 
-                public:
-                    /**
-                     * @brief Changes the locale.
-                     * Sets the default locale to be used as the standard locale.
-                     * @param locale The locale to set.
-                     */
-                    static void setLocale ( const QString );
+public:
+    /**
+     * @brief Changes the locale.
+     * Sets the default locale to be used as the standard locale.
+     * @param locale The locale to set.
+     */
+    static void setLocale ( const QString );
 
-                    /**
-                     * @brief Changes root directory.
-                     * Sets the root directory to find data for linguistics from.
-                     * @param root The root directory.
-                     */
-                    static void setDirectory ( const QString );
+    /**
+     * @brief Changes root directory.
+     * Sets the root directory to find data for linguistics from.
+     * @param root The root directory.
+     */
+    static void setDirectory ( const QString );
 
-                    /**
-                     * @brief Gets current locale used.
-                     * Returns the locale considered to be the standard of the linguistics system.
-                     * @fn getLocale
-                     * @return string String with the current locale.
-                     */
-                    static const inline QString locale() { return s_lcl; }
-
-                    /**
-                     * @brief Obtains a list of all of the locales known to the system.
-                     * @fn locales
-                     */
-                    static const QStringList locales();
-
-                    /**
-                     * @brief Gets linguistics directory.
-                     * Returns the directory that's considered to be the absolute directory for loading linguistics information.
-                     * @fn getDirectory
-                     * @return string
-                     */
-                    static const inline QString directory() { return s_dir; }
-                    
-                    /** 
-                     * @brief Loads the system with a specific storage directory and locale.
-                     * @fn load
-                     */
-                    static void load ( const QString = s_dir, const QString = s_lcl );
-                    
-                    /**
-                     * @brief Unloads all information from the system.
-                     * @fn unload
-                     */
-                    static void unload();
-            };
-        } // namespaces
+    /**
+     * @brief Gets current locale used.
+     * Returns the locale considered to be the standard of the linguistics system.
+     * @fn getLocale
+     * @return string String with the current locale.
+     */
+    inline static const QString locale() {
+        return s_lcl;
     }
+
+    /**
+     * @brief Obtains a list of all of the locales known to the system.
+     * @fn locales
+     */
+    static const QStringList locales();
+
+    /**
+     * @brief Gets linguistics directory.
+     * Returns the directory that's considered to be the absolute directory for loading linguistics information.
+     * @fn getDirectory
+     * @return string
+     */
+    inline static const QString directory() {
+        return s_dir;
+    }
+
+    /**
+     * @brief Loads the system with a specific storage directory and locale.
+     * @fn load
+     */
+    static void load ( const QString = s_dir, const QString = s_lcl );
+
+    /**
+     * @brief Unloads all information from the system.
+     * @fn unload
+     */
+    static void unload();
+};
+} // namespaces
+}
 }
 #endif	/* LINGUISTICS_HPP */
 // kate: indent-mode cstyle; space-indent on; indent-width 4;

@@ -62,129 +62,129 @@ using namespace Wintermute::Data::Linguistics;
 using Wintermute::Plugins::AbstractPlugin;
 
 namespace Wintermute {
-    namespace Data {
-        struct Plugin;
-        struct System;
-        struct NodeManager;
-        struct RuleManager;
+namespace Data {
+struct Plugin;
+struct System;
+struct NodeManager;
+struct RuleManager;
 
-        class NodeManager : public QObject {
-            friend class NodeAdaptor;
-            friend class NodeInterface;
-            Q_OBJECT
-            Q_DISABLE_COPY(NodeManager)
+class NodeManager : public QObject {
+    friend class NodeAdaptor;
+    friend class NodeInterface;
+    Q_OBJECT
+    Q_DISABLE_COPY(NodeManager)
 
-            private:
-                static NodeManager* s_inst;
-                NodeManager();
+private:
+    static NodeManager* s_inst;
+    NodeManager();
 
-            signals:
-                void nodeCreated(const QString&);
+signals:
+    void nodeCreated(const QString&);
 
-            public slots:
-                void generate();
-                Lexical::Data& pseudo(Lexical::Data& ) const;
-                Lexical::Data& read(Lexical::Data& ) const;
-                const Lexical::Data& write(const Lexical::Data& );
-                const bool exists(const Lexical::Data& ) const;
-                const bool isPseudo(const Lexical::Data& ) const;
-                static NodeManager* instance();
-        };
+public slots:
+    void generate();
+    Lexical::Data& pseudo(Lexical::Data& ) const;
+    Lexical::Data& read(Lexical::Data& ) const;
+    const Lexical::Data& write(const Lexical::Data& );
+    const bool exists(const Lexical::Data& ) const;
+    const bool isPseudo(const Lexical::Data& ) const;
+    static NodeManager* instance();
+};
 
-        class RuleManager : public QObject {
-            Q_OBJECT
-            Q_DISABLE_COPY(RuleManager)
+class RuleManager : public QObject {
+    Q_OBJECT
+    Q_DISABLE_COPY(RuleManager)
 
-            private:
-                static RuleManager* s_inst;
-                RuleManager();
+private:
+    static RuleManager* s_inst;
+    RuleManager();
 
-            public slots:
-                static RuleManager* instance();
-                void read(Rules::Chain& );
-                void write(Rules::Chain& );
-                const bool exists(const QString&, const QString& ) const;
-        };
+public slots:
+    static RuleManager* instance();
+    void read(Rules::Chain& );
+    void write(Rules::Chain& );
+    const bool exists(const QString&, const QString& ) const;
+};
 
-        /**
-         * @brief Manages the data location representing WntrData.
-         * @class Configuration config.hpp "config.hpp"
-         */
-        class System : public QObject {
-            friend class SystemAdaptor;
-            friend class SystemInterface;
-            Q_OBJECT
-            Q_DISABLE_COPY(System)
+/**
+ * @brief Manages the data location representing WntrData.
+ * @class Configuration config.hpp "config.hpp"
+ */
+class System : public QObject {
+    friend class SystemAdaptor;
+    friend class SystemInterface;
+    Q_OBJECT
+    Q_DISABLE_COPY(System)
 
-            private:
-                static System* s_inst;
-                QString m_dir;
-                System();
+private:
+    static System* s_inst;
+    QString m_dir;
+    System();
 
-            public:
-                /**
-                 * @brief Obtains the directory that of which the data files are stored.
-                 * @fn getDirectory
-                 * @return const QString
-                 */
-                static const QString directory();
+public:
+    /**
+     * @brief Obtains the directory that of which the data files are stored.
+     * @fn getDirectory
+     * @return const QString
+     */
+    static const QString directory();
 
-                /**
-                 * @brief Changes the working directory.
-                 * @fn setDirectory
-                 * @param const QString
-                 */
-                static void setDirectory(const QString&);
+    /**
+     * @brief Changes the working directory.
+     * @fn setDirectory
+     * @param const QString
+     */
+    static void setDirectory(const QString&);
 
-                /**
-                 * @brief Obtains an instance of the data system object.
-                 * @fn instance
-                 * @return const Configuration
-                 */
-                static System* instance();
+    /**
+     * @brief Obtains an instance of the data system object.
+     * @fn instance
+     * @return const Configuration
+     */
+    static System* instance();
 
-            signals:
-                /**
-                 * @brief
-                 *
-                 * @fn started
-                 */
-                void started();
+signals:
+    /**
+     * @brief
+     *
+     * @fn started
+     */
+    void started();
 
-                /**
-                 * @brief
-                 *
-                 * @fn stopped
-                 */
-                void stopped();
+    /**
+     * @brief
+     *
+     * @fn stopped
+     */
+    void stopped();
 
-            public slots:
-                /**
-                 * @brief Initializes the data services.
-                 * @fn Initialize
-                 */
-                static void stop();
+public slots:
+    /**
+     * @brief Initializes the data services.
+     * @fn Initialize
+     */
+    static void stop();
 
-                /**
-                 * @brief Deinitializes the data services.
-                 * @fn Deinitialize
-                 */
-                static void start();
+    /**
+     * @brief Deinitializes the data services.
+     * @fn Deinitialize
+     */
+    static void start();
 
-                static void registerDataTypes();
-        };
+    static void registerDataTypes();
+};
 
-       class Plugin : public AbstractPlugin {
-            Q_OBJECT
-            public:
-                Plugin() : AbstractPlugin() { }
-                ~Plugin() { }
-                Plugin(Plugin const &k) : AbstractPlugin(k) { }
+class Plugin : public AbstractPlugin {
+    Q_OBJECT
+public:
+    Plugin() : AbstractPlugin() { }
+    ~Plugin() { }
+    Plugin(Plugin const &k) : AbstractPlugin(k) { }
 
-                virtual void start() const;
-                virtual void stop() const;
-        };
-    }
+    virtual void start() const;
+    virtual void stop() const;
+};
+}
 }
 
 #endif /* __WNTRDATA_HPP__ */

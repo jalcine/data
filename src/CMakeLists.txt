@@ -3,15 +3,14 @@ cmake_minimum_required(VERSION 2.8)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 ## Files
-file(GLOB WNTRDATA_HEADERS *.hpp)
+file(GLOB WNTRDATA_HEADERS "*.hpp"
+                           "*/*.hpp")
+file(GLOB WNTRDATA_SOURCES "*.cpp"
+                           "*/*.cpp")
 list(REMOVE_ITEM WNTRDATA_HEADERS "dbus.hpp")
-file(GLOB WNTRDATA_SOURCES *.cpp)
 
-file(GLOB ontology_SUBDIR_H "ontology/*.hpp")
-file(GLOB ontology_SUBDIR_S "ontology/*.cpp")
-
-set(WNTRDATA_HEADERS ${WNTRDATA_HEADERS} ${ontology_SUBDIR_H})
-set(WNTRDATA_SOURCES ${WNTRDATA_SOURCES} ${ontology_SUBDIR_S})
+set(WNTRDATA_HEADERS ${WNTRDATA_HEADERS})
+set(WNTRDATA_SOURCES ${WNTRDATA_SOURCES})
 file(GLOB WNTRDATA_CMAKE_MODULES "${PROJECT_SOURCE_DIR}/cmake/Modules/*.cmake")
 QT4_WRAP_CPP(WNTRDATA_SOURCES ${WNTRDATA_HEADERS})
 

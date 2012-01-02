@@ -26,25 +26,25 @@
 #include <wntr/plugins.hpp>
 
 namespace Wintermute {
-    namespace Data {
-        NodeInterface::NodeInterface()
-            : QDBusAbstractInterface(WNTRDATA_DBUS_SERVICE, "/Nodes", staticInterfaceName(), *IPC::System::bus(), Plugins::Factory::currentPlugin()){
-        }
+namespace Data {
+NodeInterface::NodeInterface()
+        : QDBusAbstractInterface(WNTRDATA_DBUS_SERVICE, "/Nodes", staticInterfaceName(), *IPC::System::bus(), Plugins::Factory::currentPlugin()) {
+}
 
-        NodeInterface::~NodeInterface() { }
+NodeInterface::~NodeInterface() { }
 
-        RuleInterface::RuleInterface()
-            : QDBusAbstractInterface(WNTRDATA_DBUS_SERVICE, "/Rules", staticInterfaceName(), *IPC::System::bus(), Plugins::Factory::currentPlugin()){
-        }
+RuleInterface::RuleInterface()
+        : QDBusAbstractInterface(WNTRDATA_DBUS_SERVICE, "/Rules", staticInterfaceName(), *IPC::System::bus(), Plugins::Factory::currentPlugin()) {
+}
 
-        RuleInterface::~RuleInterface() { }
+RuleInterface::~RuleInterface() { }
 
-        SystemInterface::SystemInterface()
-            : QDBusAbstractInterface(WNTRDATA_DBUS_SERVICE, "/System", staticInterfaceName(), *IPC::System::bus(), Plugins::Factory::currentPlugin()){
-        }
+SystemInterface::SystemInterface()
+        : QDBusAbstractInterface(WNTRDATA_DBUS_SERVICE, "/System", staticInterfaceName(), *IPC::System::bus(), Plugins::Factory::currentPlugin()) {
+}
 
-        SystemInterface::~SystemInterface()
-        {
-        }
-    }
+SystemInterface::~SystemInterface()
+{
+}
+}
 }

@@ -30,7 +30,7 @@ namespace Data {
 namespace Ontology {
 
 Query::Query(QObject *parent) :
-    QObject(parent), blockOpened(false), base("")
+        QObject(parent), blockOpened(false), base("")
 {
 }
 
@@ -84,4 +84,6 @@ void Query::closeQuery()
     }
 }
 
-}}} // namespaces
+}
+}
+} // namespaces

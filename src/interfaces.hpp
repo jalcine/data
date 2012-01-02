@@ -33,148 +33,158 @@
 using namespace Wintermute::Data::Linguistics;
 
 namespace Wintermute {
-    namespace Data {
-        struct NodeInterface;
-        struct RuleInterface;
-        struct SystemInterface;
+namespace Data {
+struct NodeInterface;
+struct RuleInterface;
+struct SystemInterface;
 
-        class NodeInterface: public QDBusAbstractInterface {
-            Q_OBJECT
+class NodeInterface: public QDBusAbstractInterface {
+    Q_OBJECT
 
-            public:
-                static inline const char *staticInterfaceName()
-                { return "org.thesii.Wintermute.Data.Nodes"; }
-                NodeInterface();
-
-            ~NodeInterface();
-
-            public slots:
-                inline QDBusPendingReply<bool> exists(Lexical::Data in0) {
-                    QList<QVariant> argumentList;
-                    argumentList << in0.toString();
-                    return asyncCallWithArgumentList(QLatin1String("exists"), argumentList);
-                }
-
-                inline Q_NOREPLY void generate() {
-                    QList<QVariant> argumentList;
-                    callWithArgumentList(QDBus::NoBlock, QLatin1String("generate"), argumentList);
-                }
-
-                inline QDBusPendingReply<bool> isPseudo(Lexical::Data in0) {
-                    QList<QVariant> argumentList;
-                    argumentList << qVariantFromValue(in0.toString());
-                    return asyncCallWithArgumentList(QLatin1String("isPseudo"), argumentList);
-                }
-
-                inline QDBusPendingReply<Lexical::Data> pseudo(Lexical::Data in0) {
-                    QList<QVariant> argumentList;
-                    argumentList << qVariantFromValue(in0.toString());
-                    return asyncCallWithArgumentList(QLatin1String("pseudo"), argumentList);
-                }
-
-                inline QDBusPendingReply<> quit() {
-                    QList<QVariant> argumentList;
-                    return asyncCallWithArgumentList(QLatin1String("quit"), argumentList);
-                }
-
-                inline QDBusPendingReply<Lexical::Data> read(Lexical::Data in0) {
-                    QList<QVariant> argumentList;
-                    argumentList << qVariantFromValue(in0.toString());
-                    return asyncCallWithArgumentList(QLatin1String("read"), argumentList);
-                }
-
-                inline QDBusPendingReply<Lexical::Data> write(Lexical::Data in0) {
-                    QList<QVariant> argumentList;
-                    argumentList << qVariantFromValue(in0.toString());
-                    return asyncCallWithArgumentList(QLatin1String("write"), argumentList);
-                }
-
-            Q_SIGNALS: // SIGNALS
-                void nodeCreated(const QString &in0);
-         };
-
-        class RuleInterface: public QDBusAbstractInterface {
-            Q_OBJECT
-
-            public:
-                static inline const char *staticInterfaceName()
-                { return "org.thesii.Wintermute.Data.Rules"; }
-
-                RuleInterface();
-                ~RuleInterface();
-
-            public slots:
-                inline QDBusPendingReply<bool> exists(const QString &in0, const QString &in1) {
-                    QList<QVariant> argumentList;
-                    argumentList << qVariantFromValue(in0) << qVariantFromValue(in1);
-                    return asyncCallWithArgumentList(QLatin1String("exists"), argumentList);
-                }
-
-                inline QDBusPendingReply<> quit() {
-                    QList<QVariant> argumentList;
-                    return asyncCallWithArgumentList(QLatin1String("quit"), argumentList);
-                }
-
-                inline QDBusPendingReply<Rules::Chain> read(Rules::Chain in0) {
-                    QList<QVariant> argumentList;
-                    qDebug() << in0.toString();
-                    argumentList << in0.toString();
-                    return asyncCallWithArgumentList(QLatin1String("read"), argumentList);
-                }
-
-                inline QDBusPendingReply<Rules::Chain> write(Rules::Chain in0) {
-                    QList<QVariant> argumentList;
-                    argumentList << in0.toString();
-                    return asyncCallWithArgumentList(QLatin1String("write"), argumentList);
-                }
-
-            signals:
-                void ruleCreated(const QString &in0);
-        };
-
-        class SystemInterface: public QDBusAbstractInterface {
-            Q_OBJECT
-            public:
-                static inline const char *staticInterfaceName()
-                { return "org.thesii.Wintermute.Data.System"; }
-
-                SystemInterface();
-                ~SystemInterface();
-
-            Q_PROPERTY(QString Directory READ directory WRITE setDirectory)
-
-            inline QString directory() const
-            { return qvariant_cast< QString >(property("Directory")); }
-            inline void setDirectory(const QString &value)
-            { setProperty("Directory", qVariantFromValue(value)); }
-
-            public slots:
-                inline QDBusPendingReply<bool> localeExists(const QString &in0) {
-                    QList<QVariant> argumentList;
-                    argumentList << qVariantFromValue(in0);
-                    return asyncCallWithArgumentList(QLatin1String("localeExists"), argumentList);
-                }
-
-                inline QDBusPendingReply<> quit() {
-                    QList<QVariant> argumentList;
-                    return asyncCallWithArgumentList(QLatin1String("quit"), argumentList);
-                }
-
-                inline Q_NOREPLY void start() {
-                    QList<QVariant> argumentList;
-                    callWithArgumentList(QDBus::NoBlock, QLatin1String("start"), argumentList);
-                }
-
-                inline Q_NOREPLY void stop() {
-                    QList<QVariant> argumentList;
-                    callWithArgumentList(QDBus::NoBlock, QLatin1String("stop"), argumentList);
-                }
-
-            signals:
-                void started();
-                void stopped();
-        };
+public:
+    static inline const char *staticInterfaceName()
+    {
+        return "org.thesii.Wintermute.Data.Nodes";
     }
+    NodeInterface();
+
+    ~NodeInterface();
+
+public slots:
+    inline QDBusPendingReply<bool> exists(Lexical::Data in0) {
+        QList<QVariant> argumentList;
+        argumentList << in0.toString();
+        return asyncCallWithArgumentList(QLatin1String("exists"), argumentList);
+    }
+
+    inline Q_NOREPLY void generate() {
+        QList<QVariant> argumentList;
+        callWithArgumentList(QDBus::NoBlock, QLatin1String("generate"), argumentList);
+    }
+
+    inline QDBusPendingReply<bool> isPseudo(Lexical::Data in0) {
+        QList<QVariant> argumentList;
+        argumentList << qVariantFromValue(in0.toString());
+        return asyncCallWithArgumentList(QLatin1String("isPseudo"), argumentList);
+    }
+
+    inline QDBusPendingReply<Lexical::Data> pseudo(Lexical::Data in0) {
+        QList<QVariant> argumentList;
+        argumentList << qVariantFromValue(in0.toString());
+        return asyncCallWithArgumentList(QLatin1String("pseudo"), argumentList);
+    }
+
+    inline QDBusPendingReply<> quit() {
+        QList<QVariant> argumentList;
+        return asyncCallWithArgumentList(QLatin1String("quit"), argumentList);
+    }
+
+    inline QDBusPendingReply<Lexical::Data> read(Lexical::Data in0) {
+        QList<QVariant> argumentList;
+        argumentList << qVariantFromValue(in0.toString());
+        return asyncCallWithArgumentList(QLatin1String("read"), argumentList);
+    }
+
+    inline QDBusPendingReply<Lexical::Data> write(Lexical::Data in0) {
+        QList<QVariant> argumentList;
+        argumentList << qVariantFromValue(in0.toString());
+        return asyncCallWithArgumentList(QLatin1String("write"), argumentList);
+    }
+
+Q_SIGNALS: // SIGNALS
+    void nodeCreated(const QString &in0);
+};
+
+class RuleInterface: public QDBusAbstractInterface {
+    Q_OBJECT
+
+public:
+    static inline const char *staticInterfaceName()
+    {
+        return "org.thesii.Wintermute.Data.Rules";
+    }
+
+    RuleInterface();
+    ~RuleInterface();
+
+public slots:
+    inline QDBusPendingReply<bool> exists(const QString &in0, const QString &in1) {
+        QList<QVariant> argumentList;
+        argumentList << qVariantFromValue(in0) << qVariantFromValue(in1);
+        return asyncCallWithArgumentList(QLatin1String("exists"), argumentList);
+    }
+
+    inline QDBusPendingReply<> quit() {
+        QList<QVariant> argumentList;
+        return asyncCallWithArgumentList(QLatin1String("quit"), argumentList);
+    }
+
+    inline QDBusPendingReply<Rules::Chain> read(Rules::Chain in0) {
+        QList<QVariant> argumentList;
+        qDebug() << in0.toString();
+        argumentList << in0.toString();
+        return asyncCallWithArgumentList(QLatin1String("read"), argumentList);
+    }
+
+    inline QDBusPendingReply<Rules::Chain> write(Rules::Chain in0) {
+        QList<QVariant> argumentList;
+        argumentList << in0.toString();
+        return asyncCallWithArgumentList(QLatin1String("write"), argumentList);
+    }
+
+signals:
+    void ruleCreated(const QString &in0);
+};
+
+class SystemInterface: public QDBusAbstractInterface {
+    Q_OBJECT
+public:
+    static inline const char *staticInterfaceName()
+    {
+        return "org.thesii.Wintermute.Data.System";
+    }
+
+    SystemInterface();
+    ~SystemInterface();
+
+    Q_PROPERTY(QString Directory READ directory WRITE setDirectory)
+
+    inline QString directory() const
+    {
+        return qvariant_cast< QString >(property("Directory"));
+    }
+    inline void setDirectory(const QString &value)
+    {
+        setProperty("Directory", qVariantFromValue(value));
+    }
+
+public slots:
+    inline QDBusPendingReply<bool> localeExists(const QString &in0) {
+        QList<QVariant> argumentList;
+        argumentList << qVariantFromValue(in0);
+        return asyncCallWithArgumentList(QLatin1String("localeExists"), argumentList);
+    }
+
+    inline QDBusPendingReply<> quit() {
+        QList<QVariant> argumentList;
+        return asyncCallWithArgumentList(QLatin1String("quit"), argumentList);
+    }
+
+    inline Q_NOREPLY void start() {
+        QList<QVariant> argumentList;
+        callWithArgumentList(QDBus::NoBlock, QLatin1String("start"), argumentList);
+    }
+
+    inline Q_NOREPLY void stop() {
+        QList<QVariant> argumentList;
+        callWithArgumentList(QDBus::NoBlock, QLatin1String("stop"), argumentList);
+    }
+
+signals:
+    void started();
+    void stopped();
+};
+}
 }
 
 #endif

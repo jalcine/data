@@ -29,61 +29,60 @@ using namespace Wintermute::Data;
 using std::unique;
 
 namespace Wintermute {
-    namespace Data {
-        namespace Linguistics {
-            QString System::s_dir = QString(WNTR_DATA_DIR) + "/" + QString(WNTRDATA_LING_DIR);
-            QString System::s_lcl = QString(WNTR_LOCALE);
+namespace Data {
+namespace Linguistics {
+QString System::s_dir = QString(WNTR_DATA_DIR) + "/" + QString(WNTRDATA_LING_DIR);
+QString System::s_lcl = QString(WNTR_LOCALE);
 
-            void System::load ( const QString p_dir, const QString p_lcl ) {
-                qDebug() << "(data) [System] # ling # System loading...";
-                qDebug() << p_dir << p_lcl;
+void System::load ( const QString p_dir, const QString p_lcl ) {
+    qDebug() << "(data) [System] # ling # System loading...";
 
-                System::setDirectory ( p_dir );
-                System::setLocale ( p_lcl );
+    System::setDirectory ( p_dir );
+    System::setLocale ( p_lcl );
 
-                Lexical::Cache::addStorage ((new Lexical::DomStorage));
-                Rules::Cache::addStorage ((new Rules::DomStorage));
+    Lexical::Cache::addStorage ((new Lexical::DomStorage));
+    Rules::Cache::addStorage ((new Rules::DomStorage));
 
-                Lexical::Cache::generate();
+    Lexical::Cache::generate();
 
-                qDebug() << "(data) [System] # ling # System loaded.";
-            }
+    qDebug() << "(data) [System] # ling # System loaded.";
+}
 
-            void System::unload() {
-                qDebug() << "(ling) [System] System unloading...";
-                Lexical::Cache::clearStorage();
-                Rules::Cache::clearStorage();
-                qDebug() << "(data) [System] # ling # System unloaded.";
-            }            
+void System::unload() {
+    qDebug() << "(ling) [System] System unloading...";
+    Lexical::Cache::clearStorage();
+    Rules::Cache::clearStorage();
+    qDebug() << "(data) [System] # ling # System unloaded.";
+}
 
-            void System::setLocale ( const QString p_lcl ) {
-                if ( p_lcl.isEmpty() )
-                    return;
+void System::setLocale ( const QString p_lcl ) {
+    if ( p_lcl.isEmpty() )
+        return;
 
-                System::s_lcl = p_lcl;
-                qDebug() << "(data) [System] # ling # Default locale:" << p_lcl;
-            }
+    System::s_lcl = p_lcl;
+    qDebug() << "(data) [System] # ling # Default locale:" << p_lcl;
+}
 
-            void System::setDirectory ( const QString p_dir ) {
-                if ( p_dir.isEmpty() )
-                    return;
+void System::setDirectory ( const QString p_dir ) {
+    if ( p_dir.isEmpty() )
+        return;
 
-                QDir* d = new QDir(p_dir);
-                if (d->exists ()){
-                    System::s_dir = d->absolutePath();
-                    qDebug() << "(data) [System] # ling # Root dir:" << p_dir;
-                }
-            }
-
-            const QStringList System::locales() {
-                QDir l_dir(System::directory ());
-                const QString l_path = l_dir.absolutePath ();
-                l_dir.setFilter (QDir::Dirs | QDir::NoDotAndDotDot);
-                QStringList l_locale = l_dir.entryList ();
-                unique(l_locale.begin (),l_locale.end ());
-                return l_locale;
-            }
-        } // namespaces
+    QDir* d = new QDir(p_dir);
+    if (d->exists ()) {
+        System::s_dir = d->absolutePath();
+        qDebug() << "(data) [System] # ling # Root dir:" << p_dir;
     }
+}
+
+const QStringList System::locales() {
+    QDir l_dir(System::directory ());
+    const QString l_path = l_dir.absolutePath ();
+    l_dir.setFilter (QDir::Dirs | QDir::NoDotAndDotDot);
+    QStringList l_locale = l_dir.entryList ();
+    unique(l_locale.begin (),l_locale.end ());
+    return l_locale;
+}
+} // namespaces
+}
 }
 // kate: indent-mode cstyle; space-indent on; indent-width 4;

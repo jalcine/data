@@ -31,112 +31,112 @@
 #include <QtCore/QVariant>
 
 namespace Wintermute {
-    namespace Data {
-        NodeAdaptor::NodeAdaptor()
-            : QDBusAbstractAdaptor(NodeManager::instance()) {
-            // constructor
-            setAutoRelaySignals(true);
-        }
+namespace Data {
+NodeAdaptor::NodeAdaptor()
+        : QDBusAbstractAdaptor(NodeManager::instance()) {
+    // constructor
+    setAutoRelaySignals(true);
+}
 
-        NodeAdaptor::~NodeAdaptor() { }
+NodeAdaptor::~NodeAdaptor() { }
 
-        bool NodeAdaptor::exists(QString in0) {
-            return NodeManager::instance()->exists(Lexical::Data::fromString(in0));
-        }
+bool NodeAdaptor::exists(QString in0) {
+    return NodeManager::instance()->exists(Lexical::Data::fromString(in0));
+}
 
-        void NodeAdaptor::generate(){
-            QMetaObject::invokeMethod(parent(), "generate");
-        }
+void NodeAdaptor::generate() {
+    QMetaObject::invokeMethod(parent(), "generate");
+}
 
-        bool NodeAdaptor::isPseudo(QString in0){
-            bool out0;
-            QMetaObject::invokeMethod(parent(), "isPseudo", Q_RETURN_ARG(bool, out0), Q_ARG(Lexical::Data, Lexical::Data::fromString(in0)));
-            return out0;
-        }
+bool NodeAdaptor::isPseudo(QString in0) {
+    bool out0;
+    QMetaObject::invokeMethod(parent(), "isPseudo", Q_RETURN_ARG(bool, out0), Q_ARG(Lexical::Data, Lexical::Data::fromString(in0)));
+    return out0;
+}
 
-        QString NodeAdaptor::pseudo(QString in0){
-            Lexical::Data l_dt = Lexical::Data::fromString(in0);
-            return NodeManager::instance()->pseudo(l_dt).toString();
-        }
+QString NodeAdaptor::pseudo(QString in0) {
+    Lexical::Data l_dt = Lexical::Data::fromString(in0);
+    return NodeManager::instance()->pseudo(l_dt).toString();
+}
 
-        void NodeAdaptor::quit(){
-            QMetaObject::invokeMethod(parent(), "quit");
-        }
+void NodeAdaptor::quit() {
+    QMetaObject::invokeMethod(parent(), "quit");
+}
 
-        QString NodeAdaptor::read(QString in0){
-            Lexical::Data out0;
-            QMetaObject::invokeMethod(parent(), "read", Q_RETURN_ARG(Lexical::Data, out0), Q_ARG(Lexical::Data, Lexical::Data::fromString(in0)));
-            return out0.toString();
-        }
+QString NodeAdaptor::read(QString in0) {
+    Lexical::Data out0;
+    QMetaObject::invokeMethod(parent(), "read", Q_RETURN_ARG(Lexical::Data, out0), Q_ARG(Lexical::Data, Lexical::Data::fromString(in0)));
+    return out0.toString();
+}
 
-        QString NodeAdaptor::write(QString in0){
-            Lexical::Data out0;
-            QMetaObject::invokeMethod(parent(), "write", Q_RETURN_ARG(Lexical::Data, out0), Q_ARG(Lexical::Data, Lexical::Data::fromString(in0)));
-            return out0.toString();
-        }
+QString NodeAdaptor::write(QString in0) {
+    Lexical::Data out0;
+    QMetaObject::invokeMethod(parent(), "write", Q_RETURN_ARG(Lexical::Data, out0), Q_ARG(Lexical::Data, Lexical::Data::fromString(in0)));
+    return out0.toString();
+}
 
-        RuleAdaptor::RuleAdaptor()
-            : QDBusAbstractAdaptor(RuleManager::instance()) {
-            setAutoRelaySignals(true);
-        }
+RuleAdaptor::RuleAdaptor()
+        : QDBusAbstractAdaptor(RuleManager::instance()) {
+    setAutoRelaySignals(true);
+}
 
-        RuleAdaptor::~RuleAdaptor(){ }
+RuleAdaptor::~RuleAdaptor() { }
 
-        bool RuleAdaptor::exists(const QString &in0, const QString &in1){
-            bool out0;
-            QMetaObject::invokeMethod(parent(), "exists", Q_RETURN_ARG(bool, out0), Q_ARG(QString, in0), Q_ARG(QString, in1));
-            return out0;
-        }
+bool RuleAdaptor::exists(const QString &in0, const QString &in1) {
+    bool out0;
+    QMetaObject::invokeMethod(parent(), "exists", Q_RETURN_ARG(bool, out0), Q_ARG(QString, in0), Q_ARG(QString, in1));
+    return out0;
+}
 
-        void RuleAdaptor::quit(){
-            QMetaObject::invokeMethod(parent(), "quit");
-        }
+void RuleAdaptor::quit() {
+    QMetaObject::invokeMethod(parent(), "quit");
+}
 
-        QString RuleAdaptor::read(QString in0){
-            Rules::Chain l_chn = Rules::Chain::fromString(in0);
-            RuleManager::instance()->read(l_chn);
-            return l_chn.toString();
-        }
+QString RuleAdaptor::read(QString in0) {
+    Rules::Chain l_chn = Rules::Chain::fromString(in0);
+    RuleManager::instance()->read(l_chn);
+    return l_chn.toString();
+}
 
-        QString RuleAdaptor::write(QString in0){
-            Rules::Chain l_chn = Rules::Chain::fromString(in0);
-            RuleManager::instance()->write(l_chn);
-            return l_chn.toString();
-        }
+QString RuleAdaptor::write(QString in0) {
+    Rules::Chain l_chn = Rules::Chain::fromString(in0);
+    RuleManager::instance()->write(l_chn);
+    return l_chn.toString();
+}
 
 
-        SystemAdaptor::SystemAdaptor()
-            : QDBusAbstractAdaptor(System::instance()){
-            // constructor
-            setAutoRelaySignals(true);
-        }
+SystemAdaptor::SystemAdaptor()
+        : QDBusAbstractAdaptor(System::instance()) {
+    // constructor
+    setAutoRelaySignals(true);
+}
 
-        SystemAdaptor::~SystemAdaptor() { }
+SystemAdaptor::~SystemAdaptor() { }
 
-        QString SystemAdaptor::directory() const {
-            return qvariant_cast< QString >(parent()->property("Directory"));
-        }
+QString SystemAdaptor::directory() const {
+    return qvariant_cast< QString >(parent()->property("Directory"));
+}
 
-        void SystemAdaptor::setDirectory(const QString &value) {
-            parent()->setProperty("Directory", qVariantFromValue(value));
-        }
+void SystemAdaptor::setDirectory(const QString &value) {
+    parent()->setProperty("Directory", qVariantFromValue(value));
+}
 
-        bool SystemAdaptor::localeExists(const QString &in0){
-            bool out0;
-            QMetaObject::invokeMethod(parent(), "localeExists", Q_RETURN_ARG(bool, out0), Q_ARG(QString, in0));
-            return out0;
-        }
+bool SystemAdaptor::localeExists(const QString &in0) {
+    bool out0;
+    QMetaObject::invokeMethod(parent(), "localeExists", Q_RETURN_ARG(bool, out0), Q_ARG(QString, in0));
+    return out0;
+}
 
-        void SystemAdaptor::quit() {
-            QMetaObject::invokeMethod(parent(), "quit");
-        }
+void SystemAdaptor::quit() {
+    QMetaObject::invokeMethod(parent(), "quit");
+}
 
-        void SystemAdaptor::start() {
-            QMetaObject::invokeMethod(parent(), "start");
-        }
+void SystemAdaptor::start() {
+    QMetaObject::invokeMethod(parent(), "start");
+}
 
-        void SystemAdaptor::stop() {
-            QMetaObject::invokeMethod(parent(), "stop");
-        }
-    }
+void SystemAdaptor::stop() {
+    QMetaObject::invokeMethod(parent(), "stop");
+}
+}
 }
